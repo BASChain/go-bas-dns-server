@@ -19,10 +19,10 @@ import (
 	"os"
 
 	"github.com/Ungigdu/BAS_contract_go/BAS_Ethereum"
-	"github.com/kprc/basserver/app/cmdcommon"
-	"github.com/kprc/basserver/app/cmdservice"
-	"github.com/kprc/basserver/config"
-	"github.com/kprc/basserver/dns/server"
+	"github.com/BASChain/go-bas-dns-server/app/cmdcommon"
+	"github.com/BASChain/go-bas-dns-server/app/cmdservice"
+	"github.com/BASChain/go-bas-dns-server/config"
+	"github.com/BASChain/go-bas-dns-server/dns/server"
 	"github.com/spf13/cobra"
 	"log"
 )

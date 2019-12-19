@@ -2,7 +2,7 @@ package cmdcommon
 
 import (
 	"errors"
-	"github.com/kprc/basserver/config"
+	"github.com/BASChain/go-bas-dns-server/config"
 	"github.com/kprc/nbsnetwork/tools"
 )
 

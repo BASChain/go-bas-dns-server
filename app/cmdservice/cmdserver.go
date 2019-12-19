@@ -10,10 +10,10 @@ import (
 	"google.golang.org/grpc/reflection"
 	"log"
 
-	"github.com/kprc/basserver/app/cmdpb"
-	"github.com/kprc/basserver/app/cmdservice/api"
-	"github.com/kprc/basserver/config"
-	"github.com/kprc/basserver/dns/server"
+	"github.com/BASChain/go-bas-dns-server/app/cmdpb"
+	"github.com/BASChain/go-bas-dns-server/app/cmdservice/api"
+	"github.com/BASChain/go-bas-dns-server/config"
+	"github.com/BASChain/go-bas-dns-server/dns/server"
 )
 
 type cmdServer struct {

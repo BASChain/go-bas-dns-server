@@ -16,8 +16,8 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/kprc/basserver/app/cmdclient"
-	"github.com/kprc/basserver/app/cmdcommon"
+	"github.com/BASChain/go-bas-dns-server/app/cmdclient"
+	"github.com/BASChain/go-bas-dns-server/app/cmdcommon"
 	"github.com/spf13/cobra"
 
 	"log"

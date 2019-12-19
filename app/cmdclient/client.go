@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kprc/basserver/app/cmdcommon"
-	"github.com/kprc/basserver/app/cmdpb"
-	"github.com/kprc/basserver/config"
+	"github.com/BASChain/go-bas-dns-server/app/cmdcommon"
+	"github.com/BASChain/go-bas-dns-server/app/cmdpb"
+	"github.com/BASChain/go-bas-dns-server/config"
 	"strings"
 )
 

@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/Ungigdu/BAS_contract_go/BAS_Ethereum"
-	"github.com/kprc/basserver/config"
+	"github.com/BASChain/go-bas-dns-server/config"
 
 	"encoding/binary"
 	"github.com/btcsuite/btcutil/base58"

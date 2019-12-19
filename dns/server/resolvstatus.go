@@ -2,7 +2,7 @@ package server
 
 import (
 	"fmt"
-	"github.com/kprc/basserver/config"
+	"github.com/BASChain/go-bas-dns-server/config"
 	"sort"
 	"sync"
 )
