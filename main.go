@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/kprc/basserver/app/cmd"
+import "github.com/BASChain/go-bas-dns-server/cmd"
 
 var (
 	Version   string
