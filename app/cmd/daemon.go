@@ -15,8 +15,8 @@
 package cmd
 
 import (
-	"github.com/Ungigdu/BAS_contract_go/BAS_Ethereum"
 	"github.com/BASChain/go-bas-dns-server/dns/server"
+	"github.com/Ungigdu/BAS_contract_go/BAS_Ethereum"
 
 	"github.com/sevlyar/go-daemon"
 	"github.com/spf13/cobra"
@@ -89,5 +89,11 @@ func init() {
 	daemonCmd.Flags().StringVarP(&cmdbastokenaddr, "bas-token-address", "a", "", "bas token address")
 	daemonCmd.Flags().StringVarP(&cmdbasmgraddr, "bas-mgr-address", "m", "", "bas manager address")
 	daemonCmd.Flags().StringVarP(&cmdconfigfilename, "config-file-name", "c", "", "configuration file name")
+	rootCmd.Flags().IntVarP(&cmddohserverport, "doh-listen-port", "p", 65566, "local doh server listen port")
+	rootCmd.Flags().StringVarP(&cmdcertfile, "cert-file", "f", "", "certificate file for tls")
+	rootCmd.Flags().StringVarP(&cmdkeyfile, "key-file", "k", "", "private key file for tls")
+	rootCmd.Flags().StringVarP(&cmddnspath, "dns-query-path", "q", "", "path for dns query")
+	rootCmd.Flags().IntVarP(&cmdquerydnstimeout, "dns-query-time", "o", 0, "max time for wait remote dns server reply")
+	rootCmd.Flags().IntVarP(&cmdquerydnstrytimes, "dns-query-times", "s", 0, "max times for sending dns to remote dns server ")
 
 }

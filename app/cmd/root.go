@@ -18,11 +18,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Ungigdu/BAS_contract_go/BAS_Ethereum"
 	"github.com/BASChain/go-bas-dns-server/app/cmdcommon"
 	"github.com/BASChain/go-bas-dns-server/app/cmdservice"
 	"github.com/BASChain/go-bas-dns-server/config"
 	"github.com/BASChain/go-bas-dns-server/dns/server"
+	"github.com/Ungigdu/BAS_contract_go/BAS_Ethereum"
 	"github.com/spf13/cobra"
 	"log"
 )
@@ -30,12 +30,18 @@ import (
 //var cfgFile string
 
 var (
-	cmdrootudpport    int
-	cmdroottcpport    int
-	cmdropstennap     string
-	cmdbastokenaddr   string
-	cmdbasmgraddr     string
-	cmdconfigfilename string
+	cmdrootudpport      int
+	cmdroottcpport      int
+	cmdropstennap       string
+	cmdbastokenaddr     string
+	cmdbasmgraddr       string
+	cmdconfigfilename   string
+	cmddohserverport    int
+	cmdcertfile         string
+	cmdkeyfile          string
+	cmddnspath          string
+	cmdquerydnstimeout  int
+	cmdquerydnstrytimes int
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -118,6 +124,22 @@ func cfginit(bc *config.BASDConfig) *config.BASDConfig {
 	if cmdbasmgraddr != "" {
 		cfg.MgrAddr = cmdbasmgraddr
 	}
+	if cmddohserverport > 0 && cmddohserverport < 65535 {
+		cfg.DohServerPort = cmddohserverport
+	}
+
+	if cmdcertfile != "" {
+		cfg.CertFile = cmdcertfile
+	}
+	if cmdkeyfile != "" {
+		cfg.KeyFile = cmdkeyfile
+	}
+	if cmdquerydnstimeout != 0 {
+		cfg.TimeOut = cmdquerydnstimeout
+	}
+	if cmdquerydnstrytimes != 0 {
+		cfg.TryTimes = cmdquerydnstrytimes
+	}
 
 	return cfg
 
@@ -141,7 +163,12 @@ func init() {
 	rootCmd.Flags().StringVarP(&cmdbastokenaddr, "bas-token-address", "a", "", "bas token address")
 	rootCmd.Flags().StringVarP(&cmdbasmgraddr, "bas-mgr-address", "m", "", "bas manager address")
 	rootCmd.Flags().StringVarP(&cmdconfigfilename, "config-file-name", "c", "", "configuration file name")
-
+	rootCmd.Flags().IntVarP(&cmddohserverport, "doh-listen-port", "p", 65566, "local doh server listen port")
+	rootCmd.Flags().StringVarP(&cmdcertfile, "cert-file", "f", "", "certificate file for tls")
+	rootCmd.Flags().StringVarP(&cmdkeyfile, "key-file", "k", "", "private key file for tls")
+	rootCmd.Flags().StringVarP(&cmddnspath, "dns-query-path", "q", "", "path for dns query")
+	rootCmd.Flags().IntVarP(&cmdquerydnstimeout, "dns-query-time", "o", 0, "max time for wait remote dns server reply")
+	rootCmd.Flags().IntVarP(&cmdquerydnstrytimes, "dns-query-times", "s", 0, "max times for sending dns to remote dns server ")
 }
 
 //

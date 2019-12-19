@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/Ungigdu/BAS_contract_go/BAS_Ethereum"
 	"github.com/BASChain/go-bas-dns-server/config"
+	"github.com/Ungigdu/BAS_contract_go/BAS_Ethereum"
 
 	"encoding/binary"
 	"github.com/btcsuite/btcutil/base58"
@@ -33,7 +33,6 @@ type DR struct {
 func (dr *DR) IntIPv4() uint32 {
 	return binary.BigEndian.Uint32(dr.IPv4[:])
 }
-
 
 func sendErrMsg(w dns.ResponseWriter, msg *dns.Msg, errCode int) {
 	m := msg.Copy()
