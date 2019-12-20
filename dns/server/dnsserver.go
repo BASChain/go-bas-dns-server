@@ -10,6 +10,7 @@ import (
 	"log"
 	"net"
 	"strconv"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -87,11 +88,11 @@ func BCReplayTypeA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 	}
 
 	if bdr, err := BAS_Ethereum.QueryByString(qn); err != nil {
-		return nil, err
+		return nil, errors.New("Not Found")
 	} else {
 		dr := &DR{bdr}
 		if dr.IntIPv4() == 0 {
-			return nil, err
+			return nil, errors.New("Not Found")
 		}
 		m := msg.Copy()
 		m.Compress = true
