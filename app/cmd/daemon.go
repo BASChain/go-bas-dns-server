@@ -91,11 +91,11 @@ func init() {
 	daemonCmd.Flags().StringVarP(&cmdbastokenaddr, "bas-token-address", "a", "", "bas token address")
 	daemonCmd.Flags().StringVarP(&cmdbasmgraddr, "bas-mgr-address", "m", "", "bas manager address")
 	daemonCmd.Flags().StringVarP(&cmdconfigfilename, "config-file-name", "c", "", "configuration file name")
-	rootCmd.Flags().IntVarP(&cmddohserverport, "doh-listen-port", "p", 65566, "local doh server listen port")
-	rootCmd.Flags().StringVarP(&cmdcertfile, "cert-file", "f", "", "certificate file for tls")
-	rootCmd.Flags().StringVarP(&cmdkeyfile, "key-file", "k", "", "private key file for tls")
-	rootCmd.Flags().StringVarP(&cmddnspath, "dns-query-path", "q", "", "path for dns query")
-	rootCmd.Flags().IntVarP(&cmdquerydnstimeout, "dns-query-time", "o", 0, "max time for wait remote dns server reply")
-	rootCmd.Flags().IntVarP(&cmdquerydnstrytimes, "dns-query-times", "s", 0, "max times for sending dns to remote dns server ")
+	daemonCmd.Flags().IntVarP(&cmddohserverport, "doh-listen-port", "p", 65566, "local doh server listen port")
+	daemonCmd.Flags().StringVarP(&cmdcertfile, "cert-file", "f", "", "certificate file for tls")
+	daemonCmd.Flags().StringVarP(&cmdkeyfile, "key-file", "k", "", "private key file for tls")
+	daemonCmd.Flags().StringVarP(&cmddnspath, "dns-query-path", "q", "", "path for dns query")
+	daemonCmd.Flags().IntVarP(&cmdquerydnstimeout, "dns-query-time", "o", 0, "max time for wait remote dns server reply")
+	daemonCmd.Flags().IntVarP(&cmdquerydnstrytimes, "dns-query-times", "s", 0, "max times for sending dns to remote dns server ")
 
 }

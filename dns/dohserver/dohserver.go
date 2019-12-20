@@ -14,6 +14,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"log"
 )
 
 const (
@@ -88,7 +89,9 @@ func (doh *DohServer) StartDaemon() error {
 		return errors.New("No Server, Please Init first")
 	}
 
-	//cfg := config.GetBasDCfg()
+	cfg := config.GetBasDCfg()
+	log.Println("DOH Server Start at :",cfg.DohServerPort )
+	
 	//return doh.dohServer.ListenAndServeTLS(cfg.CertFile, cfg.KeyFile)
 	return doh.dohServer.ListenAndServe()
 }
