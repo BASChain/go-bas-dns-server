@@ -13,6 +13,7 @@ import (
 	"github.com/BASChain/go-bas-dns-server/app/cmdpb"
 	"github.com/BASChain/go-bas-dns-server/app/cmdservice/api"
 	"github.com/BASChain/go-bas-dns-server/config"
+	"github.com/BASChain/go-bas-dns-server/dns/dohserver"
 	"github.com/BASChain/go-bas-dns-server/dns/server"
 )
 
@@ -76,11 +77,12 @@ func (cs *cmdServer) StartCmdService() {
 func (cs *cmdServer) StopCmdService() {
 	config.GetBasDCfg().Save()
 	server.DNSServerStop()
-
+	dohserver.GetDohDaemonServer().ShutDown()
 	cs.grpcServer.Stop()
 	log.Println("Command line server stoped")
 }
 
 func stop() {
 	GetCmdServerInst().StopCmdService()
+
 }

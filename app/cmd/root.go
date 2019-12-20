@@ -21,6 +21,7 @@ import (
 	"github.com/BASChain/go-bas-dns-server/app/cmdcommon"
 	"github.com/BASChain/go-bas-dns-server/app/cmdservice"
 	"github.com/BASChain/go-bas-dns-server/config"
+	"github.com/BASChain/go-bas-dns-server/dns/dohserver"
 	"github.com/BASChain/go-bas-dns-server/dns/server"
 	"github.com/Ungigdu/BAS_contract_go/BAS_Ethereum"
 	"github.com/spf13/cobra"
@@ -62,6 +63,7 @@ var rootCmd = &cobra.Command{
 
 		BAS_Ethereum.RecoverContract()
 		go server.DNSServerDaemon()
+		go dohserver.GetDohDaemonServer().StartDaemon()
 
 		cmdservice.GetCmdServerInst().StartCmdService()
 	},

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/BASChain/go-bas-dns-server/config"
+	"github.com/BASChain/go-bas-dns-server/dns/server"
 	"github.com/m13253/dns-over-https/json-dns"
 	"github.com/miekg/dns"
 	"github.com/pkg/errors"
@@ -11,7 +12,13 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
+)
+
+const (
+	VERSION    = "1.1.0"
+	USER_AGENT = "DNS-over-HTTPS/" + VERSION + " (github.com/BASChain/go-bas-dns-server)"
 )
 
 type DohServer struct {
@@ -29,6 +36,23 @@ type DNSRequest struct {
 	isTailored      bool
 	errcode         int
 	errtext         string
+}
+
+var (
+	gdohserver  *DohServer
+	dohoncelock sync.Mutex
+)
+
+func GetDohDaemonServer() *DohServer {
+	if gdohserver == nil {
+		dohoncelock.Lock()
+		defer dohoncelock.Unlock()
+
+		if gdohserver == nil {
+			gdohserver = NewDohServer()
+		}
+	}
+	return gdohserver
 }
 
 func NewDohServer() *DohServer {
@@ -59,18 +83,19 @@ func NewDohServer() *DohServer {
 
 }
 
-const (
-	VERSION    = "1.1.0"
-	USER_AGENT = "DNS-over-HTTPS/" + VERSION + " (github.com/BASChain/go-bas-dns-server)"
-)
-
 func (doh *DohServer) StartDaemon() error {
 	if doh.dohServer == nil {
 		return errors.New("No Server, Please Init first")
 	}
 
-	cfg := config.GetBasDCfg()
-	return doh.dohServer.ListenAndServeTLS(cfg.CertFile, cfg.KeyFile)
+	//cfg := config.GetBasDCfg()
+	//return doh.dohServer.ListenAndServeTLS(cfg.CertFile, cfg.KeyFile)
+	return doh.dohServer.ListenAndServe()
+}
+
+func (doh *DohServer) ShutDown() {
+	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	doh.dohServer.Shutdown(ctx)
 }
 
 func (doh *DohServer) handlerFunc(w http.ResponseWriter, r *http.Request) {
@@ -221,49 +246,32 @@ func (doh *DohServer) indexQuestionType(msg *dns.Msg, qtype uint16) int {
 
 func (doh *DohServer) doDNSQuery(ctx context.Context, req *DNSRequest) (resp *DNSRequest, err error) {
 
-	// TODO(m13253): Make ctx work. Waiting for a patch for ExchangeContext from miekg/dns.
-	/*
-		numServers := len(s.conf.Upstream)
-		for i := uint(0); i < s.conf.Tries; i++ {
-			req.currentUpstream = s.conf.Upstream[rand.Intn(numServers)]
+	msg := req.request
+	if msg == nil || len(msg.Question) == 0 {
+		req.response = server.DeriveMsg(req.request, dns.RcodeFormatError)
+		return req, nil
+	}
 
-			upstream, t := addressAndType(req.currentUpstream)
+	q := msg.Question[0]
+	if q.Qclass != dns.ClassINET {
+		req.response = server.DeriveMsg(req.request, dns.RcodeNotImplemented)
+		return req, nil
+	}
 
-			switch t {
-			default:
-				log.Printf("invalid DNS type %q in upstream %q", t, upstream)
-				return nil, &configError{"invalid DNS type"}
-				// Use DNS-over-TLS (DoT) if configured to do so
-			case "tcp-tls":
-				req.response, _, err = s.tcpClientTLS.Exchange(req.request, upstream)
-			case "tcp", "udp":
-				// Use TCP if always configured to or if the Query type dictates it (AXFR)
-				if t == "tcp" || (s.indexQuestionType(req.request, dns.TypeAXFR) > -1) {
-					req.response, _, err = s.tcpClient.Exchange(req.request, upstream)
-				} else {
-					req.response, _, err = s.udpClient.Exchange(req.request, upstream)
-					if err == nil && req.response != nil && req.response.Truncated {
-						log.Println(err)
-						req.response, _, err = s.tcpClient.Exchange(req.request, upstream)
-					}
+	switch q.Qtype {
+	case dns.TypeA:
+		req.response, err = server.BCReplayTypeA(req.request, q)
 
-					// Retry with TCP if this was an IXFR request and we only received an SOA
-					if (s.indexQuestionType(req.request, dns.TypeIXFR) > -1) &&
-						(len(req.response.Answer) == 1) &&
-						(req.response.Answer[0].Header().Rrtype == dns.TypeSOA) {
-						req.response, _, err = s.tcpClient.Exchange(req.request, upstream)
-					}
-				}
-			}
-
-			if err == nil {
-				return req, nil
-			}
-			log.Printf("DNS error from upstream %s: %s\n", req.currentUpstream, err.Error())
+		if err != nil {
+			req.response, err = server.BCReplyTraditionTypeA(msg)
 		}
-		return req, err
+	case server.TypeBCAddr:
+		req.response, err = server.BCReplyTypeBCA(req.request, q)
 
-	*/
+	default:
+		req.response, err = server.BCReplyTraditionTypeA(msg)
 
-	return
+	}
+
+	return req, nil
 }

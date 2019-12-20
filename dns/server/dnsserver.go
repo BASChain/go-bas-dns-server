@@ -7,7 +7,6 @@ import (
 	"encoding/binary"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/miekg/dns"
-	"github.com/pkg/errors"
 	"log"
 	"net"
 	"strconv"
@@ -35,14 +34,19 @@ func (dr *DR) IntIPv4() uint32 {
 }
 
 func sendErrMsg(w dns.ResponseWriter, msg *dns.Msg, errCode int) {
-	m := msg.Copy()
+	m := DeriveMsg(msg, errCode)
 
+	w.WriteMsg(m)
+}
+
+func DeriveMsg(msg *dns.Msg, errCode int) *dns.Msg {
+	m := msg.Copy()
 	m.Compress = true
 	m.Response = true
 
 	m.Rcode = errCode
 
-	w.WriteMsg(m)
+	return m
 }
 
 func buildAnswer(ipv4 [4]byte, q dns.Question) []dns.RR {
@@ -67,58 +71,68 @@ func buildAnswer(ipv4 [4]byte, q dns.Question) []dns.RR {
 
 func replyTypA(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) error {
 
+	if m, err := BCReplayTypeA(msg, q); err != nil {
+		return err
+	} else {
+		w.WriteMsg(m)
+		return nil
+	}
+
+}
+
+func BCReplayTypeA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 	qn := q.Name
 	if qn[len(qn)-1] == '.' {
 		qn = qn[:len(qn)-1]
-
 	}
+
 	if bdr, err := BAS_Ethereum.QueryByString(qn); err != nil {
-		return errors.New("Query DN from Ethereum error: " + err.Error())
+		return nil, err
 	} else {
 		dr := &DR{bdr}
 		if dr.IntIPv4() == 0 {
-			return errors.New("ipv4 address error")
+			return nil, err
 		}
 		m := msg.Copy()
 		m.Compress = true
 		m.Response = true
-
 		m.Answer = buildAnswer(dr.IPv4, q)
 
-		w.WriteMsg(m)
-
-		return nil
+		return m, nil
 	}
 }
 
 func replyTraditionTypA(w dns.ResponseWriter, msg *dns.Msg) {
+	m, _ := BCReplyTraditionTypeA(msg)
+	w.WriteMsg(m)
+}
+
+func BCReplyTraditionTypeA(msg *dns.Msg) (resp *dns.Msg, err error) {
 	cnt := 0
 
 	for {
-
 		cnt++
-
 		s := GetDns()
 
 		if s == "" {
-			sendErrMsg(w, msg, dns.RcodeServerFailure)
-			return
+			m := DeriveMsg(msg, dns.RcodeServerFailure)
+			return m, nil
 		}
-		//log.Println(s+":53",msg.Question[0].Name)
+
 		if m, err := dns.Exchange(msg, s+":53"); err != nil {
 			FailDns(s)
 			log.Println("failed "+s+":53", msg.Question[0].Name)
 			if cnt >= MaxTimes() {
-				sendErrMsg(w, msg, dns.RcodeBadKey)
-				return
+				m := DeriveMsg(msg, dns.RcodeBadKey)
+				return m, nil
 			}
 		} else {
-			w.WriteMsg(m)
 			log.Println("success "+s+":53", msg.Question[0].Name)
-			return
+			return m, nil
 		}
 
 	}
+
 }
 
 func replyTypPTR(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) error {
@@ -129,7 +143,13 @@ func replyTraditionTypPTR(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) {
 
 }
 
-func replyTypBCA(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) error {
+func replyTypBCA(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) {
+	m, _ := BCReplyTypeBCA(msg, q)
+
+	w.WriteMsg(m)
+}
+
+func BCReplyTypeBCA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 	qn := q.Name
 	if qn[len(qn)-1] == '.' {
 		qn = qn[:len(qn)-1]
@@ -145,11 +165,13 @@ func replyTypBCA(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) error {
 	}
 
 	if bdr, err := BAS_Ethereum.QueryByBCAddress(barr); err != nil {
-		return errors.New("Query BCA from Ethereum error: " + err.Error())
+		m := DeriveMsg(msg, dns.RcodeBadKey)
+		return m, nil
 	} else {
 		dr := &DR{bdr}
 		if dr.IntIPv4() == 0 {
-			return errors.New("ipv4 address error")
+			m := DeriveMsg(msg, dns.RcodeBadKey)
+			return m, nil
 		}
 		m := msg.Copy()
 		m.Compress = true
@@ -157,10 +179,9 @@ func replyTypBCA(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) error {
 
 		m.Answer = buildAnswer(dr.IPv4, q)
 
-		w.WriteMsg(m)
-
-		return nil
+		return m, nil
 	}
+
 }
 
 func DnsHandleTradition(w dns.ResponseWriter, msg *dns.Msg) {
@@ -186,12 +207,7 @@ func DnsHandleTradition(w dns.ResponseWriter, msg *dns.Msg) {
 		//}
 		replyTraditionTypA(w, msg)
 	case TypeBCAddr:
-
-		if err := replyTypBCA(w, msg, q); err != nil {
-			//replyTraditionTypPTR(w,msg,q)
-			sendErrMsg(w, msg, dns.RcodeBadKey)
-		}
-
+		replyTypBCA(w, msg, q)
 	default:
 		//sendErrMsg(w,msg,dns.RcodeNotImplemented)
 		replyTraditionTypA(w, msg)
