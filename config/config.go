@@ -153,6 +153,25 @@ func GetBASDCFGFile() string {
 	return path.Join(GetBASDHomeDir(), BASD_CFG_FileName)
 }
 
+func (bc *BASDConfig) GetCertFile() string {
+	cf := path.Join(GetBASDHomeDir(), bc.CertFile)
+
+	if tools.FileExists(cf) {
+		return cf
+	} else {
+		return ""
+	}
+}
+
+func (bc *BASDConfig) GetKeyFile() string {
+	kf := path.Join(GetBASDHomeDir(), bc.KeyFile)
+	if tools.FileExists(kf) {
+		return kf
+	} else {
+		return ""
+	}
+}
+
 func (bc *BASDConfig) Save() {
 	jbytes, err := json.MarshalIndent(*bc, " ", "\t")
 

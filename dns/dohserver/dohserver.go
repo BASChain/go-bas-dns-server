@@ -8,13 +8,13 @@ import (
 	"github.com/m13253/dns-over-https/json-dns"
 	"github.com/miekg/dns"
 	"github.com/pkg/errors"
+	"log"
 	"net"
 	"net/http"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-	"log"
 )
 
 const (
@@ -90,10 +90,13 @@ func (doh *DohServer) StartDaemon() error {
 	}
 
 	cfg := config.GetBasDCfg()
-	log.Println("DOH Server Start at :",cfg.DohServerPort )
-	
-	//return doh.dohServer.ListenAndServeTLS(cfg.CertFile, cfg.KeyFile)
-	return doh.dohServer.ListenAndServe()
+	log.Println("DOH Server Start at :", cfg.DohServerPort)
+
+	if cfg.GetCertFile() != "" && cfg.GetKeyFile() != "" {
+		return doh.dohServer.ListenAndServeTLS(cfg.CertFile, cfg.KeyFile)
+	} else {
+		return doh.dohServer.ListenAndServe()
+	}
 }
 
 func (doh *DohServer) ShutDown() {

@@ -7,10 +7,10 @@ import (
 	"encoding/binary"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/miekg/dns"
+	"github.com/pkg/errors"
 	"log"
 	"net"
 	"strconv"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -141,7 +141,7 @@ func replyTypPTR(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) error {
 }
 
 func replyTraditionTypPTR(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) {
-
+	return
 }
 
 func replyTypBCA(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) {
