@@ -154,6 +154,11 @@ func GetBASDCFGFile() string {
 }
 
 func (bc *BASDConfig) GetCertFile() string {
+
+	if bc.CertFile == ""{
+		return ""
+	}
+
 	cf := path.Join(GetBASDHomeDir(), bc.CertFile)
 
 	if tools.FileExists(cf) {
@@ -164,6 +169,9 @@ func (bc *BASDConfig) GetCertFile() string {
 }
 
 func (bc *BASDConfig) GetKeyFile() string {
+	if bc.KeyFile == ""{
+		return ""
+	}
 	kf := path.Join(GetBASDHomeDir(), bc.KeyFile)
 	if tools.FileExists(kf) {
 		return kf

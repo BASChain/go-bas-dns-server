@@ -90,11 +90,13 @@ func (doh *DohServer) StartDaemon() error {
 	}
 
 	cfg := config.GetBasDCfg()
-	log.Println("DOH Server Start at :", cfg.DohServerPort)
+
 
 	if cfg.GetCertFile() != "" && cfg.GetKeyFile() != "" {
-		return doh.dohServer.ListenAndServeTLS(cfg.CertFile, cfg.KeyFile)
+		log.Println("DOHS Server Start at :", cfg.DohServerPort)
+		return doh.dohServer.ListenAndServeTLS(cfg.GetCertFile(), cfg.GetKeyFile())
 	} else {
+		log.Println("DOH Server Start at :", cfg.DohServerPort)
 		return doh.dohServer.ListenAndServe()
 	}
 }
