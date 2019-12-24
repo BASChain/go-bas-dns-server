@@ -7,7 +7,6 @@ import (
 	"github.com/BASChain/go-bas-dns-server/dns/server"
 	"github.com/m13253/dns-over-https/json-dns"
 	"github.com/miekg/dns"
-	"github.com/pkg/errors"
 	"log"
 	"net"
 	"net/http"
@@ -24,6 +23,7 @@ const (
 
 type DohServer struct {
 	dohServer    *http.Server
+	dohsServer   *http.Server
 	udpClient    *dns.Client
 	tcpClient    *dns.Client
 	tcpClientTls *dns.Client
@@ -40,7 +40,8 @@ type DNSRequest struct {
 }
 
 var (
-	gdohserver  *DohServer
+	gdohserver *DohServer
+
 	dohoncelock sync.Mutex
 )
 
@@ -50,13 +51,13 @@ func GetDohDaemonServer() *DohServer {
 		defer dohoncelock.Unlock()
 
 		if gdohserver == nil {
-			gdohserver = NewDohServer()
+			gdohserver = NewDohServers()
 		}
 	}
 	return gdohserver
 }
 
-func NewDohServer() *DohServer {
+func NewDohServers() *DohServer {
 	cfg := config.GetBasDCfg()
 	tv := cfg.TimeOut
 	if tv == 0 {
@@ -71,10 +72,18 @@ func NewDohServer() *DohServer {
 
 	server.dohServer = &http.Server{Addr: addr}
 
+	saddr := ":" + strconv.Itoa(cfg.DohsServerPort)
+	server.dohsServer = &http.Server{Addr: saddr}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc(cfg.DnsPath, server.handlerFunc)
 
+	smux := http.NewServeMux()
+	smux.HandleFunc(cfg.DnsPath, server.handlerFunc)
+
 	server.dohServer.Handler = http.Handler(mux)
+
+	server.dohsServer.Handler = http.Handler(smux)
 
 	server.udpClient = &dns.Client{Net: "udp", UDPSize: dns.DefaultMsgSize, Timeout: timeout}
 	server.tcpClient = &dns.Client{Net: "tcp", Timeout: timeout}
@@ -84,26 +93,28 @@ func NewDohServer() *DohServer {
 
 }
 
-func (doh *DohServer) StartDaemon() error {
+func (doh *DohServer) StartDaemon() {
 	if doh.dohServer == nil {
-		return errors.New("No Server, Please Init first")
+		log.Fatal("No Server, Please Init first")
+		return
 	}
 
 	cfg := config.GetBasDCfg()
 
-
 	if cfg.GetCertFile() != "" && cfg.GetKeyFile() != "" {
-		log.Println("DOHS Server Start at :", cfg.DohServerPort)
-		return doh.dohServer.ListenAndServeTLS(cfg.GetCertFile(), cfg.GetKeyFile())
-	} else {
-		log.Println("DOH Server Start at :", cfg.DohServerPort)
-		return doh.dohServer.ListenAndServe()
+		log.Println("DOHS Server Start at :", cfg.DohsServerPort)
+		go doh.dohsServer.ListenAndServeTLS(cfg.GetCertFile(), cfg.GetKeyFile())
 	}
+
+	log.Println("DOH Server Start at :", cfg.DohServerPort)
+	doh.dohServer.ListenAndServe()
+
 }
 
 func (doh *DohServer) ShutDown() {
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	doh.dohServer.Shutdown(ctx)
+	doh.dohsServer.Shutdown(ctx)
 }
 
 func (doh *DohServer) handlerFunc(w http.ResponseWriter, r *http.Request) {

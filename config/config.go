@@ -15,19 +15,20 @@ const (
 )
 
 type BASDConfig struct {
-	UpdPort       int      `json:"updport"`
-	TcpPort       int      `json:"tcpport"`
-	RopstenNAP    string   `json:"ropstennap"`
-	TokenAddr     string   `json:"tokenaddr"`
-	MgrAddr       string   `json:"mgraddr"`
-	CmdListenPort string   `json:"cmdlistenport"`
-	ResolvDns     []string `json:"resolvdns"`
-	DohServerPort int      `json:"dohserverport"`
-	CertFile      string   `json:"certfile"`
-	KeyFile       string   `json:"keyfile"`
-	DnsPath       string   `json:"dnspath"`
-	TimeOut       int      `json:"timeout"`
-	TryTimes      int      `json:"trytimes"`
+	UpdPort        int      `json:"updport"`
+	TcpPort        int      `json:"tcpport"`
+	RopstenNAP     string   `json:"ropstennap"`
+	TokenAddr      string   `json:"tokenaddr"`
+	MgrAddr        string   `json:"mgraddr"`
+	CmdListenPort  string   `json:"cmdlistenport"`
+	ResolvDns      []string `json:"resolvdns"`
+	DohServerPort  int      `json:"dohserverport"`
+	DohsServerPort int      `json:"dohsserverport"`
+	CertFile       string   `json:"certfile"`
+	KeyFile        string   `json:"keyfile"`
+	DnsPath        string   `json:"dnspath"`
+	TimeOut        int      `json:"timeout"`
+	TryTimes       int      `json:"trytimes"`
 }
 
 var (
@@ -41,6 +42,7 @@ func (bc *BASDConfig) InitCfg() *BASDConfig {
 	bc.CmdListenPort = "127.0.0.1:59527"
 	bc.ResolvDns = []string{"202.106.0.20", "8.8.8.8", "202.106.46.151", "8.8.4.4"}
 	bc.DohServerPort = 8053
+	bc.DohsServerPort = 8043
 	bc.DnsPath = "/dns-query"
 	bc.TimeOut = 10
 	bc.TryTimes = 3
@@ -155,7 +157,7 @@ func GetBASDCFGFile() string {
 
 func (bc *BASDConfig) GetCertFile() string {
 
-	if bc.CertFile == ""{
+	if bc.CertFile == "" {
 		return ""
 	}
 
@@ -169,7 +171,7 @@ func (bc *BASDConfig) GetCertFile() string {
 }
 
 func (bc *BASDConfig) GetKeyFile() string {
-	if bc.KeyFile == ""{
+	if bc.KeyFile == "" {
 		return ""
 	}
 	kf := path.Join(GetBASDHomeDir(), bc.KeyFile)

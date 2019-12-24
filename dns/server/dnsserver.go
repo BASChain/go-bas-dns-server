@@ -220,8 +220,6 @@ func DnsHandleTradition(w dns.ResponseWriter, msg *dns.Msg) {
 func DNSServerDaemon() {
 	cfg := config.GetBasDCfg()
 
-	//fmt.Println(*cfg)
-
 	uport := cfg.UpdPort
 	uaddr := ":" + strconv.Itoa(uport)
 
