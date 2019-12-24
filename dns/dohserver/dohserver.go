@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	VERSION    = "1.1.0"
+	VERSION    = "1.1.1"
 	USER_AGENT = "DNS-over-HTTPS/" + VERSION + " (github.com/BASChain/go-bas-dns-server)"
 )
 
