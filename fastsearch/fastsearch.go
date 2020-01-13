@@ -117,6 +117,26 @@ func Insert(domain string) error {
 
 }
 
+func InsertNonEnd(domain string) error {
+	if len(domain) > MaxChars{
+		return errors.New("Domain name length too large")
+	}
+
+	preidx := 0
+
+	for i:=0;i<len(domain);i++{
+		idx:=ByteIndex[domain[i]]
+
+		preidx = preidx*MaxBitsLen + idx
+
+		tag(i,preidx)
+	}
+
+	return nil
+
+}
+
+
 func InsertBytes(bts []byte) error {
 	if len(bts) > MaxChars-1{
 		return errors.New("Domain name length too large")
@@ -178,4 +198,30 @@ func Find(domain string) bool{
 
 	return false
 }
+
+func FindNonEnd(domain string) bool  {
+	if len(domain) > MaxChars{
+		return false
+	}
+
+	preidx:=0
+	var i int
+	for ;i<len(domain);i++{
+		idx:=ByteIndex[domain[i]]
+		preidx = preidx*MaxBitsLen + idx
+
+		if !istag(i,preidx){
+			break
+		}
+
+	}
+
+	if i==len(domain){
+		return true
+	}
+
+	return false
+
+}
+
 
