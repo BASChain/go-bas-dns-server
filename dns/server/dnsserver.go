@@ -70,6 +70,22 @@ func buildAnswer(ipv4 [4]byte, q dns.Question) []dns.RR {
 	return rr
 }
 
+func BuildNullAnswer(q dns.Question) dns.RR  {
+	NULL:=&dns.NULL{}
+
+	NULL.Hdr.Name = q.Name
+
+	NULL.Hdr.Rrtype = dns.TypeNULL
+	NULL.Hdr.Class = dns.ClassINET
+	NULL.Hdr.Ttl = 10
+	NULL.Hdr.Rdlength = uint16(len("TraditionSystemName"))
+
+	NULL.Data="TraditionSystemName"
+
+	return NULL
+}
+
+
 func replyTypA(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) error {
 
 	if m, err := BCReplayTypeA(msg, q); err != nil {
