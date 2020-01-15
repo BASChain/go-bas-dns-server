@@ -52,6 +52,10 @@ func testfs2()  {
 	//fastsearch2.Insert("abcd")
 	//fastsearch2.Insert("sina")
 	fmt.Println(fastsearch2.Insert("googlex"))
+	fmt.Println(fastsearch2.Insert("aaaaaa"))
+	fmt.Println(fastsearch2.Insert("bbbbbb"))
+	fmt.Println(fastsearch2.Insert("cccccc"))
+	fmt.Println(fastsearch2.Insert("______"))
 
 	//for i:=0;i<100000000;i++{
 	//
@@ -75,5 +79,9 @@ func testfs2()  {
 	//}
 
 	fmt.Println(fastsearch2.Find("google"))
+	fmt.Println(fastsearch2.Find("aaaaaa"))
+	fmt.Println(fastsearch2.Find("______"))
+
+
 
 }

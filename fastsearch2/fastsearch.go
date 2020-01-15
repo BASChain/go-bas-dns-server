@@ -73,7 +73,7 @@ func init()  {
 	gFastBitPtr.startMemory = make([]byte,memlen)
 	gFastSearchEndPoint.startMemory = make([]byte,memlen)
 
-	fmt.Println("total memory :",strconv.Itoa((2*memlen)/1024/1024),"M","/Max domain name:",strconv.Itoa(length))
+	fmt.Println("total memory :",strconv.Itoa((2*memlen)/1024/1024),"M","/ max domain name:",strconv.Itoa(length))
 }
 
 func (bp *BitPtr)Clone() *BitPtr {
@@ -222,6 +222,9 @@ func Find(domain string)  (isEnd bool,isFind bool,predix int) {
 	}
 	if i == inslen {
 		isFind = true
+		predix += gFastSearchEndPoint.fastSearchBitPtr[i-1].Start
+	}else{
+		predix += gFastSearchEndPoint.fastSearchBitPtr[i].Start
 	}
 
 	return
