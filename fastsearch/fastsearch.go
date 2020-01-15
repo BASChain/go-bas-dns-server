@@ -30,6 +30,7 @@ func init()  {
 	sum := 0
 	for i:=1;i<=MaxChars;i++{
 		sum += GetNextBytesCnt(i)
+		fmt.Println("level "+strconv.Itoa(i)+" :", strconv.Itoa(GetNextBytesCnt(i)/1024/1024),"M")
 	}
 
 	fmt.Println("Max Memory: "+strconv.Itoa(sum/1024/1024)+"M")
