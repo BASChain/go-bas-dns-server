@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/BASChain/go-bas/DataSync"
+	"encoding/hex"
 )
 
 type DomainList struct {
@@ -23,10 +24,12 @@ type DomainListItem struct {
 	Name string `json:"name"`
 	Expire int64 `json:"expire"`
 	OpenApplied bool `json:"openApplied"`
+	Hash string `json:"hash"`
 }
 
 type DomainListResp struct {
 	State int `json:"state"`
+	Owner string `json:"owner"`
 	Data []*DomainListItem `json:"data"`
 } 
 
@@ -60,7 +63,7 @@ func (dl *DomainList)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 
 	addr:=common.HexToAddress(dtl.Wallet)
 
-	dtlresp := &DomainListResp{}
+	dtlresp := &DomainListResp{Owner:dtl.Wallet}
 
 	DataSync.MemLock()
 	defer DataSync.MemUnlock()
@@ -81,6 +84,7 @@ func (dl *DomainList)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		dtli.Name = dm.GetName()
 		dtli.Expire = dm.GetExpire()
 		dtli.OpenApplied = dm.GetOpenStatus()
+		dtli.Hash = "0x"+hex.EncodeToString(hasharr[i][:])
 		dtlresp.Data = append(dtlresp.Data,dtli)
 	}
 
