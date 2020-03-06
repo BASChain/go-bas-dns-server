@@ -14,6 +14,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"github.com/BASChain/go-bas-dns-server/dns/dohserver/api"
+	"path"
 )
 
 const (
@@ -57,6 +59,12 @@ func GetDohDaemonServer() *DohServer {
 	return gdohserver
 }
 
+const(
+	TotalPath string = "getDomainTotal"
+	DomainList string = "getDomainList"
+	AutoComplete string = "autocomplete"
+)
+
 func NewDohServers() *DohServer {
 	cfg := config.GetBasDCfg()
 	tv := cfg.TimeOut
@@ -76,10 +84,17 @@ func NewDohServers() *DohServer {
 	server.dohsServer = &http.Server{Addr: saddr}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc(cfg.DnsPath, server.handlerFunc)
+	mux.Handle(cfg.DnsPath, &DohServer{})
+
+	mux.Handle(path.Join(cfg.BasApi,TotalPath),api.NewDomainTotal())
+	mux.Handle(path.Join(cfg.BasApi,DomainList),api.NewDomainList())
+	mux.Handle(path.Join(cfg.BasApi,AutoComplete),api.NewAutoComplete())
 
 	smux := http.NewServeMux()
-	smux.HandleFunc(cfg.DnsPath, server.handlerFunc)
+	smux.Handle(cfg.DnsPath, &DohServer{})
+	smux.Handle(path.Join(cfg.BasApi,TotalPath),api.NewDomainTotal())
+	smux.Handle(path.Join(cfg.BasApi,DomainList),api.NewDomainList())
+	smux.Handle(path.Join(cfg.BasApi,AutoComplete),api.NewAutoComplete())
 
 	server.dohServer.Handler = http.Handler(mux)
 
@@ -117,7 +132,7 @@ func (doh *DohServer) ShutDown() {
 	doh.dohsServer.Shutdown(ctx)
 }
 
-func (doh *DohServer) handlerFunc(w http.ResponseWriter, r *http.Request) {
+func (doh *DohServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS, POST")

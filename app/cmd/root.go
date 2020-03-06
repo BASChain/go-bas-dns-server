@@ -26,6 +26,7 @@ import (
 	"github.com/Ungigdu/BAS_contract_go/BAS_Ethereum"
 	"github.com/spf13/cobra"
 	"log"
+	"github.com/BASChain/go-bas/DataSync"
 )
 
 //var cfgFile string
@@ -61,7 +62,8 @@ var rootCmd = &cobra.Command{
 		InitCfg()
 		config.GetBasDCfg().Save()
 
-		BAS_Ethereum.RecoverContract()
+		//BAS_Ethereum.RecoverContract()
+		DataSync.Sync();
 		go server.DNSServerDaemon()
 		go dohserver.GetDohDaemonServer().StartDaemon()
 

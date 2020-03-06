@@ -29,6 +29,7 @@ type BASDConfig struct {
 	DnsPath        string   `json:"dnspath"`
 	TimeOut        int      `json:"timeout"`
 	TryTimes       int      `json:"trytimes"`
+	BasApi         string   `json:"basapi"`
 }
 
 var (
@@ -46,6 +47,7 @@ func (bc *BASDConfig) InitCfg() *BASDConfig {
 	bc.DnsPath = "/dns-query"
 	bc.TimeOut = 10
 	bc.TryTimes = 3
+	bc.BasApi = "/api"
 
 	return bc
 }
