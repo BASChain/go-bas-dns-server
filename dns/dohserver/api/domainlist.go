@@ -76,7 +76,7 @@ func (dl *DomainList)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		dtlresp.State = 1
 	}
 
-	for i:=(dtl.PageNumber - 1)*dtl.PageSize;i<len(hasharr);i++{
+	for i:=(dtl.PageNumber - 1)*dtl.PageSize;i<len(hasharr) && i < (dtl.PageNumber)*dtl.PageSize;i++{
 		dtli:=&DomainListItem{}
 		dm,ok:=DataSync.Records[hasharr[i]]
 		if !ok{
