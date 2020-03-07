@@ -65,7 +65,7 @@ var daemonCmd = &cobra.Command{
 		defer cntxt.Release()
 
 		//BAS_Ethereum.RecoverContract()
-		DataSync.Sync();
+		go DataSync.Sync()
 		go server.DNSServerDaemon()
 		go dohserver.GetDohDaemonServer().StartDaemon()
 		cmdservice.GetCmdServerInst().StartCmdService()

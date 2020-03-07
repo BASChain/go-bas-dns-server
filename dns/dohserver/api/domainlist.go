@@ -38,6 +38,7 @@ func NewDomainList() *DomainList {
 }
 
 func (dl *DomainList)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
+
 	if r.Method != "POST" {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")

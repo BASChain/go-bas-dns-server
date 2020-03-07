@@ -63,7 +63,7 @@ var rootCmd = &cobra.Command{
 		config.GetBasDCfg().Save()
 
 		//BAS_Ethereum.RecoverContract()
-		DataSync.Sync();
+		go DataSync.Sync()
 		go server.DNSServerDaemon()
 		go dohserver.GetDohDaemonServer().StartDaemon()
 
