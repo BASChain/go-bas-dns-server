@@ -2,15 +2,17 @@ package server
 
 import (
 	"github.com/BASChain/go-bas-dns-server/config"
-	"github.com/Ungigdu/BAS_contract_go/BAS_Ethereum"
 
-	"encoding/binary"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/miekg/dns"
-	"github.com/pkg/errors"
+
 	"log"
 	"net"
 	"strconv"
+	"github.com/BASChain/go-bas-dns-server/dns/dohserver/api"
+
+
+	"errors"
 )
 
 const (
@@ -26,13 +28,7 @@ var (
 	tcpServer *dns.Server
 )
 
-type DR struct {
-	BAS_Ethereum.DomainRecord
-}
 
-func (dr *DR) IntIPv4() uint32 {
-	return binary.BigEndian.Uint32(dr.IPv4[:])
-}
 
 func sendErrMsg(w dns.ResponseWriter, msg *dns.Msg, errCode int) {
 	m := DeriveMsg(msg, errCode)
@@ -103,20 +99,35 @@ func BCReplayTypeA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 		qn = qn[:len(qn)-1]
 	}
 
-	if bdr, err := BAS_Ethereum.QueryByString(qn); err != nil {
+	//if bdr, err := BAS_Ethereum.QueryByString(qn); err != nil {
+	//	return nil, errors.New("Not Found")
+	//} else {
+	//	dr := &DR{bdr}
+	//	if dr.IntIPv4() == 0 {
+	//		return nil, errors.New("Not Found")
+	//	}
+	//	m := msg.Copy()
+	//	m.Compress = true
+	//	m.Response = true
+	//	m.Answer = buildAnswer(dr.IPv4, q)
+	//
+	//	return m, nil
+	//}
+	 dr:=api.QueryBasByDomainName(qn)
+	 if dr == nil{
 		return nil, errors.New("Not Found")
-	} else {
-		dr := &DR{bdr}
-		if dr.IntIPv4() == 0 {
-			return nil, errors.New("Not Found")
-		}
-		m := msg.Copy()
-		m.Compress = true
-		m.Response = true
-		m.Answer = buildAnswer(dr.IPv4, q)
+	 }
 
-		return m, nil
-	}
+	 if dr.GetIPv4() == 0{
+		 return nil, errors.New("Not Found")
+	 }
+	 m := msg.Copy()
+	 m.Compress = true
+	 m.Response = true
+	 m.Answer = buildAnswer(dr.GetIPv4Addr(), q)
+
+	 return m, nil
+
 }
 
 func replyTraditionTypA(w dns.ResponseWriter, msg *dns.Msg) {
@@ -181,23 +192,27 @@ func BCReplyTypeBCA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 		barr[i] = b[i]
 	}
 
-	if bdr, err := BAS_Ethereum.QueryByBCAddress(barr); err != nil {
-		m := DeriveMsg(msg, dns.RcodeBadKey)
-		return m, nil
-	} else {
-		dr := &DR{bdr}
-		if dr.IntIPv4() == 0 {
-			m := DeriveMsg(msg, dns.RcodeBadKey)
-			return m, nil
-		}
-		m := msg.Copy()
-		m.Compress = true
-		m.Response = true
+	//if bdr, err := BAS_Ethereum.QueryByBCAddress(barr); err != nil {
+	//	m := DeriveMsg(msg, dns.RcodeBadKey)
+	//	return m, nil
+	//} else {
+	//	dr := &DR{bdr}
+	//	if dr.IntIPv4() == 0 {
+	//		m := DeriveMsg(msg, dns.RcodeBadKey)
+	//		return m, nil
+	//	}
+	//	m := msg.Copy()
+	//	m.Compress = true
+	//	m.Response = true
+	//
+	//	m.Answer = buildAnswer(dr.IPv4, q)
+	//
+	//	return m, nil
+	//}
 
-		m.Answer = buildAnswer(dr.IPv4, q)
+	m := DeriveMsg(msg, dns.RcodeBadKey)
+	return m, nil
 
-		return m, nil
-	}
 
 }
 
