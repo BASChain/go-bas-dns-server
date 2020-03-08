@@ -100,7 +100,7 @@ func getDomain(domain DataSync.DomainRecord) string {
 
 	msg += fmt.Sprintf("   %-20s ",domain.GetName())
 	ip:=domain.GetIPv4Addr()
-	msg += fmt.Sprintf("%-8s ",net.IPv4(ip[0],ip[1],ip[2],ip[3]).String())
+	msg += fmt.Sprintf("%-16s ",net.IPv4(ip[0],ip[1],ip[2],ip[3]).String())
 	msg += fmt.Sprintf("%-12s ",strconv.FormatInt(domain.GetExpire(),10))
 
 	return msg
