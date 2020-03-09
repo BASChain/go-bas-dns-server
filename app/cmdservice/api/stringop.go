@@ -75,7 +75,7 @@ func GetRecords(r string) string  {
 	msg:=""
 	if r == ""{
 		for k,d:=range DataSync.Records{
-			msg += "DHash: "+hex.EncodeToString(k[:])+"\r\n"
+			msg += "DHash: "+hex.EncodeToString(k[:])
 			msg += getDomain(d)
 			msg += "\r\n"
 		}
@@ -84,7 +84,7 @@ func GetRecords(r string) string  {
 	}
 
 	hash := Bas_Ethereum.GetHash(r)
-	msg += "DHash: "+ r +"\r\n"
+	msg += "DHash: "+ r
 	if n,ok := DataSync.Records[hash];!ok{
 		return "Domain Not Found"
 	}else{
