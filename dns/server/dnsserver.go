@@ -96,21 +96,7 @@ func BCReplayTypeA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 	if qn[len(qn)-1] == '.' {
 		qn = qn[:len(qn)-1]
 	}
-
-	//if bdr, err := BAS_Ethereum.QueryByString(qn); err != nil {
-	//	return nil, errors.New("Not Found")
-	//} else {
-	//	dr := &DR{bdr}
-	//	if dr.IntIPv4() == 0 {
-	//		return nil, errors.New("Not Found")
-	//	}
-	//	m := msg.Copy()
-	//	m.Compress = true
-	//	m.Response = true
-	//	m.Answer = buildAnswer(dr.IPv4, q)
-	//
-	//	return m, nil
-	//}
+	
 	 dr:=api.QueryBasByDomainName(qn)
 	 if dr == nil{
 		return nil, errors.New("Not Found")
@@ -189,24 +175,6 @@ func BCReplyTypeBCA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 	for i := 0; i < len(b); i++ {
 		barr[i] = b[i]
 	}
-
-	//if bdr, err := BAS_Ethereum.QueryByBCAddress(barr); err != nil {
-	//	m := DeriveMsg(msg, dns.RcodeBadKey)
-	//	return m, nil
-	//} else {
-	//	dr := &DR{bdr}
-	//	if dr.IntIPv4() == 0 {
-	//		m := DeriveMsg(msg, dns.RcodeBadKey)
-	//		return m, nil
-	//	}
-	//	m := msg.Copy()
-	//	m.Compress = true
-	//	m.Response = true
-	//
-	//	m.Answer = buildAnswer(dr.IPv4, q)
-	//
-	//	return m, nil
-	//}
 
 	m := DeriveMsg(msg, dns.RcodeBadKey)
 	return m, nil
