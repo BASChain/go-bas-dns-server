@@ -11,9 +11,7 @@ import (
 	"strconv"
 	"github.com/BASChain/go-bas-dns-server/dns/dohserver/api"
 
-
 	"errors"
-	"golang.org/x/tools/go/ssa/interp/testdata/src/fmt"
 )
 
 const (
@@ -84,11 +82,9 @@ func BuildNullAnswer(q dns.Question) dns.RR  {
 
 
 func replyTypA(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) error {
-	fmt.Println("replyTypA",q.Name)
 	if m, err := BCReplayTypeA(msg, q); err != nil {
 		return err
 	} else {
-		fmt.Println("replyTypA no error",q.Name)
 		w.WriteMsg(m)
 		return nil
 	}
@@ -232,9 +228,9 @@ func DnsHandleTradition(w dns.ResponseWriter, msg *dns.Msg) {
 
 	switch q.Qtype {
 	case dns.TypeA:
-		log.Println("type a reply", q.Name)
+		//log.Println("type a reply", q.Name)
 		if err := replyTypA(w, msg, q); err != nil {
-			log.Println("replyTypA error,begin reply tradition type a",q.Name)
+			//log.Println("replyTypA error,begin reply tradition type a",q.Name)
 			replyTraditionTypA(w, msg)
 		}
 	case dns.TypePTR:
@@ -246,7 +242,7 @@ func DnsHandleTradition(w dns.ResponseWriter, msg *dns.Msg) {
 		replyTypBCA(w, msg, q)
 	default:
 		//sendErrMsg(w,msg,dns.RcodeNotImplemented)
-		log.Println("Default reply",q.Name)
+		//log.Println("Default reply",q.Name)
 		replyTraditionTypA(w, msg)
 		return
 	}
