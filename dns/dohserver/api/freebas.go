@@ -83,6 +83,7 @@ func (fb *FreeBas)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 			RestoreKey()
 			go Transactions.SendFreeBasByContract(key,addr,sndamount)
 			resp.Amount = amount
+			resp.ErrMsg = "success"
 		}
 
 	}
