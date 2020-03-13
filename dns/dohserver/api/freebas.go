@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/BASChain/go-bas/Transactions"
+	"github.com/BASChain/go-bas-dns-server/config"
+	"math/big"
 )
 
 type FreeBas struct {
@@ -16,14 +18,15 @@ type FreeBas struct {
 
 type FreeBasReq struct {
 	Wallet string `json:"wallet"`
-	Amount int64  `json:"amount"`
+	Amount string  `json:"amount"`
 }
 
 
 type FreeBasResp struct {
 	State int `json:"state"`
 	Wallet string `json:"wallet"`
-	Amount int64  `json:"amount"`
+	Amount string `json:"amount"`
+	ErrMsg string `json:"errmsg"`
 }
 
 func NewFreeBas() *FreeBas {
@@ -56,25 +59,32 @@ func (fb *FreeBas)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	addr:=common.HexToAddress(fbr.Wallet)
 
 	resp:=&FreeBasResp{}
+	resp.Wallet = fbr.Wallet
 
 	var b bool
 	b,err = Transactions.CheckIfApplied(addr)
 	if b{
 		resp.State = 0
+		resp.ErrMsg = "You have Applied"
 	}else{
-		resp.State = 1
 
-		RestoreKey()
-
-		go Transactions.SendFreeBas(key,addr)
-
-		resp.Wallet = fbr.Wallet
-		amount,_ := Transactions.GetFreeBasAmount()
-		if amount == nil{
-			resp.Amount = 0
-		}else{
-			resp.Amount = amount.Int64()
+		amount := fbr.Amount
+		if amount == ""{
+			amount = config.GetBasDCfg().FreeBasAmount
 		}
+
+		z:=&big.Int{}
+		sndamount,b:=z.SetString(amount,10)
+		if !b{
+			resp.State = 0
+			resp.ErrMsg = "Amount error"
+		}else{
+			resp.State = 1
+			RestoreKey()
+			go Transactions.SendFreeBasByContract(key,addr,sndamount)
+			resp.Amount = amount
+		}
+
 	}
 
 

@@ -11,6 +11,7 @@ import (
 	"github.com/BASChain/go-bas/Account"
 	"github.com/pkg/errors"
 	"github.com/BASChain/go-bas/Transactions"
+	"math/big"
 )
 
 type FreeEth struct {
@@ -20,13 +21,14 @@ type FreeEth struct {
 
 type FreeEthReq struct {
 	Wallet string	`json:"wallet"`
-	Amount int64	`json:"amount"`
+	Amount string	`json:"amount"`
 }
 
 type FreeEthResp struct {
 	Wallet string `json:"wallet"`
 	State int     `json:"state"`
-	Amount int64  `json:"amount"`
+	ErrMsg    string  `json:"errmsg"`
+	Amount string  `json:"amount"`
 }
 
 func NewFreeEth() *FreeEth {
@@ -75,8 +77,8 @@ func (fe *FreeEth)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 
 	addr:=common.HexToAddress(fer.Wallet)
 	amount := fer.Amount
-	if amount == 0{
-		amount = config.GetBasDCfg().FreeTokenAmount
+	if amount == ""{
+		amount = config.GetBasDCfg().FreeEthAmount
 	}
 
 	err = RestoreKey()
@@ -84,12 +86,20 @@ func (fe *FreeEth)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		panic("load key failed")
 	}
 
-	go Transactions.SendFreeEth(key,addr,amount)
-
 	feresp := &FreeEthResp{}
-	feresp.Amount = amount
 	feresp.Wallet = fer.Wallet
-	feresp.State = 1
+
+	z:=big.Int{}
+	sndamount,b:=z.SetString(amount,10)
+	if b{
+		feresp.Amount = amount
+		feresp.State = 1
+		feresp.ErrMsg = "success"
+		go Transactions.SendFreeEth(key,addr,sndamount)
+	}else{
+		feresp.ErrMsg = "Amount Error"
+		feresp.State = 0
+	}
 
 	var bresp []byte
 
