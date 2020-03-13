@@ -30,6 +30,7 @@ type BASDConfig struct {
 	TimeOut        int      `json:"timeout"`
 	TryTimes       int      `json:"trytimes"`
 	BasApi         string   `json:"basapi"`
+	FreeTokenAmount   int64	`json:"freetokenamount"`
 }
 
 var (
@@ -48,6 +49,8 @@ func (bc *BASDConfig) InitCfg() *BASDConfig {
 	bc.TimeOut = 10
 	bc.TryTimes = 3
 	bc.BasApi = "/api"
+	bc.FreeTokenAmount = 1000000000000000
+
 
 	return bc
 }
@@ -151,6 +154,10 @@ func GetBASDHomeDir() string {
 	}
 
 	return path.Join(curHome, BASD_HomeDir)
+}
+
+func GetKeyFile() string  {
+	return path.Join(GetBASDHomeDir(),"UTC--2020-03-11T06-56-52.423772000Z--33324a5ee0b35f17536ceda27274e88e76640f24")
 }
 
 func GetBASDCFGFile() string {

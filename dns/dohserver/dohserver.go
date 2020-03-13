@@ -63,6 +63,7 @@ const(
 	TotalPath string = "getDomainTotal"
 	DomainList string = "getDomainList"
 	AutoComplete string = "autocomplete"
+	FreeEth   string = "freeEth"
 )
 
 func NewDohServers() *DohServer {
@@ -89,12 +90,14 @@ func NewDohServers() *DohServer {
 	mux.Handle(path.Join(cfg.BasApi,TotalPath),api.NewDomainTotal())
 	mux.Handle(path.Join(cfg.BasApi,DomainList),api.NewDomainList())
 	mux.Handle(path.Join(cfg.BasApi,AutoComplete),api.NewAutoComplete())
+	mux.Handle(path.Join(cfg.BasApi,FreeEth),api.NewFreeEth())
 
 	smux := http.NewServeMux()
 	smux.Handle(cfg.DnsPath, &DohServer{})
 	smux.Handle(path.Join(cfg.BasApi,TotalPath),api.NewDomainTotal())
 	smux.Handle(path.Join(cfg.BasApi,DomainList),api.NewDomainList())
 	smux.Handle(path.Join(cfg.BasApi,AutoComplete),api.NewAutoComplete())
+	smux.Handle(path.Join(cfg.BasApi,FreeEth),api.NewFreeEth())
 
 	server.dohServer.Handler = http.Handler(mux)
 
