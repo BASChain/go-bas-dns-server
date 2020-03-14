@@ -96,7 +96,7 @@ func BCReplayTypeA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 	if qn[len(qn)-1] == '.' {
 		qn = qn[:len(qn)-1]
 	}
-	
+
 	 dr:=api.QueryBasByDomainName(qn)
 	 if dr == nil{
 		return nil, errors.New("Not Found")
