@@ -4,7 +4,7 @@ import (
 	"github.com/BASChain/go-bas-dns-server/config"
 
 	"github.com/btcsuite/btcutil/base58"
-	"github.com/miekg/dns"
+	"github.com/BASChain/go-bas-dns-server/lib/dns"
 
 	"log"
 	"net"
