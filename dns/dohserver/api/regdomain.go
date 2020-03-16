@@ -28,6 +28,7 @@ type RegDomainRecord struct {
 	RIsPureA bool `json:"rispurea"`
 	RcustomePrice string `json:"rcustomeprice"`
 	ParentDomain *RegDomainRecord `json:"parentdomain"`
+	DomainHash string `json:"domainhash,omitempty"`
 }
 
 type RegDomainResp struct {

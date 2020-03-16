@@ -15,7 +15,8 @@ import (
 )
 
 const (
-	TypeBCAddr = 65
+	TypeBCAddr = 65  //only for Question
+	TypeBasAddr = 66 //for answer
 )
 
 var (
@@ -64,6 +65,7 @@ func buildAnswer(ipv4 [4]byte, q dns.Question) []dns.RR {
 
 	return rr
 }
+
 
 func BuildNullAnswer(q dns.Question) dns.RR  {
 	NULL:=&dns.NULL{}

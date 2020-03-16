@@ -30,6 +30,7 @@ type BASDConfig struct {
 	TimeOut        int      `json:"timeout"`
 	TryTimes       int      `json:"trytimes"`
 	BasApi         string   `json:"basapi"`
+	DnsBasApi      string   `json:"dnsbasapi"`
 	FreeEthAmount   string	`json:"freetokenamount"`
 	FreeBasAmount   string 	`json:"freebasamount"`
 }
@@ -50,6 +51,7 @@ func (bc *BASDConfig) InitCfg() *BASDConfig {
 	bc.TimeOut = 10
 	bc.TryTimes = 3
 	bc.BasApi = "/api"
+	bc.DnsBasApi = "/api/domain"
 	bc.FreeEthAmount = "100000000000000000"			//0.1eth
 	bc.FreeBasAmount = "1000000000000000000000"   //100bas
 
