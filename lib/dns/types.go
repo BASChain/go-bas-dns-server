@@ -81,6 +81,10 @@ const (
 	TypeCDNSKEY    uint16 = 60
 	TypeOPENPGPKEY uint16 = 61
 	TypeCSYNC      uint16 = 62
+	TypeBCAddr     uint16 = 65
+	TypeBasExtra   uint16 = 66
+	TypePtrBCAddr  uint16 = 67
+	TypePtrExtra   uint16 = 68
 	TypeSPF        uint16 = 99
 	TypeUINFO      uint16 = 100
 	TypeUID        uint16 = 101
