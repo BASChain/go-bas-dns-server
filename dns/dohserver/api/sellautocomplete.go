@@ -74,7 +74,7 @@ func (sac *SellAutoComplete)ServeHTTP(w http.ResponseWriter, r *http.Request)   
 
 	for _,r:=range DataSync.Records{
 		if strings.Contains(r.GetName(),searchText){
-			if addr == nil || (*addr) != (*r.GetOwnerOrig()){
+			if (addr == nil || (*addr) != (*r.GetOwnerOrig())) && r.GetBCAddr() != ""{
 				item:=DHPaire{}
 				item.DomainName = r.GetName()
 				item.WalletAddress = r.GetBCAddr()
