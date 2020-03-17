@@ -23,7 +23,7 @@ type SellAutoCompleteReq struct {
 
 type DHPaire struct {
 	DomainName string `json:"domainname"`
-	WalletAddress  string `json:"hash"`
+	WalletAddress  string `json:"walletaddress"`
 }
 
 

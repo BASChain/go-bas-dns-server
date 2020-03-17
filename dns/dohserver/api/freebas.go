@@ -9,6 +9,7 @@ import (
 	"github.com/BASChain/go-bas/Transactions"
 	"github.com/BASChain/go-bas-dns-server/config"
 	"math/big"
+	"github.com/BASChain/go-bas-dns-server/dns/mem"
 )
 
 type FreeBas struct {
@@ -28,6 +29,7 @@ type FreeBasResp struct {
 	Amount string `json:"amount"`
 	ErrMsg string `json:"errmsg"`
 }
+
 
 func NewFreeBas() *FreeBas {
 	return &FreeBas{}
@@ -61,30 +63,60 @@ func (fb *FreeBas)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	resp:=&FreeBasResp{}
 	resp.Wallet = fbr.Wallet
 
+	var flag bool
+
 	var b bool
 	b,err = Transactions.CheckIfApplied(addr)
 	if b{
 		resp.State = 0
 		resp.ErrMsg = "You have Applied"
-	}else{
+		flag = true
+	}
 
-		amount := fbr.Amount
+	if !flag{
+		var stat int
+		stat,err = mem.GetState(addr,mem.BAS)
+		if err == nil {
+			if stat == mem.SUCCESS {
+				resp.State = 0
+				resp.ErrMsg = "You have Applied"
+				flag = true
+			}
+			if  stat == mem.WAITING{
+				resp.State = 0
+				resp.ErrMsg = "Your Applying is running"
+				flag = true
+			}
+		}
+	}
+
+	var sndamount *big.Int
+	var amount string
+
+	if !flag{
+		amount = fbr.Amount
 		if amount == ""{
 			amount = config.GetBasDCfg().FreeBasAmount
 		}
 
 		z:=&big.Int{}
-		sndamount,b:=z.SetString(amount,10)
+		sndamount,b = z.SetString(amount,10)
 		if !b{
 			resp.State = 0
 			resp.ErrMsg = "Amount error"
-		}else{
-			resp.State = 1
-			RestoreKey()
-			go Transactions.SendFreeBasByContract(key,addr,sndamount)
-			resp.Amount = amount
-			resp.ErrMsg = "success"
+			flag = true
 		}
+	}
+
+	if !flag{
+		resp.State = 1
+		err = RestoreKey()
+		if err!=nil{
+			panic("load key failed")
+		}
+		Transactions.SendFreeBasByContractWrapper(key,addr,sndamount)
+		resp.Amount = amount
+		resp.ErrMsg = "success"
 
 	}
 

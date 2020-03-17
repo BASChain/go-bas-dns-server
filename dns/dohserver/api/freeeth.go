@@ -95,7 +95,7 @@ func (fe *FreeEth)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		feresp.Amount = amount
 		feresp.State = 1
 		feresp.ErrMsg = "success"
-		go Transactions.SendFreeEth(key,addr,sndamount)
+		Transactions.SendFreeEthWrapper(key,addr,sndamount)
 	}else{
 		feresp.ErrMsg = "Amount Error"
 		feresp.State = 0
