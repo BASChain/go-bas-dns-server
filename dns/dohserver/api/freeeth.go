@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/BASChain/go-bas/Transactions"
 	"math/big"
+	"github.com/BASChain/go-bas-dns-server/dns/mem"
 )
 
 type FreeEth struct {
@@ -89,16 +90,37 @@ func (fe *FreeEth)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	feresp := &FreeEthResp{}
 	feresp.Wallet = fer.Wallet
 
+	var flag bool
+
 	z:=big.Int{}
 	sndamount,b:=z.SetString(amount,10)
-	if b{
+
+	if !b{
+		feresp.ErrMsg = "Amount Error"
+		feresp.State = 0
+		flag = true
+	}
+	var state int
+	state,err=mem.GetState(addr,mem.ETH)
+	if err == nil{
+		if state == mem.SUCCESS{
+			feresp.State = 0
+			feresp.ErrMsg = "You have Applied"
+			flag = true
+		}
+
+		if state == mem.WAITING{
+			feresp.State = 0
+			feresp.ErrMsg = "Your Applying is running"
+			flag = true
+		}
+	}
+
+	if !flag{
 		feresp.Amount = amount
 		feresp.State = 1
 		feresp.ErrMsg = "success"
 		Transactions.SendFreeEthWrapper(key,addr,sndamount)
-	}else{
-		feresp.ErrMsg = "Amount Error"
-		feresp.State = 0
 	}
 
 	var bresp []byte
