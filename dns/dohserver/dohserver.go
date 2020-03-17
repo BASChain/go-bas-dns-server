@@ -67,6 +67,7 @@ const(
 	FreeBas   string = "freeBas"
 	RegDomain string = "registerDomain"
 	DomainInfo string = "domainInfo"
+	DomainSell string = "domainSell"
 )
 
 func NewDohServers() *DohServer {
@@ -93,19 +94,21 @@ func NewDohServers() *DohServer {
 	mux.Handle(path.Join(cfg.BasApi,TotalPath),api.NewDomainTotal())
 	mux.Handle(path.Join(cfg.BasApi,DomainList),api.NewDomainList())
 	mux.Handle(path.Join(cfg.BasApi,AutoComplete),api.NewAutoComplete())
-	mux.Handle(path.Join(cfg.BasApi,FreeEth),api.NewFreeEth())
-	mux.Handle(path.Join(cfg.BasApi,FreeBas),api.NewFreeBas())
+	mux.Handle(path.Join(cfg.ContactApi,FreeEth),api.NewFreeEth())
+	mux.Handle(path.Join(cfg.ContactApi,FreeBas),api.NewFreeBas())
 	mux.Handle(path.Join(cfg.BasApi,RegDomain),api.NewRegDomain())
 	mux.Handle(path.Join(cfg.DnsBasApi,DomainInfo),api.NewDomainInfo())
+	mux.Handle(path.Join(cfg.DnsBasApi,DomainSell),api.NewDomainInfo())
 
 	smux := http.NewServeMux()
 	smux.Handle(cfg.DnsPath, &DohServer{})
 	smux.Handle(path.Join(cfg.BasApi,TotalPath),api.NewDomainTotal())
 	smux.Handle(path.Join(cfg.BasApi,DomainList),api.NewDomainList())
 	smux.Handle(path.Join(cfg.BasApi,AutoComplete),api.NewAutoComplete())
-	smux.Handle(path.Join(cfg.BasApi,FreeEth),api.NewFreeEth())
-	smux.Handle(path.Join(cfg.BasApi,RegDomain),api.NewRegDomain())
+	smux.Handle(path.Join(cfg.ContactApi,FreeEth),api.NewFreeEth())
+	smux.Handle(path.Join(cfg.ContactApi,RegDomain),api.NewRegDomain())
 	smux.Handle(path.Join(cfg.DnsBasApi,DomainInfo),api.NewDomainInfo())
+	smux.Handle(path.Join(cfg.DnsBasApi,DomainSell),api.NewDomainInfo())
 
 	server.dohServer.Handler = http.Handler(mux)
 
