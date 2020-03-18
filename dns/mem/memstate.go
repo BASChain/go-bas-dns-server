@@ -77,6 +77,9 @@ func MemStateStop()  {
 }
 
 func MemStateStart(){
+
+	quit = make(chan int ,1)
+
 	wg.Add(1)
 
 	go MemStateTimeOut()
@@ -108,7 +111,7 @@ func MemStateTimeOut()  {
 
 		if m != nil{
 			for k,v:=range m{
-				if v.WriteTime - curTime > 300000{
+				if curTime - v.WriteTime > 300000{
 					ks = append(ks,k)
 				}
 			}
