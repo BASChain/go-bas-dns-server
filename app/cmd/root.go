@@ -27,6 +27,7 @@ import (
 	"github.com/spf13/cobra"
 	"log"
 	"github.com/BASChain/go-bas/DataSync"
+	"github.com/BASChain/go-bas-dns-server/dns/mem"
 )
 
 //var cfgFile string
@@ -64,7 +65,9 @@ var rootCmd = &cobra.Command{
 
 		//BAS_Ethereum.RecoverContract()
 		go DataSync.Sync()
+		go mem.MemStateStart()
 		go server.DNSServerDaemon()
+
 		go dohserver.GetDohDaemonServer().StartDaemon()
 
 		cmdservice.GetCmdServerInst().StartCmdService()

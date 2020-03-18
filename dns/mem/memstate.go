@@ -15,6 +15,9 @@ type MemState struct {
 var (
 	lock sync.Mutex
 	m map[common.Address]*MemState
+	quit chan int
+	wg sync.WaitGroup
+	roundTime int64
 )
 
 const(
@@ -67,3 +70,55 @@ func GetState(addr common.Address,typ int) (int,error) {
 		return s.FreeState[typ],nil
 	}
 }
+
+func MemStateStop()  {
+	quit <- 1
+	wg.Wait()
+}
+
+func MemStateStart(){
+	wg.Add(1)
+
+	go MemStateTimeOut()
+}
+
+func MemStateTimeOut()  {
+
+	defer wg.Done()
+
+	for{
+		select {
+		case <-quit:
+			return
+		default:
+
+		}
+
+		curTime := tools.GetNowMsTime()
+
+		if curTime - roundTime < 300000{
+			continue
+		}
+
+		roundTime = curTime
+
+		ks := make([]common.Address,0)
+
+		lock.Lock()
+
+		if m != nil{
+			for k,v:=range m{
+				if v.WriteTime - curTime > 300000{
+					ks = append(ks,k)
+				}
+			}
+		}
+
+		for i:=0;i<len(ks); i++{
+			delete(m,ks[i])
+		}
+
+		lock.Unlock()
+	}
+}
+
