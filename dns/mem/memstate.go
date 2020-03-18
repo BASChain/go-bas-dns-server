@@ -27,6 +27,7 @@ const(
 )
 
 func Update(addr common.Address,typ int,state int) error {
+
 	if typ != BAS && typ != ETH{
 		return errors.New("type error")
 	}
@@ -35,7 +36,9 @@ func Update(addr common.Address,typ int,state int) error {
 	}
 	lock.Lock()
 	defer lock.Unlock()
-
+	if m == nil{
+		m = make(map[common.Address]*MemState)
+	}
 	if s,ok:=m[addr];!ok{
 		s = &MemState{}
 		s.FreeState[typ] = state

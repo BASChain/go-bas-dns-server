@@ -24,6 +24,7 @@ type SellAutoCompleteReq struct {
 type DHPaire struct {
 	DomainName string `json:"domainname"`
 	WalletAddress  string `json:"walletaddress"`
+	Expire int64 `json:"expire"`
 }
 
 
@@ -78,6 +79,7 @@ func (sac *SellAutoComplete)ServeHTTP(w http.ResponseWriter, r *http.Request)   
 				item:=DHPaire{}
 				item.DomainName = r.GetName()
 				item.WalletAddress = r.GetBCAddr()
+				item.Expire = r.GetExpire()
 				dhp = append(dhp,item)
 			}
 		}
