@@ -7,9 +7,6 @@ import (
 	"encoding/json"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/BASChain/go-bas-dns-server/config"
-	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/BASChain/go-bas/Account"
-	"github.com/pkg/errors"
 	"github.com/BASChain/go-bas/Transactions"
 	"math/big"
 	"github.com/BASChain/go-bas-dns-server/dns/mem"
@@ -37,19 +34,19 @@ func NewFreeEth() *FreeEth {
 }
 
 
-var key *keystore.Key = nil
-
-func RestoreKey() error {
-	if key == nil{
-		keys:=Account.PrivateKeyRecover(config.GetKeyFile(),"secret")
-		if len(keys) == 0{
-			return errors.New("load key error")
-		}
-		key = keys[0]
-	}
-
-	return nil
-}
+//var key *keystore.Key = nil
+//
+//func RestoreKey() error {
+//	if key == nil{
+//		keys:=Account.PrivateKeyRecover(config.GetKeyFile(),"secret")
+//		if len(keys) == 0{
+//			return errors.New("load key error")
+//		}
+//		key = keys[0]
+//	}
+//
+//	return nil
+//}
 
 
 func (fe *FreeEth)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
@@ -82,10 +79,6 @@ func (fe *FreeEth)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		amount = config.GetBasDCfg().FreeEthAmount
 	}
 
-	err = RestoreKey()
-	if err!=nil{
-		panic("load key failed")
-	}
 
 	feresp := &FreeEthResp{}
 	feresp.Wallet = fer.Wallet
@@ -120,7 +113,7 @@ func (fe *FreeEth)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		feresp.Amount = amount
 		feresp.State = 1
 		feresp.ErrMsg = "success"
-		Transactions.SendFreeEthWrapper(key,addr,sndamount)
+		Transactions.SendFreeEthWrapper(config.GetLoanKey(),addr,sndamount)
 	}
 
 	var bresp []byte

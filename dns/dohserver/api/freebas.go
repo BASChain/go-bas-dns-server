@@ -110,11 +110,8 @@ func (fb *FreeBas)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 
 	if !flag{
 		resp.State = 1
-		err = RestoreKey()
-		if err!=nil{
-			panic("load key failed")
-		}
-		Transactions.SendFreeBasByContractWrapper(key,addr,sndamount)
+
+		Transactions.SendFreeBasByContractWrapper(config.GetLoanKey(),addr,sndamount)
 		resp.Amount = amount
 		resp.ErrMsg = "success"
 
