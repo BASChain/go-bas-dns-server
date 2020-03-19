@@ -24,9 +24,9 @@ import (
 	"github.com/BASChain/go-bas-dns-server/app/cmdservice"
 	"github.com/BASChain/go-bas-dns-server/config"
 	"github.com/BASChain/go-bas-dns-server/dns/dohserver"
-	"path"
-	"github.com/BASChain/go-bas/DataSync"
 	"github.com/BASChain/go-bas-dns-server/dns/mem"
+	"github.com/BASChain/go-bas/DataSync"
+	"path"
 )
 
 // daemonCmd represents the daemon command

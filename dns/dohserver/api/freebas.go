@@ -1,41 +1,37 @@
 package api
 
 import (
-	"net/http"
-	"fmt"
-	"io/ioutil"
 	"encoding/json"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/BASChain/go-bas/Transactions"
+	"fmt"
 	"github.com/BASChain/go-bas-dns-server/config"
-	"math/big"
 	"github.com/BASChain/go-bas-dns-server/dns/mem"
+	"github.com/BASChain/go-bas/Transactions"
+	"github.com/ethereum/go-ethereum/common"
+	"io/ioutil"
+	"math/big"
+	"net/http"
 )
 
 type FreeBas struct {
-
 }
-
 
 type FreeBasReq struct {
 	Wallet string `json:"wallet"`
-	Amount string  `json:"amount"`
+	Amount string `json:"amount"`
 }
 
-
 type FreeBasResp struct {
-	State int `json:"state"`
+	State  int    `json:"state"`
 	Wallet string `json:"wallet"`
 	Amount string `json:"amount"`
 	ErrMsg string `json:"errmsg"`
 }
 
-
 func NewFreeBas() *FreeBas {
 	return &FreeBas{}
 }
 
-func (fb *FreeBas)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
+func (fb *FreeBas) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
@@ -50,39 +46,39 @@ func (fb *FreeBas)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	fbr:=&FreeBasReq{}
+	fbr := &FreeBasReq{}
 
-	err = json.Unmarshal(body,fbr)
-	if err!=nil{
+	err = json.Unmarshal(body, fbr)
+	if err != nil {
 		w.WriteHeader(500)
-		fmt.Fprintf(w,"{}")
+		fmt.Fprintf(w, "{}")
 		return
 	}
-	addr:=common.HexToAddress(fbr.Wallet)
+	addr := common.HexToAddress(fbr.Wallet)
 
-	resp:=&FreeBasResp{}
+	resp := &FreeBasResp{}
 	resp.Wallet = fbr.Wallet
 
 	var flag bool
 
 	var b bool
-	b,err = Transactions.CheckIfApplied(addr)
-	if b{
+	b, err = Transactions.CheckIfApplied(addr)
+	if b {
 		resp.State = 0
 		resp.ErrMsg = "You have Applied"
 		flag = true
 	}
 
-	if !flag{
+	if !flag {
 		var stat int
-		stat,err = mem.GetState(addr,mem.BAS)
+		stat, err = mem.GetState(addr, mem.BAS)
 		if err == nil {
 			if stat == mem.SUCCESS {
 				resp.State = 0
 				resp.ErrMsg = "You have Applied"
 				flag = true
 			}
-			if  stat == mem.WAITING{
+			if stat == mem.WAITING {
 				resp.State = 0
 				resp.ErrMsg = "Your Applying is running"
 				flag = true
@@ -93,35 +89,34 @@ func (fb *FreeBas)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	var sndamount *big.Int
 	var amount string
 
-	if !flag{
+	if !flag {
 		amount = fbr.Amount
-		if amount == ""{
+		if amount == "" {
 			amount = config.GetBasDCfg().FreeBasAmount
 		}
 
-		z:=&big.Int{}
-		sndamount,b = z.SetString(amount,10)
-		if !b{
+		z := &big.Int{}
+		sndamount, b = z.SetString(amount, 10)
+		if !b {
 			resp.State = 0
 			resp.ErrMsg = "Amount error"
 			flag = true
 		}
 	}
 
-	if !flag{
+	if !flag {
 		resp.State = 1
 
-		Transactions.SendFreeBasByContractWrapper(config.GetLoanKey(),addr,sndamount)
+		Transactions.SendFreeBasByContractWrapper(config.GetLoanKey(), addr, sndamount)
 		resp.Amount = amount
 		resp.ErrMsg = "success"
 
 	}
 
-
 	var bresp []byte
 
-	bresp,err =json.Marshal(*resp)
-	if err != nil{
+	bresp, err = json.Marshal(*resp)
+	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return

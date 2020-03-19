@@ -1,38 +1,36 @@
 package api
 
 import (
-	"net/http"
-	"fmt"
-	"io/ioutil"
 	"encoding/json"
+	"fmt"
 	"github.com/BASChain/go-bas/Bas_Ethereum"
 	"github.com/BASChain/go-bas/DataSync"
+	"io/ioutil"
+	"net/http"
 )
 
 type RegDomain struct {
-
 }
-
 
 type RegDomainReq struct {
 	DomainName string `json:"domainname"`
 }
 
 type RegDomainRecord struct {
-	Name string `json:"name"`
-	Expire int64 `json:"expire"`
-	Owner string `json:"owner"`
-	IsRoot bool `json:"isroot"`
-	ROpenToPublic bool `json:"ropentopublic"`
-	RisCustomed bool `json:"riscustomed"`
-	RIsPureA bool `json:"rispurea"`
-	RcustomePrice string `json:"rcustomeprice"`
-	DomainHash string `json:"domainhash,omitempty"`
-	ParentDomain *RegDomainRecord `json:"parentdomain"`
+	Name          string           `json:"name"`
+	Expire        int64            `json:"expire"`
+	Owner         string           `json:"owner"`
+	IsRoot        bool             `json:"isroot"`
+	ROpenToPublic bool             `json:"ropentopublic"`
+	RisCustomed   bool             `json:"riscustomed"`
+	RIsPureA      bool             `json:"rispurea"`
+	RcustomePrice string           `json:"rcustomeprice"`
+	DomainHash    string           `json:"domainhash,omitempty"`
+	ParentDomain  *RegDomainRecord `json:"parentdomain"`
 }
 
 type RegDomainResp struct {
-	State int `json:"state"`
+	State        int              `json:"state"`
 	DomainRecord *RegDomainRecord `json:"domainrecord"`
 }
 
@@ -40,7 +38,7 @@ func NewRegDomain() *RegDomain {
 	return &RegDomain{}
 }
 
-func (rd *RegDomain)ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (rd *RegDomain) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
@@ -55,10 +53,10 @@ func (rd *RegDomain)ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req:=&RegDomainReq{}
+	req := &RegDomainReq{}
 
-	err = json.Unmarshal(body,req)
-	if err!=nil{
+	err = json.Unmarshal(body, req)
+	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return
@@ -66,13 +64,13 @@ func (rd *RegDomain)ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	dhash := Bas_Ethereum.GetHash(req.DomainName)
 
-	resp:=&RegDomainResp{}
+	resp := &RegDomainResp{}
 
-	d,ok:=DataSync.Records[dhash]
-	if !ok{
+	d, ok := DataSync.Records[dhash]
+	if !ok {
 		resp.State = 0
-	}else{
-		r:=&RegDomainRecord{}
+	} else {
+		r := &RegDomainRecord{}
 		r.RIsPureA = d.GetIsPureA()
 		r.IsRoot = d.GetIsRoot()
 		r.Owner = d.GetOwner()
@@ -84,9 +82,9 @@ func (rd *RegDomain)ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		if !r.IsRoot {
 			roothash := d.GetParentHash()
-			d,ok=DataSync.Records[roothash]
-			if ok{
-				r1:=&RegDomainRecord{}
+			d, ok = DataSync.Records[roothash]
+			if ok {
+				r1 := &RegDomainRecord{}
 				r1.RIsPureA = d.GetIsPureA()
 				r1.IsRoot = d.GetIsRoot()
 				r1.Owner = d.GetOwner()
@@ -105,8 +103,8 @@ func (rd *RegDomain)ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var bresp []byte
 
-	bresp,err =json.Marshal(*resp)
-	if err != nil{
+	bresp, err = json.Marshal(*resp)
+	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return

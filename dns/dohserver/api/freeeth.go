@@ -1,38 +1,35 @@
 package api
 
 import (
-	"net/http"
-	"fmt"
-	"io/ioutil"
 	"encoding/json"
-	"github.com/ethereum/go-ethereum/common"
+	"fmt"
 	"github.com/BASChain/go-bas-dns-server/config"
-	"github.com/BASChain/go-bas/Transactions"
-	"math/big"
 	"github.com/BASChain/go-bas-dns-server/dns/mem"
+	"github.com/BASChain/go-bas/Transactions"
+	"github.com/ethereum/go-ethereum/common"
+	"io/ioutil"
+	"math/big"
+	"net/http"
 )
 
 type FreeEth struct {
-
 }
 
-
 type FreeEthReq struct {
-	Wallet string	`json:"wallet"`
-	Amount string	`json:"amount"`
+	Wallet string `json:"wallet"`
+	Amount string `json:"amount"`
 }
 
 type FreeEthResp struct {
 	Wallet string `json:"wallet"`
-	State int     `json:"state"`
-	ErrMsg    string  `json:"errmsg"`
-	Amount string  `json:"amount"`
+	State  int    `json:"state"`
+	ErrMsg string `json:"errmsg"`
+	Amount string `json:"amount"`
 }
 
 func NewFreeEth() *FreeEth {
 	return &FreeEth{}
 }
-
 
 //var key *keystore.Key = nil
 //
@@ -48,8 +45,7 @@ func NewFreeEth() *FreeEth {
 //	return nil
 //}
 
-
-func (fe *FreeEth)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
+func (fe *FreeEth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
@@ -64,62 +60,61 @@ func (fe *FreeEth)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	fer:=&FreeEthReq{}
+	fer := &FreeEthReq{}
 
-	err = json.Unmarshal(body,fer)
-	if err!=nil{
+	err = json.Unmarshal(body, fer)
+	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return
 	}
 
-	addr:=common.HexToAddress(fer.Wallet)
+	addr := common.HexToAddress(fer.Wallet)
 	amount := fer.Amount
-	if amount == ""{
+	if amount == "" {
 		amount = config.GetBasDCfg().FreeEthAmount
 	}
-
 
 	feresp := &FreeEthResp{}
 	feresp.Wallet = fer.Wallet
 
 	var flag bool
 
-	z:=big.Int{}
-	sndamount,b:=z.SetString(amount,10)
+	z := big.Int{}
+	sndamount, b := z.SetString(amount, 10)
 
-	if !b{
+	if !b {
 		feresp.ErrMsg = "Amount Error"
 		feresp.State = 0
 		flag = true
 	}
 	var state int
-	state,err=mem.GetState(addr,mem.ETH)
-	if err == nil{
-		if state == mem.SUCCESS{
+	state, err = mem.GetState(addr, mem.ETH)
+	if err == nil {
+		if state == mem.SUCCESS {
 			feresp.State = 0
 			feresp.ErrMsg = "You have Applied"
 			flag = true
 		}
 
-		if state == mem.WAITING{
+		if state == mem.WAITING {
 			feresp.State = 0
 			feresp.ErrMsg = "Your Applying is running"
 			flag = true
 		}
 	}
 
-	if !flag{
+	if !flag {
 		feresp.Amount = amount
 		feresp.State = 1
 		feresp.ErrMsg = "success"
-		Transactions.SendFreeEthWrapper(config.GetLoanKey(),addr,sndamount)
+		Transactions.SendFreeEthWrapper(config.GetLoanKey(), addr, sndamount)
 	}
 
 	var bresp []byte
 
-	bresp,err =json.Marshal(*feresp)
-	if err != nil{
+	bresp, err = json.Marshal(*feresp)
+	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return

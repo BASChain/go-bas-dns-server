@@ -16,27 +16,27 @@ limitations under the License.
 package cmd
 
 import (
+	"github.com/BASChain/go-bas-dns-server/app/cmdclient"
+	"github.com/BASChain/go-bas-dns-server/app/cmdcommon"
 	"github.com/spf13/cobra"
 	"log"
-	"github.com/BASChain/go-bas-dns-server/app/cmdcommon"
-	"github.com/BASChain/go-bas-dns-server/app/cmdclient"
 )
 
 // assetsCmd represents the assets command
 var assetsCmd = &cobra.Command{
 	Use:   "assets",
 	Short: "Show Assets",
-	Long: `Show Assets`,
+	Long:  `Show Assets`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if _, err := cmdcommon.IsProcessStarted(); err != nil {
 			log.Println(err)
 			return
 		}
 
-		if len(args) == 0{
-			cmdclient.StringOpCmdSend("",cmdcommon.CMD_ASSET,"")
-		}else {
-			cmdclient.StringOpCmdSend("",cmdcommon.CMD_ASSET,args[0])
+		if len(args) == 0 {
+			cmdclient.StringOpCmdSend("", cmdcommon.CMD_ASSET, "")
+		} else {
+			cmdclient.StringOpCmdSend("", cmdcommon.CMD_ASSET, args[0])
 		}
 	},
 }

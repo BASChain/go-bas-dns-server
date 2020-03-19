@@ -32,8 +32,8 @@ type BASDConfig struct {
 	BasApi         string   `json:"basapi"`
 	DnsBasApi      string   `json:"dnsbasapi"`
 	ContactApi     string   `json:"contactapi"`
-	FreeEthAmount   string	`json:"freetokenamount"`
-	FreeBasAmount   string 	`json:"freebasamount"`
+	FreeEthAmount  string   `json:"freetokenamount"`
+	FreeBasAmount  string   `json:"freebasamount"`
 }
 
 var (
@@ -54,9 +54,8 @@ func (bc *BASDConfig) InitCfg() *BASDConfig {
 	bc.BasApi = "/api"
 	bc.DnsBasApi = "/api/domain"
 	bc.ContactApi = "/api/contact"
-	bc.FreeEthAmount = "100000000000000000"			//0.1eth
-	bc.FreeBasAmount = "1000000000000000000000"   //100bas
-
+	bc.FreeEthAmount = "100000000000000000"     //0.1eth
+	bc.FreeBasAmount = "1000000000000000000000" //100bas
 
 	return bc
 }
@@ -162,8 +161,8 @@ func GetBASDHomeDir() string {
 	return path.Join(curHome, BASD_HomeDir)
 }
 
-func GetKeyFile() string  {
-	return path.Join(GetBASDHomeDir(),"UTC--2020-03-11T06-56-52.423772000Z--33324a5ee0b35f17536ceda27274e88e76640f24")
+func GetKeyFile() string {
+	return path.Join(GetBASDHomeDir(), "UTC--2020-03-11T06-56-52.423772000Z--33324a5ee0b35f17536ceda27274e88e76640f24")
 }
 
 func GetBASDCFGFile() string {

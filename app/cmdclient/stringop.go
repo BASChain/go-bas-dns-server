@@ -1,14 +1,14 @@
 package cmdclient
 
 import (
-	"log"
-	"strings"
+	"fmt"
 	"github.com/BASChain/go-bas-dns-server/app/cmdcommon"
 	"github.com/BASChain/go-bas-dns-server/app/cmdpb"
-	"fmt"
+	"log"
+	"strings"
 )
 
-func StringOpCmdSend(addr string, cmd int32,reqs string) {
+func StringOpCmdSend(addr string, cmd int32, reqs string) {
 	if addr == "" || strings.Contains(addr, "127.0.0.1") {
 		if _, err := cmdcommon.IsProcessStarted(); err != nil {
 			log.Println(err)

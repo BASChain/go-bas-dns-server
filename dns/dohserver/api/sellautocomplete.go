@@ -1,43 +1,39 @@
 package api
 
 import (
-	"net/http"
-	"fmt"
-	"io/ioutil"
 	"encoding/json"
-	"github.com/ethereum/go-ethereum/common"
+	"fmt"
 	"github.com/BASChain/go-bas/DataSync"
+	"github.com/ethereum/go-ethereum/common"
+	"io/ioutil"
+	"net/http"
 	"strings"
 )
 
 type SellAutoComplete struct {
-
 }
-
 
 type SellAutoCompleteReq struct {
 	Wallet string `json:"wallet"`
-	Text string `json:"text"`
+	Text   string `json:"text"`
 }
-
 
 type DHPaire struct {
-	DomainName string `json:"domainname"`
-	WalletAddress  string `json:"walletaddress"`
-	Expire int64 `json:"expire"`
+	DomainName    string `json:"domainname"`
+	WalletAddress string `json:"walletaddress"`
+	Expire        int64  `json:"expire"`
 }
 
-
 type SellAutoCompleteResp struct {
-	State int `json:"state"`
+	State          int       `json:"state"`
 	DomainHashPair []DHPaire `json:"domainhashpair"`
 }
 
-func NewSellAutoComplete() *SellAutoComplete  {
+func NewSellAutoComplete() *SellAutoComplete {
 	return &SellAutoComplete{}
 }
 
-func (sac *SellAutoComplete)ServeHTTP(w http.ResponseWriter, r *http.Request)   {
+func (sac *SellAutoComplete) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
@@ -52,10 +48,10 @@ func (sac *SellAutoComplete)ServeHTTP(w http.ResponseWriter, r *http.Request)   
 		return
 	}
 
-	req:=&SellAutoCompleteReq{}
+	req := &SellAutoCompleteReq{}
 
-	err = json.Unmarshal(body,req)
-	if err!=nil{
+	err = json.Unmarshal(body, req)
+	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return
@@ -65,39 +61,38 @@ func (sac *SellAutoComplete)ServeHTTP(w http.ResponseWriter, r *http.Request)   
 
 	var addr *common.Address
 
-	if req.Wallet != ""{
+	if req.Wallet != "" {
 		address := common.HexToAddress(req.Wallet)
 		addr = &address
 	}
 
-
 	var dhp []DHPaire
 
-	for _,r:=range DataSync.Records{
-		if strings.Contains(r.GetName(),searchText){
-			if (addr == nil || (*addr) != (*r.GetOwnerOrig())) && r.GetBCAddr() != ""{
-				item:=DHPaire{}
+	for _, r := range DataSync.Records {
+		if strings.Contains(r.GetName(), searchText) {
+			if (addr == nil || (*addr) != (*r.GetOwnerOrig())) && r.GetBCAddr() != "" {
+				item := DHPaire{}
 				item.DomainName = r.GetName()
 				item.WalletAddress = r.GetBCAddr()
 				item.Expire = r.GetExpire()
-				dhp = append(dhp,item)
+				dhp = append(dhp, item)
 			}
 		}
 	}
 
 	resp := &SellAutoCompleteResp{}
 
-	if len(dhp) == 0{
+	if len(dhp) == 0 {
 		resp.State = 0
-	}else{
+	} else {
 		resp.State = 1
 		resp.DomainHashPair = dhp
 	}
 
 	var bresp []byte
 
-	bresp,err =json.Marshal(*resp)
-	if err != nil{
+	bresp, err = json.Marshal(*resp)
+	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return
@@ -105,10 +100,4 @@ func (sac *SellAutoComplete)ServeHTTP(w http.ResponseWriter, r *http.Request)   
 	w.WriteHeader(200)
 	w.Write(bresp)
 
-
 }
-
-
-
-
-

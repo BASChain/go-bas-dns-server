@@ -1,16 +1,15 @@
 package api
 
 import (
-	"net/http"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/BASChain/go-bas/DataSync"
+	"github.com/ethereum/go-ethereum/common"
+	"io/ioutil"
+	"net/http"
 )
 
 type DomainTotal struct {
-
 }
 
 type DomainTotalReq struct {
@@ -22,33 +21,32 @@ type DomainTotalResp struct {
 	Data  int `json:"data"`
 }
 
-const(
-	PathNotFound int = 1
+const (
+	PathNotFound    int = 1
 	AddressNotFound int = 2
 )
 
 type PathError struct {
 	ErrorCode int
-	ErrorMsg string
+	ErrorMsg  string
 }
 
-func EncapError(code int,msg string) []byte {
-	pe:=PathError{ErrorCode:code,ErrorMsg:msg}
+func EncapError(code int, msg string) []byte {
+	pe := PathError{ErrorCode: code, ErrorMsg: msg}
 
-	jpe,err:=json.Marshal(pe)
-	if err!=nil{
+	jpe, err := json.Marshal(pe)
+	if err != nil {
 		return []byte("{}")
 	}
 
 	return jpe
 }
 
-
 func NewDomainTotal() *DomainTotal {
 	return &DomainTotal{}
 }
 
-func (dt *DomainTotal)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
+func (dt *DomainTotal) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
@@ -63,34 +61,34 @@ func (dt *DomainTotal)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	dtr:=&DomainTotalReq{}
+	dtr := &DomainTotalReq{}
 
-	err = json.Unmarshal(body,dtr)
-	if err!=nil{
+	err = json.Unmarshal(body, dtr)
+	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return
 	}
 
-	addr:=common.HexToAddress(dtr.Wallet)
+	addr := common.HexToAddress(dtr.Wallet)
 
 	dtresp := &DomainTotalResp{}
 
 	DataSync.MemLock()
 	defer DataSync.MemUnlock()
 
-	hasharr,ok:=DataSync.Assets[addr]
-	if !ok{
+	hasharr, ok := DataSync.Assets[addr]
+	if !ok {
 		dtresp.State = 0
-	}else{
+	} else {
 		dtresp.State = 1
 		dtresp.Data = len(hasharr)
 	}
 
 	var bresp []byte
 
-	bresp,err =json.Marshal(*dtresp)
-	if err != nil{
+	bresp, err = json.Marshal(*dtresp)
+	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return

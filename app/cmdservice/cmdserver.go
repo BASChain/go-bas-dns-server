@@ -14,8 +14,8 @@ import (
 	"github.com/BASChain/go-bas-dns-server/app/cmdservice/api"
 	"github.com/BASChain/go-bas-dns-server/config"
 	"github.com/BASChain/go-bas-dns-server/dns/dohserver"
-	"github.com/BASChain/go-bas-dns-server/dns/server"
 	"github.com/BASChain/go-bas-dns-server/dns/mem"
+	"github.com/BASChain/go-bas-dns-server/dns/server"
 )
 
 type cmdServer struct {
@@ -67,7 +67,7 @@ func (cs *cmdServer) StartCmdService() {
 	cs.grpcServer = grpc.NewServer()
 
 	cmdpb.RegisterDefaultcmdsrvServer(cs.grpcServer, &api.CmdDefaultServer{stop})
-	cmdpb.RegisterStringopsrvServer(cs.grpcServer,&api.CmdStringOPSrv{})
+	cmdpb.RegisterStringopsrvServer(cs.grpcServer, &api.CmdStringOPSrv{})
 
 	reflection.Register(cs.grpcServer)
 	log.Println("Commamd line server will start at", cs.localaddr)

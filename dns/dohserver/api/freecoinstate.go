@@ -1,35 +1,34 @@
 package api
 
 import (
-	"net/http"
-	"fmt"
-	"io/ioutil"
 	"encoding/json"
-	"github.com/ethereum/go-ethereum/common"
+	"fmt"
 	"github.com/BASChain/go-bas-dns-server/dns/mem"
+	"github.com/ethereum/go-ethereum/common"
+	"io/ioutil"
+	"net/http"
 )
 
 type FreeCoinState struct {
-
 }
 
 type FreeCoinStateReq struct {
 	Wallet string `json:"wallet"`
-	Type   int `json:"type"`
+	Type   int    `json:"type"`
 }
 
 type FreeCoinStateResp struct {
 	Wallet string `json:"wallet"`
-	Type int `json:"type"`
-	State int `json:"state"`
-	Msg string `json:"msg"`
+	Type   int    `json:"type"`
+	State  int    `json:"state"`
+	Msg    string `json:"msg"`
 }
 
 func NewFreeCoinState() *FreeCoinState {
 	return &FreeCoinState{}
 }
 
-func (fcs *FreeCoinState) ServeHTTP(w http.ResponseWriter, r *http.Request)  {
+func (fcs *FreeCoinState) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
@@ -44,46 +43,46 @@ func (fcs *FreeCoinState) ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	req:= &FreeCoinStateReq{}
+	req := &FreeCoinStateReq{}
 
-	err = json.Unmarshal(body,req)
-	if err!=nil{
+	err = json.Unmarshal(body, req)
+	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return
 	}
 
-	addr:=common.HexToAddress(req.Wallet)
-	
-	resp:=&FreeCoinStateResp{}
+	addr := common.HexToAddress(req.Wallet)
+
+	resp := &FreeCoinStateResp{}
 	resp.Wallet = req.Wallet
 	resp.Type = req.Type
 
-	if req.Type != mem.ETH && req.Type != mem.BAS{
+	if req.Type != mem.ETH && req.Type != mem.BAS {
 		resp.Msg = "Type Error"
-	}else{
+	} else {
 		var state int
-		state,err = mem.GetState(addr,req.Type)
-		if err == nil{
+		state, err = mem.GetState(addr, req.Type)
+		if err == nil {
 			resp.State = state
-			if resp.State == mem.WAITING{
+			if resp.State == mem.WAITING {
 				resp.Msg = "Waiting a result"
 			}
-			if resp.State == mem.SUCCESS{
+			if resp.State == mem.SUCCESS {
 				resp.Msg = "Success"
 			}
-			if resp.State == mem.FAILURE{
+			if resp.State == mem.FAILURE {
 				resp.Msg = "Failure"
 			}
-		}else{
+		} else {
 			resp.Msg = "No State"
 		}
 	}
 
 	var bresp []byte
 
-	bresp,err =json.Marshal(*resp)
-	if err != nil{
+	bresp, err = json.Marshal(*resp)
+	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return

@@ -16,27 +16,27 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"log"
 	"github.com/BASChain/go-bas-dns-server/app/cmdclient"
 	"github.com/BASChain/go-bas-dns-server/app/cmdcommon"
+	"github.com/spf13/cobra"
+	"log"
 )
 
 // domainCmd represents the domain command
 var domainCmd = &cobra.Command{
 	Use:   "domain",
 	Short: "Show Domain",
-	Long: `Show Domain`,
+	Long:  `Show Domain`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if _, err := cmdcommon.IsProcessStarted(); err != nil {
 			log.Println(err)
 			return
 		}
 
-		if len(args) == 0{
-			cmdclient.StringOpCmdSend("",cmdcommon.CMD_DOMAIN,"")
-		}else {
-			cmdclient.StringOpCmdSend("",cmdcommon.CMD_DOMAIN,args[0])
+		if len(args) == 0 {
+			cmdclient.StringOpCmdSend("", cmdcommon.CMD_DOMAIN, "")
+		} else {
+			cmdclient.StringOpCmdSend("", cmdcommon.CMD_DOMAIN, args[0])
 		}
 	},
 }

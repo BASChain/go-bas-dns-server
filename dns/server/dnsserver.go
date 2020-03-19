@@ -3,19 +3,19 @@ package server
 import (
 	"github.com/BASChain/go-bas-dns-server/config"
 
-	"github.com/btcsuite/btcutil/base58"
 	"github.com/BASChain/go-bas-dns-server/lib/dns"
+	"github.com/btcsuite/btcutil/base58"
 
+	"github.com/BASChain/go-bas-dns-server/dns/dohserver/api"
 	"log"
 	"net"
 	"strconv"
-	"github.com/BASChain/go-bas-dns-server/dns/dohserver/api"
 
 	"errors"
 )
 
 const (
-	TypeBCAddr = 65  //only for Question
+	TypeBCAddr  = 65 //only for Question
 	TypeBasAddr = 66 //for answer
 )
 
@@ -27,8 +27,6 @@ var (
 	udpServer *dns.Server
 	tcpServer *dns.Server
 )
-
-
 
 func sendErrMsg(w dns.ResponseWriter, msg *dns.Msg, errCode int) {
 	m := DeriveMsg(msg, errCode)
@@ -66,9 +64,8 @@ func buildAnswer(ipv4 [4]byte, q dns.Question) []dns.RR {
 	return rr
 }
 
-
-func BuildNullAnswer(q dns.Question) dns.RR  {
-	NULL:=&dns.NULL{}
+func BuildNullAnswer(q dns.Question) dns.RR {
+	NULL := &dns.NULL{}
 
 	NULL.Hdr.Name = q.Name
 
@@ -77,11 +74,10 @@ func BuildNullAnswer(q dns.Question) dns.RR  {
 	NULL.Hdr.Ttl = 10
 	NULL.Hdr.Rdlength = uint16(len("TraditionSystemName"))
 
-	NULL.Data="TraditionSystemName"
+	NULL.Data = "TraditionSystemName"
 
 	return NULL
 }
-
 
 func replyTypA(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) error {
 	if m, err := BCReplayTypeA(msg, q); err != nil {
@@ -99,20 +95,20 @@ func BCReplayTypeA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 		qn = qn[:len(qn)-1]
 	}
 
-	 dr:=api.QueryBasByDomainName(qn)
-	 if dr == nil{
+	dr := api.QueryBasByDomainName(qn)
+	if dr == nil {
 		return nil, errors.New("Not Found")
-	 }
+	}
 
-	 if dr.GetIPv4() == 0{
-		 return nil, errors.New("Not Found")
-	 }
-	 m := msg.Copy()
-	 m.Compress = true
-	 m.Response = true
-	 m.Answer = buildAnswer(dr.GetIPv4Addr(), q)
+	if dr.GetIPv4() == 0 {
+		return nil, errors.New("Not Found")
+	}
+	m := msg.Copy()
+	m.Compress = true
+	m.Response = true
+	m.Answer = buildAnswer(dr.GetIPv4Addr(), q)
 
-	 return m, nil
+	return m, nil
 
 }
 
@@ -180,7 +176,6 @@ func BCReplyTypeBCA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 
 	m := DeriveMsg(msg, dns.RcodeBadKey)
 	return m, nil
-
 
 }
 

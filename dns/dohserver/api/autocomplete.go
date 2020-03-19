@@ -1,16 +1,15 @@
 package api
 
 import (
-	"net/http"
-	"fmt"
-	"io/ioutil"
 	"encoding/json"
+	"fmt"
 	"github.com/BASChain/go-bas/DataSync"
+	"io/ioutil"
+	"net/http"
 	"strings"
 )
 
 type AutoComplete struct {
-
 }
 
 type AutoCompleteReq struct {
@@ -18,17 +17,15 @@ type AutoCompleteReq struct {
 }
 
 type AutoCompleteResp struct {
-	State int `json:"state"`
-	Data []string `json:"data"`
-} 
-
-
+	State int      `json:"state"`
+	Data  []string `json:"data"`
+}
 
 func NewAutoComplete() *AutoComplete {
 	return &AutoComplete{}
 }
 
-func (ac *AutoComplete)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
+func (ac *AutoComplete) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
@@ -43,10 +40,10 @@ func (ac *AutoComplete)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	acr:=&AutoCompleteReq{}
+	acr := &AutoCompleteReq{}
 
-	err = json.Unmarshal(body,acr)
-	if err!=nil{
+	err = json.Unmarshal(body, acr)
+	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return
@@ -55,17 +52,17 @@ func (ac *AutoComplete)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	searchText := acr.Text
 	var data []string
 
-	for _,r:=range DataSync.Records{
-		if strings.Contains(r.GetName(),searchText){
-			data = append(data,r.GetName())
+	for _, r := range DataSync.Records {
+		if strings.Contains(r.GetName(), searchText) {
+			data = append(data, r.GetName())
 		}
 	}
 
-	resp:=&AutoCompleteResp{}
+	resp := &AutoCompleteResp{}
 
-	if len(data)>0{
+	if len(data) > 0 {
 		resp.State = 1
-	}else {
+	} else {
 		resp.State = 0
 	}
 
@@ -73,8 +70,8 @@ func (ac *AutoComplete)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 
 	var bresp []byte
 
-	bresp,err =json.Marshal(*resp)
-	if err != nil{
+	bresp, err = json.Marshal(*resp)
+	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return
