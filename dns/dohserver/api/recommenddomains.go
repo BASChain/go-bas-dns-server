@@ -49,7 +49,7 @@ func FindAllTopLevelDomain() []DataSync.DomainRecord {
 	curTime := tools.GetNowMsTime()/1000
 	var ds []DataSync.DomainRecord
 	for _,r:=range DataSync.Records{
-		if r.GetIsRoot() && r.GetIsPureA() && r.GetExpire() > curTime{
+		if r.GetIsRoot() && r.GetIsPureA() && r.GetExpire() > curTime && r.GetOpenStatus(){
 			ds = append(ds,r)
 		}
 	}
@@ -219,9 +219,6 @@ func (rd *RecommendDomains)  ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fmt.Println("prefix domain",prefixDomain)
-	fmt.Println("root domain ",rootDomain)
-
 	cnt := 0
 	cb:=(req.PageNumber-1)*req.PageSize
 	ce:=req.PageNumber*req.PageSize
@@ -233,7 +230,6 @@ func (rd *RecommendDomains)  ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if d!=nil{
 		if cnt >=cb && cnt <ce{
 			dd:=Record2DomainDetail(d)
-			fmt.Println("put into register queue",d.GetName())
 			Registered = append(Registered,dd)
 		}
 		cnt ++
@@ -241,11 +237,10 @@ func (rd *RecommendDomains)  ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r:=GetRootDomainRecord(rootDomain)
 		if r!=nil{
 			if cnt >=cb && cnt <ce{
-				dr:=Record2DomainDetail(d)
+				dr:=Record2DomainDetail(r)
 				rec:=&RecommandDomain{}
 				rec.RecommendName = searchDomain
 				rec.RootDomain = dr
-				fmt.Println("put into recommend queue",r.GetName())
 				Recommend = append(Recommend,rec)
 			}
 			cnt ++
@@ -257,11 +252,6 @@ func (rd *RecommendDomains)  ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for i:=0;i<len(roots);i++{
 		r:=roots[i]
 		rname:=r.GetName()
-		expire:=false
-		if curTime > r.GetExpire(){
-			expire = true
-		}
-		fmt.Println("rname",rname,expire)
 		if rname == rootDomain{
 			continue
 		}
@@ -273,7 +263,6 @@ func (rd *RecommendDomains)  ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				rec:=&RecommandDomain{}
 				rec.RecommendName = name
 				rec.RootDomain = dr
-				fmt.Println("put into recommend queue1",roots[i].GetName())
 				Recommend = append(Recommend,rec)
 			}
 			cnt ++
@@ -284,7 +273,6 @@ func (rd *RecommendDomains)  ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 			if cnt >=cb && cnt <ce{
 				dd:=Record2DomainDetail(d)
-				fmt.Println("put into register queue1",d.GetName())
 				Registered = append(Registered,dd)
 			}
 
