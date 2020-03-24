@@ -38,11 +38,14 @@ func Update(addr common.Address, typ int, state int) error {
 	if state != WAITING && state != SUCCESS && state != FAILURE {
 		return errors.New("state error")
 	}
+
 	lock.Lock()
 	defer lock.Unlock()
+
 	if m == nil {
 		m = make(map[common.Address]*MemState)
 	}
+
 	if s, ok := m[addr]; !ok {
 		s = &MemState{}
 		s.FreeState[typ] = state
@@ -58,6 +61,7 @@ func Update(addr common.Address, typ int, state int) error {
 }
 
 func GetState(addr common.Address, typ int) (int, error) {
+
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -83,10 +87,10 @@ func MemStateStart() {
 
 	wg.Add(1)
 
-	go MemStateTimeOut()
+	go memStateTimeOut()
 }
 
-func MemStateTimeOut() {
+func memStateTimeOut() {
 
 	defer wg.Done()
 

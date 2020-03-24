@@ -69,6 +69,10 @@ const (
 	FreeBas       string = "freeBas"
 	FreeCoinState string = "freeCoinState"
 	RegDomain     string = "registerDomain"
+	TopLevelDomain string = "tldList"
+	RecommendDomains string = "RecommendDomains"
+	LatestRegisters string = "LatestRegisters"
+	ExpensiveDomains string = "ExpensiveDomains"
 )
 
 func NewDohServers() *DohServer {
@@ -101,6 +105,8 @@ func NewDohServers() *DohServer {
 	mux.Handle(path.Join(cfg.DnsBasApi, RegDomain), api.NewRegDomain())
 	mux.Handle(path.Join(cfg.DnsBasApi, DomainInfo), api.NewDomainInfo())
 	mux.Handle(path.Join(cfg.DnsBasApi, DomainSell), api.NewSellAutoComplete())
+	mux.Handle(path.Join(cfg.DnsBasApi,TopLevelDomain),api.NewTopLevelDomains())
+	mux.Handle(path.Join(cfg.DnsBasApi,RecommendDomains),api.NewRecommendDomains())
 
 	smux := http.NewServeMux()
 	smux.Handle(cfg.DnsPath, &DohServer{})
@@ -113,6 +119,8 @@ func NewDohServers() *DohServer {
 	smux.Handle(path.Join(cfg.DnsBasApi, RegDomain), api.NewRegDomain())
 	smux.Handle(path.Join(cfg.DnsBasApi, DomainInfo), api.NewDomainInfo())
 	smux.Handle(path.Join(cfg.DnsBasApi, DomainSell), api.NewSellAutoComplete())
+	smux.Handle(path.Join(cfg.DnsBasApi,TopLevelDomain),api.NewTopLevelDomains())
+	smux.Handle(path.Join(cfg.DnsBasApi,RecommendDomains),api.NewRecommendDomains())
 
 	server.dohServer.Handler = http.Handler(mux)
 
