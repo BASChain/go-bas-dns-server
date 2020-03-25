@@ -73,6 +73,7 @@ const (
 	RecommendDomains string = "RecommendDomains"
 	LatestRegisters string = "LatestRegisters"
 	ExpensiveDomains string = "ExpensiveDomains"
+	BasBasicSettings string = "basBasicSettings"
 )
 
 func NewDohServers() *DohServer {
@@ -102,6 +103,7 @@ func NewDohServers() *DohServer {
 	mux.Handle(path.Join(cfg.ContactApi, FreeEth), api.NewFreeEth())
 	mux.Handle(path.Join(cfg.ContactApi, FreeBas), api.NewFreeBas())
 	mux.Handle(path.Join(cfg.ContactApi, FreeCoinState), api.NewFreeCoinState())
+	mux.Handle(path.Join(cfg.ContactApi,BasBasicSettings),api.NewBasSettings())
 	mux.Handle(path.Join(cfg.DnsBasApi, RegDomain), api.NewRegDomain())
 	mux.Handle(path.Join(cfg.DnsBasApi, DomainInfo), api.NewDomainInfo())
 	mux.Handle(path.Join(cfg.DnsBasApi, DomainSell), api.NewSellAutoComplete())
@@ -116,6 +118,7 @@ func NewDohServers() *DohServer {
 	smux.Handle(path.Join(cfg.ContactApi, FreeEth), api.NewFreeEth())
 	smux.Handle(path.Join(cfg.ContactApi, FreeBas), api.NewFreeBas())
 	smux.Handle(path.Join(cfg.ContactApi, FreeCoinState), api.NewFreeCoinState())
+	smux.Handle(path.Join(cfg.ContactApi,BasBasicSettings),api.NewBasSettings())
 	smux.Handle(path.Join(cfg.DnsBasApi, RegDomain), api.NewRegDomain())
 	smux.Handle(path.Join(cfg.DnsBasApi, DomainInfo), api.NewDomainInfo())
 	smux.Handle(path.Join(cfg.DnsBasApi, DomainSell), api.NewSellAutoComplete())
