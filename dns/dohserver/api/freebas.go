@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"math/big"
 	"net/http"
+	"github.com/BASChain/go-bas-dns-server/dns/dohserver/exlib"
 )
 
 type FreeBas struct {
@@ -107,7 +108,7 @@ func (fb *FreeBas) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if !flag {
 		resp.State = 1
 
-		Transactions.SendFreeBasByContractWrapper(config.GetLoanKey(), addr, sndamount)
+		exlib.SendFreeBasByContractWrapper(config.GetLoanKey(), addr, sndamount)
 		resp.Amount = amount
 		resp.ErrMsg = "success"
 
