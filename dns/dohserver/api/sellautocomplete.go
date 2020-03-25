@@ -70,10 +70,10 @@ func (sac *SellAutoComplete) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	for _, r := range DataSync.Records {
 		if strings.Contains(r.GetName(), searchText) {
-			if (addr == nil || (*addr) != (*r.GetOwnerOrig())) && r.GetBCAddr() != "" {
+			if (addr == nil || (*addr) != (*r.GetOwnerOrig())) && r.GetBCAddrStr() != "" {
 				item := DHPaire{}
 				item.DomainName = r.GetName()
-				item.WalletAddress = r.GetBCAddr()
+				item.WalletAddress = r.GetBCAddrStr()
 				item.Expire = r.GetExpire()
 				dhp = append(dhp, item)
 			}

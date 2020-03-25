@@ -94,7 +94,7 @@ func GetRecords(r string) string {
 
 }
 
-func getDomain(domain DataSync.DomainRecord) string {
+func getDomain(domain *DataSync.DomainRecord) string {
 	msg := ""
 
 	msg += fmt.Sprintf("   %-20s ", domain.GetName())

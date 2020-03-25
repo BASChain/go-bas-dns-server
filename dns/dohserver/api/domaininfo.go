@@ -74,13 +74,13 @@ func (rd *DomainInfo) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		dnsinfo.Ipv4 = d.GetIPv4Str()
 		dnsinfo.Ipv6 = d.GetIpv6Str()
 		dnsinfo.Alias = d.GetAliasName()
-		dnsinfo.BCAddr = d.GetBCAddr()
+		dnsinfo.BCAddr = d.GetBCAddrStr()
 		dnsinfo.ExtraInfo = d.GetExtraInfo()
 		dnsinfo.DomainHash = "0x" + hex.EncodeToString(dhash[:])
 
 		assetinfo := &RegDomainRecord{}
 
-		assetinfo.RIsPureA = d.GetIsPureA()
+		assetinfo.RIsPureA = d.GetIsRare()
 		assetinfo.IsRoot = d.GetIsRoot()
 		assetinfo.Owner = d.GetOwner()
 		assetinfo.Name = d.GetName()
@@ -95,7 +95,7 @@ func (rd *DomainInfo) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			d, ok = DataSync.Records[roothash]
 			if ok {
 				r1 := &RegDomainRecord{}
-				r1.RIsPureA = d.GetIsPureA()
+				r1.RIsPureA = d.GetIsRare()
 				r1.IsRoot = d.GetIsRoot()
 				r1.Owner = d.GetOwner()
 				r1.Name = d.GetName()

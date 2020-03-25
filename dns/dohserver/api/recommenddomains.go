@@ -45,11 +45,11 @@ func NewRecommendDomains() *RecommendDomains {
 	return &RecommendDomains{}
 }
 
-func FindAllTopLevelDomain() []DataSync.DomainRecord {
+func FindAllTopLevelDomain() []*DataSync.DomainRecord {
 	curTime := tools.GetNowMsTime()/1000
-	var ds []DataSync.DomainRecord
+	var ds []*DataSync.DomainRecord
 	for _,r:=range DataSync.Records{
-		if r.GetIsRoot() && r.GetIsPureA() && r.GetExpire() > curTime && r.GetOpenStatus(){
+		if r.GetIsRoot() && r.GetIsRare() && r.GetExpire() > curTime && r.GetOpenStatus(){
 			ds = append(ds,r)
 		}
 	}
@@ -72,13 +72,13 @@ func Record2DomainDetail(d *DataSync.DomainRecord) *DomainDetail {
 	dnsinfo.Ipv4 = d.GetIPv4Str()
 	dnsinfo.Ipv6 = d.GetIpv6Str()
 	dnsinfo.Alias = d.GetAliasName()
-	dnsinfo.BCAddr = d.GetBCAddr()
+	dnsinfo.BCAddr = d.GetBCAddrStr()
 	dnsinfo.ExtraInfo = d.GetExtraInfo()
 	dnsinfo.DomainHash = "0x" + hex.EncodeToString(dhash[:])
 
 	assetinfo := &RegDomainRecord{}
 
-	assetinfo.RIsPureA = d.GetIsPureA()
+	assetinfo.RIsPureA = d.GetIsRare()
 	assetinfo.IsRoot = d.GetIsRoot()
 	assetinfo.Owner = d.GetOwner()
 	assetinfo.Name = d.GetName()
@@ -93,7 +93,7 @@ func Record2DomainDetail(d *DataSync.DomainRecord) *DomainDetail {
 		d1, ok := DataSync.Records[roothash]
 		if ok {
 			r1 := &RegDomainRecord{}
-			r1.RIsPureA = d1.GetIsPureA()
+			r1.RIsPureA = d1.GetIsRare()
 			r1.IsRoot = d1.GetIsRoot()
 			r1.Owner = d1.GetOwner()
 			r1.Name = d1.GetName()
@@ -125,7 +125,7 @@ func GetRootDomainRecord(domain string) *DataSync.DomainRecord  {
 		return nil
 	}
 
-	return &d
+	return d
 }
 
 
@@ -151,7 +151,7 @@ func GetSubDomainRecord(domain string) *DataSync.DomainRecord {
 		return nil
 	}
 
-	return &d
+	return d
 
 }
 
@@ -259,7 +259,7 @@ func (rd *RecommendDomains)  ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		d:=GetSubDomainRecord(name)
 		if d == nil{
 			if cnt >=cb && cnt <ce{
-				dr:=Record2DomainDetail(&(roots[i]))
+				dr:=Record2DomainDetail(roots[i])
 				rec:=&RecommandDomain{}
 				rec.RecommendName = name
 				rec.RootDomain = dr

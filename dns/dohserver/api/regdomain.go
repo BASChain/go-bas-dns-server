@@ -71,7 +71,7 @@ func (rd *RegDomain) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		resp.State = 0
 	} else {
 		r := &RegDomainRecord{}
-		r.RIsPureA = d.GetIsPureA()
+		r.RIsPureA = d.GetIsRare()
 		r.IsRoot = d.GetIsRoot()
 		r.Owner = d.GetOwner()
 		r.Name = d.GetName()
@@ -85,7 +85,7 @@ func (rd *RegDomain) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			d, ok = DataSync.Records[roothash]
 			if ok {
 				r1 := &RegDomainRecord{}
-				r1.RIsPureA = d.GetIsPureA()
+				r1.RIsPureA = d.GetIsRare()
 				r1.IsRoot = d.GetIsRoot()
 				r1.Owner = d.GetOwner()
 				r1.Name = d.GetName()

@@ -11,7 +11,7 @@ func QueryBasByDomainName(q string) *DataSync.DomainRecord {
 	if n, ok := DataSync.Records[hash]; !ok {
 		return nil
 	} else {
-		return &n
+		return n
 	}
 }
 
