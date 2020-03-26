@@ -9,7 +9,6 @@ import (
 	"github.com/BASChain/go-bas/DataSync"
 	"bytes"
 	"strings"
-	"log"
 )
 
 type LatestRegisters struct {
@@ -126,7 +125,7 @@ func (lr *LatestRegisters)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	latestRegDomainList = list.NewList(cmp)
 	latestRegDomainList.SetSortFunc(sort)
 	for _,v:=range DataSync.Records{
-		log.Println(string(v.Name),req.Top,v.GetIsRare(),filter(string(v.Name),req.Top,v.GetIsRare()))
+		//log.Println(string(v.Name),req.Top,v.GetIsRare(),filter(string(v.Name),req.Top,v.GetIsRare()))
 		if filter(string(v.Name),req.Top,v.GetIsRare()) == true{
 			latestRegDomainList.AddValueOrder(v)
 		}
@@ -136,19 +135,19 @@ func (lr *LatestRegisters)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	e:=(req.PageNumber)*req.PageSize
 	s:=(req.PageNumber-1)*req.PageSize
 
-	cusor:=latestRegDomainList.ListIterator(e)
+	cursor:=latestRegDomainList.ListIterator(e)
 
 	resp:=&LatestRegistersResp{}
 
 	var latestDomains []*DomainDetail
 
 	cnt := 0
-	if cusor.Count() <= s {
+	if cursor.Count() <= s {
 		resp.State = 0
 	}else{
 		resp.State = 1
 		for{
-			d:=cusor.Next()
+			d:=cursor.Next()
 			if d == nil{
 				break
 			}
@@ -162,7 +161,7 @@ func (lr *LatestRegisters)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	}
 	resp.PageSize = req.PageSize
 	resp.PageNumber = req.PageNumber
-	resp.TotalPage = cnt
+	resp.TotalPage = cursor.Count()
 
 	var bresp []byte
 
