@@ -109,6 +109,7 @@ func NewDohServers() *DohServer {
 	mux.Handle(path.Join(cfg.DnsBasApi, DomainSell), api.NewSellAutoComplete())
 	mux.Handle(path.Join(cfg.DnsBasApi,TopLevelDomain),api.NewTopLevelDomains())
 	mux.Handle(path.Join(cfg.DnsBasApi,RecommendDomains),api.NewRecommendDomains())
+	mux.Handle(path.Join(cfg.DnsBasApi,LatestRegisters),api.NewLatestRegisters())
 
 	smux := http.NewServeMux()
 	smux.Handle(cfg.DnsPath, &DohServer{})
@@ -124,6 +125,7 @@ func NewDohServers() *DohServer {
 	smux.Handle(path.Join(cfg.DnsBasApi, DomainSell), api.NewSellAutoComplete())
 	smux.Handle(path.Join(cfg.DnsBasApi,TopLevelDomain),api.NewTopLevelDomains())
 	smux.Handle(path.Join(cfg.DnsBasApi,RecommendDomains),api.NewRecommendDomains())
+	smux.Handle(path.Join(cfg.DnsBasApi,LatestRegisters),api.NewLatestRegisters())
 
 	server.dohServer.Handler = http.Handler(mux)
 

@@ -87,6 +87,7 @@ func Record2DomainDetail(d *DataSync.DomainRecord) *DomainDetail {
 	assetinfo.RisCustomed = d.GetIsCustomed()
 	assetinfo.RcustomePrice = d.GetCustomedPrice()
 	assetinfo.DomainHash = "0x" + hex.EncodeToString(dhash[:])
+	assetinfo.RegTime = d.GetRegTime()
 
 	if !assetinfo.IsRoot {
 		roothash := d.GetParentHash()
@@ -102,6 +103,7 @@ func Record2DomainDetail(d *DataSync.DomainRecord) *DomainDetail {
 			r1.RisCustomed = d1.GetIsCustomed()
 			r1.RcustomePrice = d1.GetCustomedPrice()
 			r1.DomainHash = "0x" + hex.EncodeToString(roothash[:])
+			r1.RegTime = d.GetRegTime()
 			assetinfo.ParentDomain = r1
 		}
 	}
