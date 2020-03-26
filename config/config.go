@@ -32,6 +32,8 @@ type BASDConfig struct {
 	BasApi         string   `json:"basapi"`
 	DnsBasApi      string   `json:"dnsbasapi"`
 	ContactApi     string   `json:"contactapi"`
+	MyWalletApi    string   `json:"mywalletapi"`
+	MarketApi      string   `json:"marketapi"`
 	FreeEthAmount  string   `json:"freetokenamount"`
 	FreeBasAmount  string   `json:"freebasamount"`
 }
@@ -54,6 +56,8 @@ func (bc *BASDConfig) InitCfg() *BASDConfig {
 	bc.BasApi = "/api"
 	bc.DnsBasApi = "/api/domain"
 	bc.ContactApi = "/api/contact"
+	bc.MarketApi = "/api/market"
+	bc.MyWalletApi = "/api/mywallet"
 	bc.FreeEthAmount = "100000000000000000"     //0.1eth
 	bc.FreeBasAmount = "1000000000000000000000" //100bas
 

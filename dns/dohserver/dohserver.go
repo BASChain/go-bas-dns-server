@@ -74,6 +74,11 @@ const (
 	LatestRegisters string = "LatestRegisters"
 	ExpensiveDomains string = "ExpensiveDomains"
 	BasBasicSettings string = "basBasicSettings"
+	SubDomainList string = "subDomainList"
+	//MySellDomainList string = "mySellDomainList"
+	SellingDomainList string = "SellingDomainList"
+	FavoriteDomainList string = "favoriteDomainList"
+	MarketSearch  string = "marketSearch"
 )
 
 func NewDohServers() *DohServer {
@@ -110,6 +115,10 @@ func NewDohServers() *DohServer {
 	mux.Handle(path.Join(cfg.DnsBasApi,TopLevelDomain),api.NewTopLevelDomains())
 	mux.Handle(path.Join(cfg.DnsBasApi,RecommendDomains),api.NewRecommendDomains())
 	mux.Handle(path.Join(cfg.DnsBasApi,LatestRegisters),api.NewLatestRegisters())
+	mux.Handle(path.Join(cfg.DnsBasApi,ExpensiveDomains),api.NewExpensiveDomains())
+	mux.Handle(path.Join(cfg.MyWalletApi,SubDomainList),api.NewSubDomainList())
+	mux.Handle(path.Join(cfg.MarketApi,SellingDomainList),api.NewSellingDomain())
+	mux.Handle(path.Join(cfg.MarketApi,MarketSearch),api.NewMarketSearch())
 
 	smux := http.NewServeMux()
 	smux.Handle(cfg.DnsPath, &DohServer{})
@@ -126,6 +135,11 @@ func NewDohServers() *DohServer {
 	smux.Handle(path.Join(cfg.DnsBasApi,TopLevelDomain),api.NewTopLevelDomains())
 	smux.Handle(path.Join(cfg.DnsBasApi,RecommendDomains),api.NewRecommendDomains())
 	smux.Handle(path.Join(cfg.DnsBasApi,LatestRegisters),api.NewLatestRegisters())
+	smux.Handle(path.Join(cfg.DnsBasApi,ExpensiveDomains),api.NewExpensiveDomains())
+	smux.Handle(path.Join(cfg.MyWalletApi,SubDomainList),api.NewSubDomainList())
+	smux.Handle(path.Join(cfg.MarketApi,SellingDomainList),api.NewSellingDomain())
+	smux.Handle(path.Join(cfg.MarketApi,MarketSearch),api.NewMarketSearch())
+
 
 	server.dohServer.Handler = http.Handler(mux)
 
