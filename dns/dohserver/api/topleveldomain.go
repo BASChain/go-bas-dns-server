@@ -71,6 +71,7 @@ func (tld *TopLevelDomains)ServeHTTP(w http.ResponseWriter,r *http.Request) {
 	curTime:=tools.GetNowMsTime()/1000
 
 	for _,r:=range DataSync.Records{
+
 		if r.GetIsRoot() && r.GetIsRare() && r.GetExpire() > curTime && r.GetOpenStatus(){
 			if cnt >=rb && cnt < re{
 				domains = append(domains,r.GetName())

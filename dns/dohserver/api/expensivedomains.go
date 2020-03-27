@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"encoding/json"
-	"github.com/BASChain/go-bas/Market"
 	"github.com/BASChain/go-bas/DataSync"
 	"github.com/BASChain/go-bas/Bas_Ethereum"
 	"github.com/kprc/nbsnetwork/common/list"
 	"math/big"
+	"github.com/BASChain/go-bas/Market"
 )
 
 type ExpensiveDomains struct {
@@ -29,6 +29,7 @@ type ExpensiveDomain struct {
 	RegTime int64 `json:"regtime"`
 	ExpireTime int64 `json:"expiretime"`
 	Owner string `json:"owner"`
+	From string  `json:"from,omitempty"`
 }
 
 type ExpensiveDomainsResp struct {
@@ -44,7 +45,7 @@ func NewExpensiveDomains() *ExpensiveDomains {
 }
 
 func expensiveCmp(v1 interface{},v2 interface{}) int  {
-	e1,e2:=v1.(ExpensiveDomain),v2.(ExpensiveDomain)
+	e1,e2:=v1.(*ExpensiveDomain),v2.(*ExpensiveDomain)
 
 	if e1.Domain == e2.Domain{
 		return 0
@@ -53,7 +54,7 @@ func expensiveCmp(v1 interface{},v2 interface{}) int  {
 }
 
 func expensiveSort(v1 interface{},v2 interface{}) int  {
-	e1,e2:=v1.(ExpensiveDomain),v2.(ExpensiveDomain)
+	e1,e2:=v1.(*ExpensiveDomain),v2.(*ExpensiveDomain)
 
 	if e1.PriceOmit.Cmp(e2.PriceOmit) < 0{
 		return 1
@@ -62,6 +63,22 @@ func expensiveSort(v1 interface{},v2 interface{}) int  {
 	return -1
 
 }
+
+func fDo(arg interface{}, v interface{}) (ret interface{},err error) {
+	e1,e2:=arg.(*ExpensiveDomain),v.(*ExpensiveDomain)
+
+	if e1.PriceOmit.Cmp(e2.PriceOmit) > 0{
+		e2.PriceOmit = e1.PriceOmit
+		e2.Price = e1.Price
+		e2.RegTime = e1.RegTime
+		e2.ExpireTime = e1.ExpireTime
+		e2.Owner = e1.Owner
+		e2.From = e1.From
+	}
+
+	return e1,nil
+}
+
 
 
 func GetRecord(hash Bas_Ethereum.Hash) *DataSync.DomainRecord  {
@@ -98,25 +115,27 @@ func (ed *ExpensiveDomains) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	expensiveList := list.NewList(expensiveCmp)
 	expensiveList.SetSortFunc(expensiveSort)
 
-	for _,v:=range Market.SellOrders{
-		for kk,vv:=range v{
-			d:=GetRecord(kk)
-			if d == nil {
-				continue
-			}
-			e:=&ExpensiveDomain{}
-			e.Domain = string(d.Name)
-			e.PriceOmit = vv.GetPrice()
-			e.Price = vv.GetPriceStr()
-			t,_ := Bas_Ethereum.GetTimestamp(vv.BlockNumber)
-			e.RegTime = int64(t)
-			e.ExpireTime = d.GetExpire()
-			e.Owner = d.GetOwner()
+	for i:=0;i<len(Market.Sold);i++{
+		deal:=Market.Sold[i]
+		d:=GetRecord(deal.GetHash())
+		if d == nil || deal.GetAGreedPrice() == nil{
+			continue
+		}
+		ed:=&ExpensiveDomain{}
+		ed.From = deal.GetFromOwner()
+		ed.Owner = deal.GetOwner()
+		ed.PriceOmit = deal.GetAGreedPrice()
+		ed.Price = ed.PriceOmit.String()
+		ed.ExpireTime = d.GetExpire()
+		ed.RegTime = d.GetRegTime()
+		ed.Domain = d.GetName()
 
-			expensiveList.AddValueOrder(e)
+		if _,err:=expensiveList.FindDo(ed,fDo);err!=nil{
+			expensiveList.AddValue(ed)
 		}
 	}
 
+	expensiveList.Sort()
 
 	cnt:=0
 	b:=(req.PageNumber-1)*req.PageSize

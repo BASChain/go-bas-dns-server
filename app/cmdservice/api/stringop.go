@@ -101,6 +101,18 @@ func getDomain(domain *DataSync.DomainRecord) string {
 	ip := domain.GetIPv4Addr()
 	msg += fmt.Sprintf("%-16s ", net.IPv4(ip[0], ip[1], ip[2], ip[3]).String())
 	msg += fmt.Sprintf("%-12s ", strconv.FormatInt(domain.GetExpire(), 10))
+	rare:="0"
+	if domain.GetIsRare() {
+		rare = "1"
+	}
+	msg += fmt.Sprintf("%-2s",rare)
+	open:="0"
+	if domain.GetOpenStatus(){
+		open = "1"
+	}
+	msg += fmt.Sprintf("%-2s",open)
+
+
 
 	return msg
 }
