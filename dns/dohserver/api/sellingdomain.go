@@ -8,6 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/BASChain/go-bas/Market"
 	"github.com/BASChain/go-bas/Bas_Ethereum"
+	"encoding/hex"
 )
 
 type SellingDomain struct {
@@ -101,6 +102,7 @@ func (sd *SellingDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 				ed.RegTime = int64(t)
 				ed.ExpireTime = d.GetExpire()
 				ed.Owner = d.GetOwner()
+				ed.Hash = "0x" + hex.EncodeToString(k[:])
 
 				resp.Domains = append(resp.Domains,ed)
 			}

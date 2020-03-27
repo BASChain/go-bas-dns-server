@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"strings"
 	"github.com/BASChain/go-bas/DataSync"
+	"encoding/hex"
 )
 
 type SubDomainList struct {
@@ -24,6 +25,7 @@ type SubDomainDesc struct {
 	RegTime int64 `json:"regtime"`
 	ExpireTime int64 `json:"expiretime"`
 	Owner string `json:"owner"`
+	Hash string `json:"hash"`
 }
 
 type SubDomainResp struct {
@@ -82,7 +84,7 @@ func (sbl *SubDomainList)ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var sdds []*SubDomainDesc
 
-	for _,v:=range DataSync.Records{
+	for k,v:=range DataSync.Records{
 		if strings.HasSuffix(v.GetName(),rootDomain){
 			if cnt >=b && cnt < e{
 				sdd := &SubDomainDesc{}
@@ -90,6 +92,7 @@ func (sbl *SubDomainList)ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				sdd.ExpireTime = v.GetExpire()
 				sdd.Domain = v.GetName()
 				sdd.RegTime = v.GetRegTime()
+				sdd.Hash = "0x"+hex.EncodeToString(k[:])
 				sdds = append(sdds,sdd)
 			}
 			cnt ++

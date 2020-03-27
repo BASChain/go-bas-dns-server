@@ -8,6 +8,7 @@ import (
 	"github.com/BASChain/go-bas/Market"
 	"github.com/BASChain/go-bas/Bas_Ethereum"
 	"strings"
+	"encoding/hex"
 )
 
 type MarketSearch struct {
@@ -83,6 +84,7 @@ func (ms *MarketSearch)ServeHTTP(w http.ResponseWriter, r *http.Request){
 				ed.RegTime = int64(t)
 				ed.ExpireTime = d.GetExpire()
 				ed.Owner = d.GetOwner()
+				ed.Hash = "0x"+hex.EncodeToString(kk[:])
 
 				resp.Domains = append(resp.Domains,ed)
 			}
