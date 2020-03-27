@@ -25,8 +25,8 @@ import (
 	"github.com/BASChain/go-bas-dns-server/config"
 	"github.com/BASChain/go-bas-dns-server/dns/dohserver"
 	"github.com/BASChain/go-bas-dns-server/dns/mem"
-	"github.com/BASChain/go-bas/DataSync"
 	"path"
+	"github.com/BASChain/go-bas/service"
 )
 
 // daemonCmd represents the daemon command
@@ -66,7 +66,7 @@ var daemonCmd = &cobra.Command{
 		defer cntxt.Release()
 
 		//BAS_Ethereum.RecoverContract()
-		go DataSync.Sync()
+		go service.StartService()
 		go mem.MemStateStart()
 		go server.DNSServerDaemon()
 		go dohserver.GetDohDaemonServer().StartDaemon()

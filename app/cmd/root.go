@@ -24,10 +24,10 @@ import (
 	"github.com/BASChain/go-bas-dns-server/dns/dohserver"
 	"github.com/BASChain/go-bas-dns-server/dns/mem"
 	"github.com/BASChain/go-bas-dns-server/dns/server"
-	"github.com/BASChain/go-bas/DataSync"
 	"github.com/Ungigdu/BAS_contract_go/BAS_Ethereum"
 	"github.com/spf13/cobra"
 	"log"
+	"github.com/BASChain/go-bas/service"
 )
 
 //var cfgFile string
@@ -64,7 +64,7 @@ var rootCmd = &cobra.Command{
 		config.GetBasDCfg().Save()
 
 		//BAS_Ethereum.RecoverContract()
-		go DataSync.Sync()
+		go service.StartService()
 		go mem.MemStateStart()
 		go server.DNSServerDaemon()
 

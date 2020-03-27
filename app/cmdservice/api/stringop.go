@@ -11,6 +11,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"net"
 	"strconv"
+	"github.com/BASChain/go-bas/Market"
+	"github.com/BASChain/go-bas-dns-server/dns/dohserver/api"
 )
 
 type CmdStringOPSrv struct {
@@ -23,6 +25,10 @@ func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (
 		msg = listAssets(so.Param)
 	case cmdcommon.CMD_DOMAIN:
 		msg = GetRecords(so.Param)
+	case cmdcommon.CMD_DEAL:
+		msg = GetDeal(so.Param)
+	case cmdcommon.CMD_ORDER:
+		msg = GetOrder(so.Param)
 	default:
 		return encapResp("Command Not Found"), nil
 	}
@@ -115,4 +121,99 @@ func getDomain(domain *DataSync.DomainRecord) string {
 
 
 	return msg
+}
+
+func getDealString(deal *Market.Deal) string {
+	msg:=""
+
+	d:=api.GetRecord(deal.GetHash())
+	msg += fmt.Sprintf("%-20s",string(d.Name))
+	old := deal.GetFromOwner()
+	oldlen := len(old)
+	oldOwner := old[:4] + old[oldlen-4:]
+
+	own:=deal.GetOwner()
+	ownlen := len(own)
+
+	owner := own[:4] + own[ownlen-4:]
+
+	msg += fmt.Sprintf("%-9s",oldOwner)
+	msg += fmt.Sprintf("%-9s",owner)
+
+	msg += fmt.Sprintf("%-16s",deal.GetAGreedPrice().String())
+	t,_:=Bas_Ethereum.GetTimestamp(deal.BlockNumber)
+	msg += fmt.Sprintf("%-12s",strconv.FormatInt(int64(t),10))
+
+	return msg
+
+}
+
+func GetDeal(domain string) string  {
+	msg := ""
+
+	domainhash:=Bas_Ethereum.Hash{}
+	if domain != ""{
+		domainhash = Bas_Ethereum.GetHash(domain)
+	}
+
+	for i:=0;i<len(Market.Sold);i++{
+		d:=&Market.Sold[i]
+		if domain == "" || (domain != "" && d.GetHash() == domainhash){
+			if msg != ""{
+				msg += "\r\n"
+			}
+			msg += getDealString(d)
+		}
+	}
+
+	return msg
+}
+
+func GetOrder(wallet string) string  {
+	fmt.Println("wallet"+wallet)
+	msg := ""
+
+	fmt.Println("len:",len(Market.SellOrders))
+
+	if wallet != ""{
+		addr:=common.HexToAddress(wallet)
+		if m,ok:=Market.SellOrders[addr];!ok{
+			return "Not found"
+		}else{
+			msg = getOrderString(m)
+		}
+	}else{
+		for _,m:=range Market.SellOrders{
+			if msg != ""{
+				msg += "\r\n"
+			}
+			msg += getOrderString(m)
+		}
+	}
+
+	return msg
+}
+
+func getOrderString(m map[Bas_Ethereum.Hash]*Market.SellOrder) string {
+
+	fmt.Println("d:",len(m))
+
+	msg:=""
+
+	for k,v:=range m{
+		d:=api.GetRecord(k)
+		if d == nil{
+			continue
+		}
+		if msg != ""{
+			msg += "\r\n"
+		}
+		msg += fmt.Sprintf("%-20s",string(d.Name))
+		t,_:=Bas_Ethereum.GetTimestamp(v.BlockNumber)
+		msg += fmt.Sprintf("%-12s",strconv.FormatInt(int64(t),10))
+		msg += fmt.Sprintf("%-16s",v.GetPriceStr())
+	}
+
+	return msg
+
 }
