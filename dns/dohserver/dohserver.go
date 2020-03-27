@@ -75,7 +75,6 @@ const (
 	ExpensiveDomains string = "ExpensiveDomains"
 	BasBasicSettings string = "basBasicSettings"
 	SubDomainList string = "subDomainList"
-	//MySellDomainList string = "mySellDomainList"
 	SellingDomainList string = "SellingDomainList"
 	FavoriteDomainList string = "favoriteDomainList"
 	MarketSearch  string = "marketSearch"

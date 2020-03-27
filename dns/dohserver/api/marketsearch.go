@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"github.com/BASChain/go-bas/Market"
 	"github.com/BASChain/go-bas/Bas_Ethereum"
-	"golang.org/x/tools/go/ssa/interp/testdata/src/strings"
+	"strings"
 )
 
 type MarketSearch struct {

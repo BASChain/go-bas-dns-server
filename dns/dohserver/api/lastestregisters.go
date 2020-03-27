@@ -44,6 +44,7 @@ type LatestRegistersReq struct {
 										//3 level 3 domain
 										//...
 										//257 for all domain expect 0 and 1 top level domain
+										//258 for 0 and 1 top level domain
 }
 
 
@@ -84,6 +85,13 @@ func filter(domain string, top int, rare bool) bool {
 		return !(b1||b2)
 	}
 
+	if top == 258 {
+		b1 := filter(domain,0,rare)
+		b2 := filter(domain,1,rare)
+
+		return b1||b2
+	}
+
 	ds:=strings.Split(domain,".")
 	if len(ds) == top{
 		return true
@@ -115,7 +123,7 @@ func (lr *LatestRegisters)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	if req.PageNumber < 1 || req.Top <0 || req.Top > 257{
+	if req.PageNumber < 1 || req.Top <0 || req.Top > 258{
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return
