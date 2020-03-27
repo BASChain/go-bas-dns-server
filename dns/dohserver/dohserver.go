@@ -118,6 +118,7 @@ func NewDohServers() *DohServer {
 	mux.Handle(path.Join(cfg.MyWalletApi, SubDomainList),api.NewSubDomainList())
 	mux.Handle(path.Join(cfg.MarketApi, SellingDomainList),api.NewSellingDomain())
 	mux.Handle(path.Join(cfg.MarketApi, MarketSearch),api.NewMarketSearch())
+	mux.Handle(path.Join(cfg.DnsBasApi,FavoriteDomainList),api.NewFavoriteDomain())
 
 	smux := http.NewServeMux()
 	smux.Handle(cfg.DnsPath, &DohServer{})
@@ -138,6 +139,7 @@ func NewDohServers() *DohServer {
 	smux.Handle(path.Join(cfg.MyWalletApi, SubDomainList),api.NewSubDomainList())
 	smux.Handle(path.Join(cfg.MarketApi, SellingDomainList),api.NewSellingDomain())
 	smux.Handle(path.Join(cfg.MarketApi, MarketSearch),api.NewMarketSearch())
+	smux.Handle(path.Join(cfg.DnsBasApi,FavoriteDomainList),api.NewFavoriteDomain())
 
 
 	server.dohServer.Handler = http.Handler(mux)

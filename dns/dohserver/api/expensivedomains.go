@@ -164,7 +164,7 @@ func (ed *ExpensiveDomains) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	resp.PageSize = req.PageSize
 	resp.PageNumber = req.PageNumber
-	resp.TotalPage = cursor.Count()
+	resp.TotalPage = cnt
 
 	var bresp []byte
 
