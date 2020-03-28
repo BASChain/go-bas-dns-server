@@ -8,6 +8,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"io/ioutil"
 	"net/http"
+	"github.com/BASChain/go-bas/Bas_Ethereum"
+	"github.com/BASChain/go-bas/Market"
 )
 
 type DomainList struct {
@@ -20,6 +22,7 @@ type DomainListReq struct {
 }
 
 type DomainListItem struct {
+	IsOrder     bool   `json:"isorder"`
 	Name        string `json:"name"`
 	Expire      int64  `json:"expire"`
 	OpenApplied bool   `json:"openApplied"`
@@ -34,6 +37,17 @@ type DomainListResp struct {
 
 func NewDomainList() *DomainList {
 	return &DomainList{}
+}
+
+func IsOrder(addr common.Address,hash Bas_Ethereum.Hash) bool  {
+	if m,ok:=Market.SellOrders[addr];!ok{
+		return false
+	}else{
+		if _,ok:=m[hash];ok{
+			return true
+		}
+	}
+	return false
 }
 
 func (dl *DomainList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -81,6 +95,7 @@ func (dl *DomainList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if !ok {
 			continue
 		}
+		dtli.IsOrder = IsOrder(*dm.GetOwnerOrig(),hasharr[i])
 		dtli.Name = dm.GetName()
 		dtli.Expire = dm.GetExpire()
 		dtli.OpenApplied = dm.GetOpenStatus()
