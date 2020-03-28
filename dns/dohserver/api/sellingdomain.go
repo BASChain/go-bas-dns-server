@@ -9,6 +9,7 @@ import (
 	"github.com/BASChain/go-bas/Market"
 	"github.com/BASChain/go-bas/Bas_Ethereum"
 	"encoding/hex"
+	"github.com/kprc/nbsnetwork/common/list"
 )
 
 type SellingDomain struct {
@@ -33,6 +34,19 @@ type SellingDomainResp struct {
 func NewSellingDomain() *SellingDomain {
 	return &SellingDomain{}
 }
+
+func sellingDomainSort(v1,v2 interface{}) int {
+	e1,e2:=v1.(*ExpensiveDomain),v2.(*ExpensiveDomain)
+
+	if e1.RegTime  < e2.RegTime {
+		return 1
+	}
+
+	return -1
+}
+
+
+
 
 func (sd *SellingDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	if r.Method != "POST" {
@@ -71,7 +85,7 @@ func (sd *SellingDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 
 	var owners []map[Bas_Ethereum.Hash]*Market.SellOrder
 
-	resp := &SellingDomainResp{}
+
 
 	if addr != nil{
 		if m,ok:=Market.SellOrders[*addr];ok{
@@ -83,9 +97,9 @@ func (sd *SellingDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		}
 	}
 
-	cnt:=0
-	b:=(req.PageNumber-1)*req.PageSize
-	e:=req.PageNumber * req.PageSize
+
+	sortList := list.NewList(expensiveCmp)
+	sortList.SetSortFunc(sellingDomainSort)
 
 	for i:=0;i<len(owners);i++{
 		for k,v:=range owners[i]{
@@ -93,30 +107,50 @@ func (sd *SellingDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 			if d == nil {
 				continue
 			}
-			if cnt >=b && cnt <e{
-				ed:=&ExpensiveDomain{}
-				ed.Domain = string(d.Name)
-				ed.PriceOmit = v.GetPrice()
-				ed.Price = v.GetPriceStr()
-				t,_ := Bas_Ethereum.GetTimestamp(v.BlockNumber)
-				ed.RegTime = int64(t)
-				ed.ExpireTime = d.GetExpire()
-				ed.Owner = d.GetOwner()
-				ed.Hash = "0x" + hex.EncodeToString(k[:])
+			ed:=&ExpensiveDomain{}
+			ed.Domain = string(d.Name)
+			ed.PriceOmit = v.GetPrice()
+			ed.Price = v.GetPriceStr()
+			t,_ := Bas_Ethereum.GetTimestamp(v.BlockNumber)
+			ed.RegTime = int64(t)
+			ed.ExpireTime = d.GetExpire()
+			ed.Owner = d.GetOwner()
+			ed.Hash = "0x" + hex.EncodeToString(k[:])
+			ed.OrderTime = v.GetTime()
 
-				resp.Domains = append(resp.Domains,ed)
+			sortList.AddValueOrder(ed)
+
+		}
+	}
+
+	cnt:=0
+	b:=(req.PageNumber-1)*req.PageSize
+	e:=req.PageNumber * req.PageSize
+
+	cursor:=sortList.ListIterator(e)
+
+	resp := &SellingDomainResp{}
+
+
+
+	if cursor.Count() <= b {
+		resp.State = 0
+	}else{
+		resp.State = 1
+		for{
+			d:=cursor.Next()
+			if d == nil{
+				break
+			}
+			if cnt >=b && cnt <e{
+				resp.Domains = append(resp.Domains,d.(*ExpensiveDomain))
 			}
 			cnt ++
 		}
 	}
-
+	
 	resp.PageSize = req.PageSize
 	resp.PageNumber = req.PageNumber
-	if len(resp.Domains)  == 0{
-		resp.State = 0
-	}else {
-		resp.State = 1
-	}
 	resp.TotalPage = cnt
 
 	var bresp []byte

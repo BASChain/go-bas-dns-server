@@ -30,6 +30,7 @@ type ExpensiveDomain struct {
 	ExpireTime int64 `json:"expiretime"`
 	Owner string `json:"owner"`
 	From string  `json:"from,omitempty"`
+	OrderTime int64 `json:"ordertime,omitempty"`
 	Hash string `json:"hash"`
 }
 
