@@ -111,8 +111,8 @@ func (sd *SellingDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 			ed.Domain = string(d.Name)
 			ed.PriceOmit = v.GetPrice()
 			ed.Price = v.GetPriceStr()
-			t,_ := Bas_Ethereum.GetTimestamp(v.BlockNumber)
-			ed.RegTime = int64(t)
+			//t,_ := Bas_Ethereum.GetTimestamp(v.BlockNumber)
+			ed.RegTime = d.GetRegTime()
 			ed.ExpireTime = d.GetExpire()
 			ed.Owner = d.GetOwner()
 			ed.Hash = "0x" + hex.EncodeToString(k[:])
@@ -127,7 +127,7 @@ func (sd *SellingDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	b:=(req.PageNumber-1)*req.PageSize
 	e:=req.PageNumber * req.PageSize
 
-	cursor:=sortList.ListIterator(e)
+	cursor:=sortList.ListIterator(0)
 
 	resp := &SellingDomainResp{}
 
@@ -148,7 +148,7 @@ func (sd *SellingDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 			cnt ++
 		}
 	}
-	
+
 	resp.PageSize = req.PageSize
 	resp.PageNumber = req.PageNumber
 	resp.TotalPage = cnt

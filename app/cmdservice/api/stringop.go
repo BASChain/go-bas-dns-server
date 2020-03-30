@@ -140,7 +140,7 @@ func getDealString(deal *Market.Deal) string {
 	msg += fmt.Sprintf("%-9s",oldOwner)
 	msg += fmt.Sprintf("%-9s",owner)
 
-	msg += fmt.Sprintf("%-16s",deal.GetAGreedPrice().String())
+	msg += fmt.Sprintf("%-26s",deal.GetAGreedPrice().String())
 	t,_:=Bas_Ethereum.GetTimestamp(deal.BlockNumber)
 	msg += fmt.Sprintf("%-12s",strconv.FormatInt(int64(t),10))
 
@@ -170,10 +170,10 @@ func GetDeal(domain string) string  {
 }
 
 func GetOrder(wallet string) string  {
-	fmt.Println("wallet"+wallet)
+	//fmt.Println("wallet"+wallet)
 	msg := ""
 
-	fmt.Println("len:",len(Market.SellOrders))
+	//fmt.Println("len:",len(Market.SellOrders))
 
 	if wallet != ""{
 		addr:=common.HexToAddress(wallet)
@@ -183,7 +183,11 @@ func GetOrder(wallet string) string  {
 			msg = getOrderString(m)
 		}
 	}else{
-		for _,m:=range Market.SellOrders{
+		for k,m:=range Market.SellOrders{
+			if msg != ""{
+				msg += "\r\n"
+			}
+			msg += k.String() + " "
 			if msg != ""{
 				msg += "\r\n"
 			}
@@ -196,18 +200,20 @@ func GetOrder(wallet string) string  {
 
 func getOrderString(m map[Bas_Ethereum.Hash]*Market.SellOrder) string {
 
-	fmt.Println("d:",len(m))
 
 	msg:=""
 
 	for k,v:=range m{
+
+		if msg != ""{
+			msg += "\r\n"
+		}
+		msg += k.String()+" "
 		d:=api.GetRecord(k)
 		if d == nil{
 			continue
 		}
-		if msg != ""{
-			msg += "\r\n"
-		}
+
 		msg += fmt.Sprintf("%-20s",string(d.Name))
 		t,_:=Bas_Ethereum.GetTimestamp(v.BlockNumber)
 		msg += fmt.Sprintf("%-12s",strconv.FormatInt(int64(t),10))

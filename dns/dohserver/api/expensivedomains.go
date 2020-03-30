@@ -2,13 +2,13 @@ package api
 
 import (
 	"net/http"
-	"fmt"
-	"io/ioutil"
-	"encoding/json"
 	"github.com/BASChain/go-bas/DataSync"
 	"github.com/BASChain/go-bas/Bas_Ethereum"
-	"github.com/kprc/nbsnetwork/common/list"
 	"math/big"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"github.com/kprc/nbsnetwork/common/list"
 	"github.com/BASChain/go-bas/Market"
 )
 
@@ -31,6 +31,7 @@ type ExpensiveDomain struct {
 	Owner string `json:"owner"`
 	From string  `json:"from,omitempty"`
 	OrderTime int64 `json:"ordertime,omitempty"`
+	DealTime int64  `json:"dealtime,omitempty"`
 	Hash string `json:"hash"`
 }
 
@@ -66,7 +67,30 @@ func expensiveSort(v1 interface{},v2 interface{}) int  {
 
 }
 
-func fDo(arg interface{}, v interface{}) (ret interface{},err error) {
+func latestSort(v1,v2 interface{}) int {
+	e1,e2:=v1.(*ExpensiveDomain),v2.(*ExpensiveDomain)
+	if e1.DealTime < e2.DealTime{
+		return 1
+	}
+	return -1
+}
+
+func latestfDo(arg interface{}, v interface{}) (ret interface{},err error)  {
+	e1,e2:=arg.(*ExpensiveDomain),v.(*ExpensiveDomain)
+	if e1.DealTime > e2.DealTime {
+		e2.PriceOmit = e1.PriceOmit
+		e2.Price = e1.Price
+		e2.RegTime = e1.RegTime
+		e2.ExpireTime = e1.ExpireTime
+		e2.Owner = e1.Owner
+		e2.From = e1.From
+		e2.DealTime = e1.DealTime
+		e2.OrderTime = e1.OrderTime
+	}
+	return e1,nil
+}
+
+func expensivefDo(arg interface{}, v interface{}) (ret interface{},err error) {
 	e1,e2:=arg.(*ExpensiveDomain),v.(*ExpensiveDomain)
 
 	if e1.PriceOmit.Cmp(e2.PriceOmit) > 0{
@@ -76,6 +100,8 @@ func fDo(arg interface{}, v interface{}) (ret interface{},err error) {
 		e2.ExpireTime = e1.ExpireTime
 		e2.Owner = e1.Owner
 		e2.From = e1.From
+		e2.DealTime = e1.DealTime
+		e2.OrderTime = e1.OrderTime
 	}
 
 	return e1,nil
@@ -92,6 +118,10 @@ func GetRecord(hash Bas_Ethereum.Hash) *DataSync.DomainRecord  {
 }
 
 func (ed *ExpensiveDomains) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	SH(w,r,0)
+}
+
+func SH(w http.ResponseWriter, r*http.Request, typ int)  {
 	if r.Method != "POST" {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
@@ -115,7 +145,17 @@ func (ed *ExpensiveDomains) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	expensiveList := list.NewList(expensiveCmp)
-	expensiveList.SetSortFunc(expensiveSort)
+	if typ == 0 {
+		expensiveList.SetSortFunc(expensiveSort)
+	}else {
+		expensiveList.SetSortFunc(latestSort)
+	}
+
+	fDo := expensivefDo
+	if typ == 1{
+		fDo= latestfDo
+	}
+
 
 	for i:=0;i<len(Market.Sold);i++{
 		deal:=Market.Sold[i]
@@ -131,6 +171,7 @@ func (ed *ExpensiveDomains) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ed.ExpireTime = d.GetExpire()
 		ed.RegTime = d.GetRegTime()
 		ed.Domain = d.GetName()
+		ed.DealTime = deal.GetTime()
 
 		if _,err:=expensiveList.FindDo(ed,fDo);err!=nil{
 			expensiveList.AddValue(ed)
@@ -147,7 +188,7 @@ func (ed *ExpensiveDomains) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var ds []*ExpensiveDomain
 
-	cursor:=expensiveList.ListIterator(e)
+	cursor:=expensiveList.ListIterator(0)
 	if cursor.Count() <= b{
 		resp.State = 0
 	}else{
@@ -178,11 +219,7 @@ func (ed *ExpensiveDomains) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(200)
 	w.Write(bresp)
-
 }
-
-
-
 
 
 

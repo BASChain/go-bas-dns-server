@@ -73,6 +73,7 @@ const (
 	RecommendDomains string = "RecommendDomains"
 	LatestRegisters string = "LatestRegisters"
 	ExpensiveDomains string = "ExpensiveDomains"
+	LatestDealDomains string = "latestDealDomains"
 	BasBasicSettings string = "basBasicSettings"
 	SubDomainList string = "subDomainList"
 	SellingDomainList string = "SellingDomainList"
@@ -115,6 +116,7 @@ func NewDohServers() *DohServer {
 	mux.Handle(path.Join(cfg.DnsBasApi, RecommendDomains),api.NewRecommendDomains())
 	mux.Handle(path.Join(cfg.DnsBasApi, LatestRegisters),api.NewLatestRegisters())
 	mux.Handle(path.Join(cfg.DnsBasApi, ExpensiveDomains),api.NewExpensiveDomains())
+	mux.Handle(path.Join(cfg.DnsBasApi, LatestDealDomains),api.NewLatestDealDomain())
 	mux.Handle(path.Join(cfg.MyWalletApi, SubDomainList),api.NewSubDomainList())
 	mux.Handle(path.Join(cfg.MarketApi, SellingDomainList),api.NewSellingDomain())
 	mux.Handle(path.Join(cfg.MarketApi, MarketSearch),api.NewMarketSearch())

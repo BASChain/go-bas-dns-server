@@ -143,7 +143,7 @@ func (lr *LatestRegisters)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	e:=(req.PageNumber)*req.PageSize
 	s:=(req.PageNumber-1)*req.PageSize
 
-	cursor:=latestRegDomainList.ListIterator(e)
+	cursor:=latestRegDomainList.ListIterator(0)
 
 	resp:=&LatestRegistersResp{}
 

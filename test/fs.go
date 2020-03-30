@@ -3,13 +3,18 @@ package main
 import (
 	"fmt"
 	"github.com/BASChain/go-bas-dns-server/fastsearch2"
+	"math/big"
 )
 
 func main()  {
 
 	//testfs()
 
-	testfs2()
+	bgi:=big.Int{}
+
+	fmt.Println("===>",bgi.String())
+
+	//testfs2()
 
 
 }

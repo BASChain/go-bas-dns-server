@@ -142,7 +142,7 @@ func (fd *FavoriteDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 
 	var ds []*FavoriteItem
 
-	cursor:=favoriteList.ListIterator(e)
+	cursor:=favoriteList.ListIterator(0)
 	if cursor.Count() <= b{
 		resp.State = 0
 	}else{
