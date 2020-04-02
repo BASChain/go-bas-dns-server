@@ -21,6 +21,7 @@ type FavoriteItem struct {
 	RegTime int64 `json:"regtime"`
 	Price string `json:"price"`
 	Hash string `json:"hash"`
+	ROpenToPublic bool `json:"ropentopublic"`
 	SubDomainCount int `json:"subdomaincount"`
 }
 
@@ -108,6 +109,7 @@ func (fd *FavoriteDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 			item.ExpireTime = v.GetExpire()
 			item.Owner = v.GetOwner()
 			item.Price = v.GetCustomedPrice()
+			item.ROpenToPublic = v.GetOpenStatus()
 
 			if l:=favoriteList.Find(item);l==nil{
 				favoriteList.AddValue(item)
@@ -126,6 +128,7 @@ func (fd *FavoriteDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 			item.ExpireTime = r.GetExpire()
 			item.Owner = r.GetOwner()
 			item.Price = r.GetCustomedPrice()
+			item.ROpenToPublic = r.GetOpenStatus()
 			if l:=favoriteList.Find(item);l==nil{
 				favoriteList.AddValue(item)
 			}
