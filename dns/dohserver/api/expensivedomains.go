@@ -32,6 +32,7 @@ type ExpensiveDomain struct {
 	From string  `json:"from,omitempty"`
 	OrderTime int64 `json:"ordertime,omitempty"`
 	DealTime int64  `json:"dealtime,omitempty"`
+	ROpenToPublic bool `json:"ropentopublic,omitempty"`
 	Hash string `json:"hash"`
 }
 
@@ -86,6 +87,7 @@ func latestfDo(arg interface{}, v interface{}) (ret interface{},err error)  {
 		e2.From = e1.From
 		e2.DealTime = e1.DealTime
 		e2.OrderTime = e1.OrderTime
+		e2.ROpenToPublic = e1.ROpenToPublic
 	}
 	return e1,nil
 }
@@ -102,6 +104,7 @@ func expensivefDo(arg interface{}, v interface{}) (ret interface{},err error) {
 		e2.From = e1.From
 		e2.DealTime = e1.DealTime
 		e2.OrderTime = e1.OrderTime
+		e2.ROpenToPublic = e1.ROpenToPublic
 	}
 
 	return e1,nil
@@ -172,6 +175,7 @@ func SH(w http.ResponseWriter, r*http.Request, typ int)  {
 		ed.RegTime = d.GetRegTime()
 		ed.Domain = d.GetName()
 		ed.DealTime = deal.GetTime()
+		ed.ROpenToPublic = d.GetOpenStatus()
 
 		if _,err:=expensiveList.FindDo(ed,fDo);err!=nil{
 			expensiveList.AddValue(ed)

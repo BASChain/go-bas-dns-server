@@ -118,8 +118,6 @@ func getDomain(domain *DataSync.DomainRecord) string {
 	}
 	msg += fmt.Sprintf("%-2s",open)
 
-
-
 	return msg
 }
 
@@ -170,10 +168,8 @@ func GetDeal(domain string) string  {
 }
 
 func GetOrder(wallet string) string  {
-	//fmt.Println("wallet"+wallet)
-	msg := ""
 
-	//fmt.Println("len:",len(Market.SellOrders))
+	msg := ""
 
 	if wallet != ""{
 		addr:=common.HexToAddress(wallet)
@@ -199,12 +195,9 @@ func GetOrder(wallet string) string  {
 }
 
 func getOrderString(m map[Bas_Ethereum.Hash]*Market.SellOrder) string {
-
-
 	msg:=""
 
 	for k,v:=range m{
-
 		if msg != ""{
 			msg += "\r\n"
 		}
@@ -215,7 +208,6 @@ func getOrderString(m map[Bas_Ethereum.Hash]*Market.SellOrder) string {
 		}
 
 		msg += fmt.Sprintf("%-20s",string(d.Name))
-		//t,_:=DataSync.GetTimestamp(v.BlockNumber)
 		msg += fmt.Sprintf("%-12s",strconv.FormatInt(Market.BlockNumnber2TimeStamp(v.BlockNumber),10))
 		msg += fmt.Sprintf("%-16s",v.GetPriceStr())
 	}
