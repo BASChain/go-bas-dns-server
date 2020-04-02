@@ -2,9 +2,9 @@ package api
 
 import (
 	"net/http"
-	"github.com/BASChain/go-bas/Bas_Ethereum"
 	"encoding/json"
 	"fmt"
+	"github.com/BASChain/go-bas/DataSync"
 )
 
 type BasSettings struct {
@@ -28,7 +28,7 @@ func NewBasSettings()  *BasSettings {
 func (bs *BasSettings)ServeHTTP(w http.ResponseWriter, r *http.Request)   {
 
 	if r.URL.Query().Get("refresh") == "true"{
-		Bas_Ethereum.Settings()
+		DataSync.Settings()
 		w.WriteHeader(200)
 		w.Write([]byte("Refresh Success"))
 
@@ -37,13 +37,13 @@ func (bs *BasSettings)ServeHTTP(w http.ResponseWriter, r *http.Request)   {
 
 	resp:=&BasSettingsResp{}
 
-	Bas_Ethereum.CheckSettings()
-	resp.ARootGas = Bas_Ethereum.GetARootGas()
-	resp.BRootGas = Bas_Ethereum.GetBRootGas()
-	resp.SubGas   = Bas_Ethereum.GetSubGas()
-	resp.CustomPriceGas = Bas_Ethereum.GetCustomPriceGas()
-	resp.MaxYear = Bas_Ethereum.GetMaxYear()
-	resp.RareTypeLength = Bas_Ethereum.GetRareTypeLength()
+	DataSync.CheckSettings()
+	resp.ARootGas = DataSync.GetARootGas()
+	resp.BRootGas = DataSync.GetBRootGas()
+	resp.SubGas   = DataSync.GetSubGas()
+	resp.CustomPriceGas = DataSync.GetCustomPriceGas()
+	resp.MaxYear = DataSync.GetMaxYear()
+	resp.RareTypeLength = DataSync.GetRareTypeLength()
 
 
 	var bresp []byte

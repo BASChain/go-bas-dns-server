@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"github.com/BASChain/go-bas/Market"
-	"github.com/BASChain/go-bas/Bas_Ethereum"
 	"strings"
 	"encoding/hex"
 )
@@ -80,8 +79,8 @@ func (ms *MarketSearch)ServeHTTP(w http.ResponseWriter, r *http.Request){
 				ed.Domain = string(d.Name)
 				ed.PriceOmit = vv.GetPrice()
 				ed.Price = vv.GetPriceStr()
-				t,_ := Bas_Ethereum.GetTimestamp(vv.BlockNumber)
-				ed.RegTime = int64(t)
+
+				ed.RegTime = Market.BlockNumnber2TimeStamp(vv.BlockNumber)
 				ed.ExpireTime = d.GetExpire()
 				ed.Owner = d.GetOwner()
 				ed.Hash = "0x"+hex.EncodeToString(kk[:])

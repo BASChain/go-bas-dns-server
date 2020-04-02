@@ -141,8 +141,8 @@ func getDealString(deal *Market.Deal) string {
 	msg += fmt.Sprintf("%-9s",owner)
 
 	msg += fmt.Sprintf("%-26s",deal.GetAGreedPrice().String())
-	t,_:=Bas_Ethereum.GetTimestamp(deal.BlockNumber)
-	msg += fmt.Sprintf("%-12s",strconv.FormatInt(int64(t),10))
+	//t,_:=DataSync.GetTimestamp(deal.BlockNumber)
+	msg += fmt.Sprintf("%-12s",strconv.FormatInt(Market.BlockNumnber2TimeStamp(deal.BlockNumber),10))
 
 	return msg
 
@@ -215,8 +215,8 @@ func getOrderString(m map[Bas_Ethereum.Hash]*Market.SellOrder) string {
 		}
 
 		msg += fmt.Sprintf("%-20s",string(d.Name))
-		t,_:=Bas_Ethereum.GetTimestamp(v.BlockNumber)
-		msg += fmt.Sprintf("%-12s",strconv.FormatInt(int64(t),10))
+		//t,_:=DataSync.GetTimestamp(v.BlockNumber)
+		msg += fmt.Sprintf("%-12s",strconv.FormatInt(Market.BlockNumnber2TimeStamp(v.BlockNumber),10))
 		msg += fmt.Sprintf("%-16s",v.GetPriceStr())
 	}
 
