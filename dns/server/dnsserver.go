@@ -79,6 +79,20 @@ func BuildNullAnswer(q dns.Question) dns.RR {
 	return NULL
 }
 
+func BuildCnameAnswer(cname string,q dns.Question) dns.RR {
+	CNAME:=&dns.CNAME{}
+
+	CNAME.Hdr.Name = q.Name
+	CNAME.Hdr.Rrtype = dns.TypeCNAME
+	CNAME.Hdr.Class = dns.ClassINET
+	CNAME.Hdr.Ttl = 10
+	CNAME.Hdr.Rdlength = uint16(len(cname))
+
+	CNAME.Target = cname
+
+	return CNAME
+}
+
 func replyTypA(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) error {
 	if m, err := BCReplayTypeA(msg, q); err != nil {
 		return err
@@ -101,14 +115,23 @@ func BCReplayTypeA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 	}
 
 	if dr.GetIPv4() == 0 {
-		return nil, errors.New("Not Found")
-	}
-	m := msg.Copy()
-	m.Compress = true
-	m.Response = true
-	m.Answer = buildAnswer(dr.GetIPv4Addr(), q)
+		
+		if dr.GetAliasName() != ""{
+			m := msg.Copy()
+			m.Compress = true
+			m.Response = true
+			m.Answer = append(m.Answer,BuildCnameAnswer(dr.GetAliasName(),q))
+			return m, nil
 
-	return m, nil
+		}
+	}else {
+		m := msg.Copy()
+		m.Compress = true
+		m.Response = true
+		m.Answer = buildAnswer(dr.GetIPv4Addr(), q)
+		return m, nil
+	}
+	return nil,errors.New("No settings")
 
 }
 
