@@ -45,6 +45,16 @@ func DeriveMsg(msg *dns.Msg, errCode int) *dns.Msg {
 }
 
 func buildAnswer(ipv4 [4]byte, q dns.Question) []dns.RR {
+	A:=BuildAAnswer(ipv4,q)
+
+	var rr []dns.RR
+
+	rr = append(rr, A)
+
+	return rr
+}
+
+func BuildAAnswer(ipv4 [4]byte, q dns.Question) dns.RR {
 	A := &dns.A{}
 
 	A.Hdr.Name = q.Name
@@ -57,14 +67,10 @@ func buildAnswer(ipv4 [4]byte, q dns.Question) []dns.RR {
 
 	log.Println("Request Name: ", q.Name, A.A.String())
 
-	var rr []dns.RR
-
-	rr = append(rr, A)
-
-	return rr
+	return A
 }
 
-func BuildNullAnswer(q dns.Question) dns.RR {
+func BuildNullAnswer(q dns.Question, data string) dns.RR {
 	NULL := &dns.NULL{}
 
 	NULL.Hdr.Name = q.Name
@@ -74,10 +80,15 @@ func BuildNullAnswer(q dns.Question) dns.RR {
 	NULL.Hdr.Ttl = 10
 	NULL.Hdr.Rdlength = uint16(len("TraditionSystemName"))
 
-	NULL.Data = "TraditionSystemName"
+	if data == ""{
+		NULL.Data = "TraditionSystemName"
+	}else {
+		NULL.Data = data
+	}
 
 	return NULL
 }
+
 
 func BuildCnameAnswer(cname string,q dns.Question) dns.RR {
 	CNAME:=&dns.CNAME{}
@@ -108,27 +119,33 @@ func BCReplayTypeA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 	if qn[len(qn)-1] == '.' {
 		qn = qn[:len(qn)-1]
 	}
+	//log.Println("query :",qn)
 
 	dr := api.QueryBasByDomainName(qn)
 	if dr == nil {
+		//log.Println("query ",qn,"failed")
 		return nil, errors.New("Not Found")
 	}
 
 	if dr.GetIPv4() == 0 {
-		
+
 		if dr.GetAliasName() != ""{
 			m := msg.Copy()
+			//m.Question[0].Name=dr.GetAliasName()
 			m.Compress = true
 			m.Response = true
 			m.Answer = append(m.Answer,BuildCnameAnswer(dr.GetAliasName(),q))
+			m.Answer = append(m.Answer,BuildNullAnswer(q,"AliasName"))
+			//m.Answer = append(m.Answer,BuildAAnswer(dr.GetIPv4Addr(), q))
+			//log.Println("response to client, type alias",qn)
 			return m, nil
-
 		}
 	}else {
 		m := msg.Copy()
 		m.Compress = true
 		m.Response = true
 		m.Answer = buildAnswer(dr.GetIPv4Addr(), q)
+		//log.Println("response to client, type a",qn)
 		return m, nil
 	}
 	return nil,errors.New("No settings")

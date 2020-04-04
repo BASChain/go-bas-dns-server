@@ -347,7 +347,7 @@ func (doh *DohServer) doDNSQuery(ctx context.Context, req *DNSRequest) (resp *DN
 		if err != nil {
 			req.response, err = server.BCReplyTraditionTypeA(msg)
 			if req.response != nil && req.request != nil && len(req.request.Question) > 0 {
-				req.response.Answer = append(req.response.Answer, server.BuildNullAnswer(req.request.Question[0]))
+				req.response.Answer = append(req.response.Answer, server.BuildNullAnswer(req.request.Question[0],""))
 			}
 		}
 	case server.TypeBCAddr:
@@ -356,7 +356,7 @@ func (doh *DohServer) doDNSQuery(ctx context.Context, req *DNSRequest) (resp *DN
 	default:
 		req.response, err = server.BCReplyTraditionTypeA(msg)
 		if req.response != nil && req.request != nil && len(req.request.Question) > 0 {
-			req.response.Answer = append(req.response.Answer, server.BuildNullAnswer(req.request.Question[0]))
+			req.response.Answer = append(req.response.Answer, server.BuildNullAnswer(req.request.Question[0],""))
 		}
 	}
 
