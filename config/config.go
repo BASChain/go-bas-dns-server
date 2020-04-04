@@ -59,7 +59,7 @@ func (bc *BASDConfig) InitCfg() *BASDConfig {
 	bc.MarketApi = "/api/market"
 	bc.MyWalletApi = "/api/mywallet"
 	bc.FreeEthAmount = "10000000000000000"     //0.01eth
-	bc.FreeBasAmount = "1000000000000000000000" //100bas
+	bc.FreeBasAmount = "4000000000000000000000" //100bas
 
 	return bc
 }
