@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"github.com/BASChain/go-bas/Bas_Ethereum"
 	"github.com/BASChain/go-bas/Market"
+	"strings"
+	"github.com/kprc/nbsnetwork/common/list"
 )
 
 type DomainList struct {
@@ -54,6 +56,29 @@ func IsOrder(addr common.Address,hash Bas_Ethereum.Hash) bool  {
 	return false
 }
 
+func domainListSort(v1,v2 interface{}) int  {
+	d1,d2:=v1.(*DomainListItem),v2.(*DomainListItem)
+
+	if strings.Compare(d1.Name,d2.Name)>=0{
+		return 1
+	}
+
+	return -1
+
+
+}
+
+func domainListCmp(v1,v2 interface{}) int {
+	d1,d2:=v1.(*DomainListItem),v2.(*DomainListItem)
+
+	if d1.Name == d2.Name {
+		return 0
+	}
+
+	return 1
+
+}
+
 func (dl *DomainList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
@@ -81,41 +106,67 @@ func (dl *DomainList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	addr := common.HexToAddress(dtl.Wallet)
 
-	dtlresp := &DomainListResp{Owner: dtl.Wallet}
+
 
 	DataSync.MemLock()
 	defer DataSync.MemUnlock()
 
+	dtlresp := &DomainListResp{Owner: dtl.Wallet}
 	hasharr, ok := DataSync.Assets[addr]
 	if !ok {
 		dtlresp.State = 0
 	} else {
 		dtlresp.State = 1
+
+		dlist:=list.NewList(domainListCmp)
+		dlist.SetSortFunc(domainListSort)
+
+		for i:=0;i<len(hasharr);i++{
+			dm, ok := DataSync.Records[hasharr[i]]
+			if !ok {
+				continue
+			}
+			if dm.IsRoot && dtl.DomainType == 2{
+				continue
+			}
+			if !dm.IsRoot && dtl.DomainType == 1{
+				continue
+			}
+
+			dtli := &DomainListItem{}
+
+			dtli.IsOrder = IsOrder(*dm.GetOwnerOrig(),hasharr[i])
+			dtli.Name = dm.GetName()
+			dtli.Expire = dm.GetExpire()
+			dtli.OpenApplied = dm.GetOpenStatus()
+			dtli.Hash = "0x" + hex.EncodeToString(hasharr[i][:])
+
+			dlist.AddValueOrder(dtli)
+
+		}
+
+		cnt:=0
+		b:=(dtl.PageNumber-1)*dtl.PageSize
+		e:=dtl.PageNumber * dtl.PageSize
+
+		cursor:=dlist.ListIterator(0)
+
+		if cursor.Count() > b{
+			for{
+				d:=cursor.Next()
+				if d == nil{
+					break
+				}
+				if cnt >=b && cnt <e{
+					dtlresp.Data = append(dtlresp.Data,d.(*DomainListItem))
+				}
+				cnt ++
+			}
+		}
+		dtlresp.TotalCnt = cursor.Count()
+
 	}
 
-	for i := (dtl.PageNumber - 1) * dtl.PageSize; i < len(hasharr) && i < (dtl.PageNumber)*dtl.PageSize; i++ {
-
-		dm, ok := DataSync.Records[hasharr[i]]
-		if !ok {
-			continue
-		}
-		if dm.IsRoot && dtl.DomainType == 2{
-			continue
-		}
-		if !dm.IsRoot && dtl.DomainType == 1{
-			continue
-		}
-		dtli := &DomainListItem{}
-
-		dtli.IsOrder = IsOrder(*dm.GetOwnerOrig(),hasharr[i])
-		dtli.Name = dm.GetName()
-		dtli.Expire = dm.GetExpire()
-		dtli.OpenApplied = dm.GetOpenStatus()
-		dtli.Hash = "0x" + hex.EncodeToString(hasharr[i][:])
-		dtlresp.Data = append(dtlresp.Data, dtli)
-	}
-
-	dtlresp.TotalCnt = len(hasharr)
 	dtlresp.PageNumber = dtl.PageNumber
 	dtlresp.PageSize = dtl.PageSize
 

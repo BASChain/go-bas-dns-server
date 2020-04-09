@@ -151,7 +151,7 @@ func (sd *SellingDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 
 	resp.PageSize = req.PageSize
 	resp.PageNumber = req.PageNumber
-	resp.TotalPage = cnt
+	resp.TotalPage = cursor.Count()
 
 	var bresp []byte
 
