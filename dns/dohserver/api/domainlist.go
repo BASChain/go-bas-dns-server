@@ -19,6 +19,7 @@ type DomainListReq struct {
 	Wallet     string `json:"wallet"`
 	PageNumber int    `json:"pageNumber"`
 	PageSize   int    `json:"pageSize"`
+	DomainType int    `json:"domaintype"`
 }
 
 type DomainListItem struct {
@@ -31,6 +32,9 @@ type DomainListItem struct {
 
 type DomainListResp struct {
 	State int               `json:"state"`
+	PageNumber int    `json:"pageNumber"`
+	PageSize   int    `json:"pageSize"`
+	TotalCnt   int    `json:"totalcnt"`
 	Owner string            `json:"owner"`
 	Data  []*DomainListItem `json:"data"`
 }
@@ -90,11 +94,19 @@ func (dl *DomainList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for i := (dtl.PageNumber - 1) * dtl.PageSize; i < len(hasharr) && i < (dtl.PageNumber)*dtl.PageSize; i++ {
-		dtli := &DomainListItem{}
+
 		dm, ok := DataSync.Records[hasharr[i]]
 		if !ok {
 			continue
 		}
+		if dm.IsRoot && dtl.DomainType == 2{
+			continue
+		}
+		if !dm.IsRoot && dtl.DomainType == 1{
+			continue
+		}
+		dtli := &DomainListItem{}
+
 		dtli.IsOrder = IsOrder(*dm.GetOwnerOrig(),hasharr[i])
 		dtli.Name = dm.GetName()
 		dtli.Expire = dm.GetExpire()
@@ -102,6 +114,10 @@ func (dl *DomainList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		dtli.Hash = "0x" + hex.EncodeToString(hasharr[i][:])
 		dtlresp.Data = append(dtlresp.Data, dtli)
 	}
+
+	dtlresp.TotalCnt = len(hasharr)
+	dtlresp.PageNumber = dtl.PageNumber
+	dtlresp.PageSize = dtl.PageSize
 
 	var bresp []byte
 
