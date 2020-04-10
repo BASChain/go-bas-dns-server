@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"github.com/BASChain/go-bas/Market"
 	"github.com/BASChain/go-bas-dns-server/dns/dohserver/api"
+	"github.com/BASChain/go-bas/utils"
 )
 
 type CmdStringOPSrv struct {
@@ -140,7 +141,7 @@ func getDealString(deal *Market.Deal) string {
 
 	msg += fmt.Sprintf("%-26s",deal.GetAGreedPrice().String())
 	//t,_:=DataSync.GetTimestamp(deal.BlockNumber)
-	msg += fmt.Sprintf("%-12s",strconv.FormatInt(Market.BlockNumnber2TimeStamp(deal.BlockNumber),10))
+	msg += fmt.Sprintf("%-12s",strconv.FormatInt(utils.BlockNumnber2TimeStamp(deal.BlockNumber),10))
 
 	return msg
 
@@ -208,7 +209,7 @@ func getOrderString(m map[Bas_Ethereum.Hash]*Market.SellOrder) string {
 		}
 
 		msg += fmt.Sprintf("%-20s",string(d.Name))
-		msg += fmt.Sprintf("%-12s",strconv.FormatInt(Market.BlockNumnber2TimeStamp(v.BlockNumber),10))
+		msg += fmt.Sprintf("%-12s",strconv.FormatInt(utils.BlockNumnber2TimeStamp(v.BlockNumber),10))
 		msg += fmt.Sprintf("%-16s",v.GetPriceStr())
 	}
 
