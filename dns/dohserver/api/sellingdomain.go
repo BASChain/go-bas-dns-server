@@ -38,7 +38,7 @@ func NewSellingDomain() *SellingDomain {
 func sellingDomainSort(v1,v2 interface{}) int {
 	e1,e2:=v1.(*ExpensiveDomain),v2.(*ExpensiveDomain)
 
-	if e1.RegTime  < e2.RegTime {
+	if e1.OrderTime  < e2.OrderTime {
 		return 1
 	}
 
