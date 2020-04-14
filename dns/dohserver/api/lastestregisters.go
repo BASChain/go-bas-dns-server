@@ -1,30 +1,27 @@
 package api
 
 import (
-	"net/http"
-	"fmt"
-	"io/ioutil"
-	"encoding/json"
-	"github.com/kprc/nbsnetwork/common/list"
-	"github.com/BASChain/go-bas/DataSync"
 	"bytes"
+	"encoding/json"
+	"fmt"
+	"github.com/BASChain/go-bas/DataSync"
+	"github.com/kprc/nbsnetwork/common/list"
+	"io/ioutil"
+	"net/http"
 	"strings"
 )
 
 type LatestRegisters struct {
-
 }
 
+func cmp(v1 interface{}, v2 interface{}) int {
+	d1, d2 := v1.(*DataSync.DomainRecord), v2.(*DataSync.DomainRecord)
 
-func  cmp(v1 interface{},v2 interface{}) int{
-	d1,d2:=v1.(*DataSync.DomainRecord),v2.(*DataSync.DomainRecord)
-
-	return bytes.Compare(d1.Name,d2.Name)
+	return bytes.Compare(d1.Name, d2.Name)
 }
 
-func sort(v1 interface{},v2 interface{}) int  {
-	d1,d2:=v1.(*DataSync.DomainRecord),v2.(*DataSync.DomainRecord)
-
+func sort(v1 interface{}, v2 interface{}) int {
+	d1, d2 := v1.(*DataSync.DomainRecord), v2.(*DataSync.DomainRecord)
 
 	if d1.CommitBlock < d2.CommitBlock {
 		return 1
@@ -34,73 +31,71 @@ func sort(v1 interface{},v2 interface{}) int  {
 
 }
 
-
 type LatestRegistersReq struct {
-	PageNumber int		`json:"pagenumber"`
-	PageSize int		`json:"pagesize"`
-	Top      int        `json:"top"`    //0 top level domain,
-										//1 normal top level domain,
-										//2 level 2 domain,
-										//3 level 3 domain
-										//...
-										//257 for all domain expect 0 and 1 top level domain
-										//258 for 0 and 1 top level domain
+	PageNumber int `json:"pagenumber"`
+	PageSize   int `json:"pagesize"`
+	Top        int `json:"top"` //0 top level domain,
+	//1 normal top level domain,
+	//2 level 2 domain,
+	//3 level 3 domain
+	//...
+	//257 for all domain expect 0 and 1 top level domain
+	//258 for 0 and 1 top level domain
 }
 
-
 type LatestRegistersResp struct {
-	State int			`json:"state"`
-	TotalPage int 		`json:"totalpage"`
-	PageNumber int		`json:"pagenumber"`
-	PageSize int		`json:"pagesize"`
+	State         int             `json:"state"`
+	TotalPage     int             `json:"totalpage"`
+	PageNumber    int             `json:"pagenumber"`
+	PageSize      int             `json:"pagesize"`
 	LatestDomains []*DomainDetail `json:"latestdomains"`
 }
 
-func NewLatestRegisters() *LatestRegisters  {
+func NewLatestRegisters() *LatestRegisters {
 	return &LatestRegisters{}
 }
 
 func filter(domain string, top int, rare bool) bool {
-	if top == 0{
+	if top == 0 {
 		return rare
 	}
 
-	if top == 1{
-		if rare == true{
+	if top == 1 {
+		if rare == true {
 			return false
 		}
 
-		ds := strings.Split(domain,".")
-		if len(ds) > 1{
+		ds := strings.Split(domain, ".")
+		if len(ds) > 1 {
 			return false
-		}else{
+		} else {
 			return true
 		}
 	}
 
 	if top == 257 {
-		b1:=filter(domain,0,rare)
-		b2:=filter(domain,1,rare)
+		b1 := filter(domain, 0, rare)
+		b2 := filter(domain, 1, rare)
 
-		return !(b1||b2)
+		return !(b1 || b2)
 	}
 
 	if top == 258 {
-		b1 := filter(domain,0,rare)
-		b2 := filter(domain,1,rare)
+		b1 := filter(domain, 0, rare)
+		b2 := filter(domain, 1, rare)
 
-		return b1||b2
+		return b1 || b2
 	}
 
-	ds:=strings.Split(domain,".")
-	if len(ds) == top{
+	ds := strings.Split(domain, ".")
+	if len(ds) == top {
 		return true
 	}
 
 	return false
 }
 
-func (lr *LatestRegisters)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
+func (lr *LatestRegisters) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
@@ -115,7 +110,7 @@ func (lr *LatestRegisters)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	req:=&LatestRegistersReq{}
+	req := &LatestRegistersReq{}
 	err = json.Unmarshal(body, req)
 	if err != nil {
 		w.WriteHeader(500)
@@ -123,7 +118,7 @@ func (lr *LatestRegisters)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	if req.PageNumber < 1 || req.Top <0 || req.Top > 258{
+	if req.PageNumber < 1 || req.Top < 0 || req.Top > 258 {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return
@@ -132,38 +127,38 @@ func (lr *LatestRegisters)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	var latestRegDomainList list.List
 	latestRegDomainList = list.NewList(cmp)
 	latestRegDomainList.SetSortFunc(sort)
-	for _,v:=range DataSync.Records{
+	for _, v := range DataSync.Records {
 		//log.Println(string(v.Name),req.Top,v.GetIsRare(),filter(string(v.Name),req.Top,v.GetIsRare()))
-		if filter(string(v.Name),req.Top,v.GetIsRare()) == true{
+		if filter(string(v.Name), req.Top, v.GetIsRare()) == true {
 			latestRegDomainList.AddValueOrder(v)
 		}
 
 	}
 
-	e:=(req.PageNumber)*req.PageSize
-	s:=(req.PageNumber-1)*req.PageSize
+	e := (req.PageNumber) * req.PageSize
+	s := (req.PageNumber - 1) * req.PageSize
 
-	cursor:=latestRegDomainList.ListIterator(0)
+	cursor := latestRegDomainList.ListIterator(0)
 
-	resp:=&LatestRegistersResp{}
+	resp := &LatestRegistersResp{}
 
 	var latestDomains []*DomainDetail
 
 	cnt := 0
 	if cursor.Count() <= s {
 		resp.State = 0
-	}else{
+	} else {
 		resp.State = 1
-		for{
-			d:=cursor.Next()
-			if d == nil{
+		for {
+			d := cursor.Next()
+			if d == nil {
 				break
 			}
-			if cnt >=s && cnt <e{
-				ld:=Record2DomainDetail(d.(*DataSync.DomainRecord))
-				latestDomains = append(latestDomains,ld)
+			if cnt >= s && cnt < e {
+				ld := Record2DomainDetail(d.(*DataSync.DomainRecord))
+				latestDomains = append(latestDomains, ld)
 			}
-			cnt ++
+			cnt++
 		}
 		resp.LatestDomains = latestDomains
 	}
@@ -181,6 +176,5 @@ func (lr *LatestRegisters)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	}
 	w.WriteHeader(200)
 	w.Write(bresp)
-
 
 }

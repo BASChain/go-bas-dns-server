@@ -11,7 +11,6 @@ import (
 	"net/http"
 
 	"github.com/BASChain/go-bas-dns-server/dns/exlib"
-
 )
 
 type FreeEth struct {

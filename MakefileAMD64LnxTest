@@ -47,7 +47,7 @@ staticfile2bin:
 
 #$(TARGET): staticfile2bin proto $(SRC)
 #	@go build $(LDFLAGS) -o $(TARGET)
-$(TARGET): proto $(SRC)
+$(TARGET): staticfile2bin proto $(SRC)
 	@GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o $(TARGET)
 
 build: $(TARGET)

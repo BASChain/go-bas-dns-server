@@ -16,17 +16,17 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"log"
 	"github.com/BASChain/go-bas-dns-server/app/cmdclient"
 	"github.com/BASChain/go-bas-dns-server/app/cmdcommon"
+	"github.com/spf13/cobra"
+	"log"
 )
 
 // orderCmd represents the order command
 var orderCmd = &cobra.Command{
 	Use:   "order",
 	Short: "show order",
-	Long: `show order`,
+	Long:  `show order`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if _, err := cmdcommon.IsProcessStarted(); err != nil {
 			log.Println(err)

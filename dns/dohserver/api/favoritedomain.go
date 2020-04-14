@@ -1,59 +1,58 @@
 package api
 
 import (
-	"net/http"
-	"fmt"
-	"io/ioutil"
-	"encoding/json"
-	"github.com/kprc/nbsnetwork/common/list"
-	"github.com/BASChain/go-bas/DataSync"
 	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"github.com/BASChain/go-bas/DataSync"
+	"github.com/kprc/nbsnetwork/common/list"
+	"io/ioutil"
+	"net/http"
 )
 
 type FavoriteDomain struct {
-
 }
 
 type FavoriteItem struct {
-	Owner string `json:"owner"`
-	Name string `json:"name"`
-	ExpireTime int64 `json:"expiretime"`
-	RegTime int64 `json:"regtime"`
-	Price string `json:"price"`
-	Hash string `json:"hash"`
-	ROpenToPublic bool `json:"ropentopublic"`
-	SubDomainCount int `json:"subdomaincount"`
+	Owner          string `json:"owner"`
+	Name           string `json:"name"`
+	ExpireTime     int64  `json:"expiretime"`
+	RegTime        int64  `json:"regtime"`
+	Price          string `json:"price"`
+	Hash           string `json:"hash"`
+	ROpenToPublic  bool   `json:"ropentopublic"`
+	SubDomainCount int    `json:"subdomaincount"`
 }
 
 type FavoriteDomainReq struct {
-	PageNumber int	`json:"pagenumber"`
-	PageSize int	`json:"pagesize"`
+	PageNumber int `json:"pagenumber"`
+	PageSize   int `json:"pagesize"`
 }
 
 type FavoriteDomainResp struct {
-	State int `json:"state"`
-	TotalPage int `json:"totalpage"`
-	PageNumber int			`json:"pagenumber"`
-	PageSize int			`json:"pagesize"`
+	State      int `json:"state"`
+	TotalPage  int `json:"totalpage"`
+	PageNumber int `json:"pagenumber"`
+	PageSize   int `json:"pagesize"`
 
 	Domains []*FavoriteItem `json:"domains"`
 }
 
-func favoriteCmp(v1 ,v2 interface{}) int  {
-	f1,f2:=v1.(*FavoriteItem),v2.(*FavoriteItem)
+func favoriteCmp(v1, v2 interface{}) int {
+	f1, f2 := v1.(*FavoriteItem), v2.(*FavoriteItem)
 
-	if f1.Hash == f2.Hash{
-		return  0
+	if f1.Hash == f2.Hash {
+		return 0
 	}
 
 	return 1
 
 }
 
-func favoriteSort(v1,v2 interface{}) int  {
-	f1,f2:=v1.(*FavoriteItem),v2.(*FavoriteItem)
+func favoriteSort(v1, v2 interface{}) int {
+	f1, f2 := v1.(*FavoriteItem), v2.(*FavoriteItem)
 
-	if f1.SubDomainCount < f2.SubDomainCount{
+	if f1.SubDomainCount < f2.SubDomainCount {
 		return 1
 	}
 
@@ -61,20 +60,18 @@ func favoriteSort(v1,v2 interface{}) int  {
 
 }
 
-func favoriteFDo(arg interface{},v interface{}) (ret interface{},err error) {
-	f2:=v.(*FavoriteItem)
-	f2.SubDomainCount ++
+func favoriteFDo(arg interface{}, v interface{}) (ret interface{}, err error) {
+	f2 := v.(*FavoriteItem)
+	f2.SubDomainCount++
 
-	return arg,nil
+	return arg, nil
 }
-
-
 
 func NewFavoriteDomain() *FavoriteDomain {
 	return &FavoriteDomain{}
 }
 
-func (fd *FavoriteDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
+func (fd *FavoriteDomain) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
@@ -89,7 +86,7 @@ func (fd *FavoriteDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	req:=&FavoriteDomainReq{}
+	req := &FavoriteDomainReq{}
 	err = json.Unmarshal(body, req)
 	if err != nil {
 		w.WriteHeader(500)
@@ -100,10 +97,10 @@ func (fd *FavoriteDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	favoriteList := list.NewList(favoriteCmp)
 	favoriteList.SetSortFunc(favoriteSort)
 
-	for k,v:=range DataSync.Records{
-		if v.GetIsRoot(){
-			item:=&FavoriteItem{}
-			item.Hash = "0x"+hex.EncodeToString(k[:])
+	for k, v := range DataSync.Records {
+		if v.GetIsRoot() {
+			item := &FavoriteItem{}
+			item.Hash = "0x" + hex.EncodeToString(k[:])
 			item.Name = v.GetName()
 			item.RegTime = v.GetRegTime()
 			item.ExpireTime = v.GetExpire()
@@ -111,54 +108,54 @@ func (fd *FavoriteDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 			item.Price = v.GetCustomedPrice()
 			item.ROpenToPublic = v.GetOpenStatus()
 
-			if l:=favoriteList.Find(item);l==nil{
+			if l := favoriteList.Find(item); l == nil {
 				favoriteList.AddValue(item)
 			}
 			continue
 		}
 
-		root:=v.SRootHash
-		if r,ok:=DataSync.Records[root];!ok{
+		root := v.SRootHash
+		if r, ok := DataSync.Records[root]; !ok {
 			continue
-		}else{
-			item:=&FavoriteItem{}
-			item.Hash = "0x"+hex.EncodeToString(root[:])
+		} else {
+			item := &FavoriteItem{}
+			item.Hash = "0x" + hex.EncodeToString(root[:])
 			item.Name = r.GetName()
 			item.RegTime = r.GetRegTime()
 			item.ExpireTime = r.GetExpire()
 			item.Owner = r.GetOwner()
 			item.Price = r.GetCustomedPrice()
 			item.ROpenToPublic = r.GetOpenStatus()
-			if l:=favoriteList.Find(item);l==nil{
+			if l := favoriteList.Find(item); l == nil {
 				favoriteList.AddValue(item)
 			}
-			favoriteList.FindDo(item,favoriteFDo)
+			favoriteList.FindDo(item, favoriteFDo)
 		}
 	}
 	favoriteList.Sort()
 
-	cnt:=0
-	b:=(req.PageNumber-1)*req.PageSize
-	e:=req.PageNumber*req.PageSize
+	cnt := 0
+	b := (req.PageNumber - 1) * req.PageSize
+	e := req.PageNumber * req.PageSize
 
-	resp:=&FavoriteDomainResp{}
+	resp := &FavoriteDomainResp{}
 
 	var ds []*FavoriteItem
 
-	cursor:=favoriteList.ListIterator(0)
-	if cursor.Count() <= b{
+	cursor := favoriteList.ListIterator(0)
+	if cursor.Count() <= b {
 		resp.State = 0
-	}else{
+	} else {
 		resp.State = 1
-		for{
-			nxt:=cursor.Next()
-			if nxt == nil{
+		for {
+			nxt := cursor.Next()
+			if nxt == nil {
 				break
 			}
-			if cnt >=b && cnt <e{
-				ds = append(ds,nxt.(*FavoriteItem))
+			if cnt >= b && cnt < e {
+				ds = append(ds, nxt.(*FavoriteItem))
 			}
-			cnt ++
+			cnt++
 		}
 		resp.Domains = ds
 	}

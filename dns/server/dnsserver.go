@@ -45,7 +45,7 @@ func DeriveMsg(msg *dns.Msg, errCode int) *dns.Msg {
 }
 
 func buildAnswer(ipv4 [4]byte, q dns.Question) []dns.RR {
-	A:=BuildAAnswer(ipv4,q)
+	A := BuildAAnswer(ipv4, q)
 
 	var rr []dns.RR
 
@@ -80,18 +80,17 @@ func BuildNullAnswer(q dns.Question, data string) dns.RR {
 	NULL.Hdr.Ttl = 10
 	NULL.Hdr.Rdlength = uint16(len("TraditionSystemName"))
 
-	if data == ""{
+	if data == "" {
 		NULL.Data = "TraditionSystemName"
-	}else {
+	} else {
 		NULL.Data = data
 	}
 
 	return NULL
 }
 
-
-func BuildCnameAnswer(cname string,q dns.Question) dns.RR {
-	CNAME:=&dns.CNAME{}
+func BuildCnameAnswer(cname string, q dns.Question) dns.RR {
+	CNAME := &dns.CNAME{}
 
 	CNAME.Hdr.Name = q.Name
 	CNAME.Hdr.Rrtype = dns.TypeCNAME
@@ -129,18 +128,18 @@ func BCReplayTypeA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 
 	if dr.GetIPv4() == 0 {
 
-		if dr.GetAliasName() != ""{
+		if dr.GetAliasName() != "" {
 			m := msg.Copy()
 			//m.Question[0].Name=dr.GetAliasName()
 			m.Compress = true
 			m.Response = true
-			m.Answer = append(m.Answer,BuildCnameAnswer(dr.GetAliasName(),q))
-			m.Answer = append(m.Answer,BuildNullAnswer(q,"AliasName"))
+			m.Answer = append(m.Answer, BuildCnameAnswer(dr.GetAliasName(), q))
+			m.Answer = append(m.Answer, BuildNullAnswer(q, "AliasName"))
 			//m.Answer = append(m.Answer,BuildAAnswer(dr.GetIPv4Addr(), q))
 			//log.Println("response to client, type alias",qn)
 			return m, nil
 		}
-	}else {
+	} else {
 		m := msg.Copy()
 		m.Compress = true
 		m.Response = true
@@ -148,7 +147,7 @@ func BCReplayTypeA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 		//log.Println("response to client, type a",qn)
 		return m, nil
 	}
-	return nil,errors.New("No settings")
+	return nil, errors.New("No settings")
 
 }
 

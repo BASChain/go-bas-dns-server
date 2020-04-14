@@ -1,54 +1,49 @@
 package api
 
 import (
-	"net/http"
-	"fmt"
-	"io/ioutil"
-	"encoding/json"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/BASChain/go-bas/Market"
-	"github.com/BASChain/go-bas/Bas_Ethereum"
 	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"github.com/BASChain/go-bas/Bas_Ethereum"
+	"github.com/BASChain/go-bas/Market"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/kprc/nbsnetwork/common/list"
+	"io/ioutil"
+	"net/http"
 )
 
 type SellingDomain struct {
-
 }
 
 type SellingDomainReq struct {
-	Wallet string `json:"wallet"`
-	PageNumber int	`json:"pagenumber"`
-	PageSize int	`json:"pagesize"`
-
+	Wallet     string `json:"wallet"`
+	PageNumber int    `json:"pagenumber"`
+	PageSize   int    `json:"pagesize"`
 }
 
 type SellingDomainResp struct {
-	State int `json:"state"`
-	TotalPage int `json:"totalpage"`
-	PageNumber int			`json:"pagenumber"`
-	PageSize int			`json:"pagesize"`
-	Domains []*ExpensiveDomain `json:"domains"`
+	State      int                `json:"state"`
+	TotalPage  int                `json:"totalpage"`
+	PageNumber int                `json:"pagenumber"`
+	PageSize   int                `json:"pagesize"`
+	Domains    []*ExpensiveDomain `json:"domains"`
 }
 
 func NewSellingDomain() *SellingDomain {
 	return &SellingDomain{}
 }
 
-func sellingDomainSort(v1,v2 interface{}) int {
-	e1,e2:=v1.(*ExpensiveDomain),v2.(*ExpensiveDomain)
+func sellingDomainSort(v1, v2 interface{}) int {
+	e1, e2 := v1.(*ExpensiveDomain), v2.(*ExpensiveDomain)
 
-	if e1.OrderTime  < e2.OrderTime {
+	if e1.OrderTime < e2.OrderTime {
 		return 1
 	}
 
 	return -1
 }
 
-
-
-
-func (sd *SellingDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
+func (sd *SellingDomain) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
@@ -63,7 +58,7 @@ func (sd *SellingDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	req:=&SellingDomainReq{}
+	req := &SellingDomainReq{}
 	err = json.Unmarshal(body, req)
 	if err != nil {
 		w.WriteHeader(500)
@@ -71,7 +66,7 @@ func (sd *SellingDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	if req.PageNumber < 1{
+	if req.PageNumber < 1 {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return
@@ -85,29 +80,26 @@ func (sd *SellingDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 
 	var owners []map[Bas_Ethereum.Hash]*Market.SellOrder
 
-
-
-	if addr != nil{
-		if m,ok:=Market.SellOrders[*addr];ok{
-			owners = append(owners,m)
+	if addr != nil {
+		if m, ok := Market.SellOrders[*addr]; ok {
+			owners = append(owners, m)
 		}
-	}else{
-		for _,v:=range Market.SellOrders{
-			owners = append(owners,v)
+	} else {
+		for _, v := range Market.SellOrders {
+			owners = append(owners, v)
 		}
 	}
-
 
 	sortList := list.NewList(expensiveCmp)
 	sortList.SetSortFunc(sellingDomainSort)
 
-	for i:=0;i<len(owners);i++{
-		for k,v:=range owners[i]{
-			d:=GetRecord(k)
+	for i := 0; i < len(owners); i++ {
+		for k, v := range owners[i] {
+			d := GetRecord(k)
 			if d == nil {
 				continue
 			}
-			ed:=&ExpensiveDomain{}
+			ed := &ExpensiveDomain{}
 			ed.Domain = string(d.Name)
 			ed.PriceOmit = v.GetPrice()
 			ed.Price = v.GetPriceStr()
@@ -123,29 +115,27 @@ func (sd *SellingDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 		}
 	}
 
-	cnt:=0
-	b:=(req.PageNumber-1)*req.PageSize
-	e:=req.PageNumber * req.PageSize
+	cnt := 0
+	b := (req.PageNumber - 1) * req.PageSize
+	e := req.PageNumber * req.PageSize
 
-	cursor:=sortList.ListIterator(0)
+	cursor := sortList.ListIterator(0)
 
 	resp := &SellingDomainResp{}
 
-
-
 	if cursor.Count() <= b {
 		resp.State = 0
-	}else{
+	} else {
 		resp.State = 1
-		for{
-			d:=cursor.Next()
-			if d == nil{
+		for {
+			d := cursor.Next()
+			if d == nil {
 				break
 			}
-			if cnt >=b && cnt <e{
-				resp.Domains = append(resp.Domains,d.(*ExpensiveDomain))
+			if cnt >= b && cnt < e {
+				resp.Domains = append(resp.Domains, d.(*ExpensiveDomain))
 			}
-			cnt ++
+			cnt++
 		}
 	}
 
@@ -163,6 +153,5 @@ func (sd *SellingDomain)ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	}
 	w.WriteHeader(200)
 	w.Write(bresp)
-
 
 }

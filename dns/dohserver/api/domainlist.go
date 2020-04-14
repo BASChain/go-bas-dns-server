@@ -4,14 +4,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/BASChain/go-bas/Bas_Ethereum"
 	"github.com/BASChain/go-bas/DataSync"
+	"github.com/BASChain/go-bas/Market"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/kprc/nbsnetwork/common/list"
 	"io/ioutil"
 	"net/http"
-	"github.com/BASChain/go-bas/Bas_Ethereum"
-	"github.com/BASChain/go-bas/Market"
 	"strings"
-	"github.com/kprc/nbsnetwork/common/list"
 )
 
 type DomainList struct {
@@ -33,43 +33,42 @@ type DomainListItem struct {
 }
 
 type DomainListResp struct {
-	State int               `json:"state"`
-	PageNumber int    `json:"pageNumber"`
-	PageSize   int    `json:"pageSize"`
-	TotalCnt   int    `json:"totalcnt"`
-	Owner string            `json:"owner"`
-	Data  []*DomainListItem `json:"data"`
+	State      int               `json:"state"`
+	PageNumber int               `json:"pageNumber"`
+	PageSize   int               `json:"pageSize"`
+	TotalCnt   int               `json:"totalcnt"`
+	Owner      string            `json:"owner"`
+	Data       []*DomainListItem `json:"data"`
 }
 
 func NewDomainList() *DomainList {
 	return &DomainList{}
 }
 
-func IsOrder(addr common.Address,hash Bas_Ethereum.Hash) bool  {
-	if m,ok:=Market.SellOrders[addr];!ok{
+func IsOrder(addr common.Address, hash Bas_Ethereum.Hash) bool {
+	if m, ok := Market.SellOrders[addr]; !ok {
 		return false
-	}else{
-		if _,ok:=m[hash];ok{
+	} else {
+		if _, ok := m[hash]; ok {
 			return true
 		}
 	}
 	return false
 }
 
-func domainListSort(v1,v2 interface{}) int  {
-	d1,d2:=v1.(*DomainListItem),v2.(*DomainListItem)
+func domainListSort(v1, v2 interface{}) int {
+	d1, d2 := v1.(*DomainListItem), v2.(*DomainListItem)
 
-	if strings.Compare(d1.Name,d2.Name)>=0{
+	if strings.Compare(d1.Name, d2.Name) >= 0 {
 		return 1
 	}
 
 	return -1
 
-
 }
 
-func domainListCmp(v1,v2 interface{}) int {
-	d1,d2:=v1.(*DomainListItem),v2.(*DomainListItem)
+func domainListCmp(v1, v2 interface{}) int {
+	d1, d2 := v1.(*DomainListItem), v2.(*DomainListItem)
 
 	if d1.Name == d2.Name {
 		return 0
@@ -106,8 +105,6 @@ func (dl *DomainList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	addr := common.HexToAddress(dtl.Wallet)
 
-
-
 	DataSync.MemLock()
 	defer DataSync.MemUnlock()
 
@@ -118,24 +115,24 @@ func (dl *DomainList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else {
 		dtlresp.State = 1
 
-		dlist:=list.NewList(domainListCmp)
+		dlist := list.NewList(domainListCmp)
 		dlist.SetSortFunc(domainListSort)
 
-		for i:=0;i<len(hasharr);i++{
+		for i := 0; i < len(hasharr); i++ {
 			dm, ok := DataSync.Records[hasharr[i]]
 			if !ok {
 				continue
 			}
-			if dm.IsRoot && dtl.DomainType == 2{
+			if dm.IsRoot && dtl.DomainType == 2 {
 				continue
 			}
-			if !dm.IsRoot && dtl.DomainType == 1{
+			if !dm.IsRoot && dtl.DomainType == 1 {
 				continue
 			}
 
 			dtli := &DomainListItem{}
 
-			dtli.IsOrder = IsOrder(*dm.GetOwnerOrig(),hasharr[i])
+			dtli.IsOrder = IsOrder(*dm.GetOwnerOrig(), hasharr[i])
 			dtli.Name = dm.GetName()
 			dtli.Expire = dm.GetExpire()
 			dtli.OpenApplied = dm.GetOpenStatus()
@@ -145,22 +142,22 @@ func (dl *DomainList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		cnt:=0
-		b:=(dtl.PageNumber-1)*dtl.PageSize
-		e:=dtl.PageNumber * dtl.PageSize
+		cnt := 0
+		b := (dtl.PageNumber - 1) * dtl.PageSize
+		e := dtl.PageNumber * dtl.PageSize
 
-		cursor:=dlist.ListIterator(0)
+		cursor := dlist.ListIterator(0)
 
-		if cursor.Count() > b{
-			for{
-				d:=cursor.Next()
-				if d == nil{
+		if cursor.Count() > b {
+			for {
+				d := cursor.Next()
+				if d == nil {
 					break
 				}
-				if cnt >=b && cnt <e{
-					dtlresp.Data = append(dtlresp.Data,d.(*DomainListItem))
+				if cnt >= b && cnt < e {
+					dtlresp.Data = append(dtlresp.Data, d.(*DomainListItem))
 				}
-				cnt ++
+				cnt++
 			}
 		}
 		dtlresp.TotalCnt = cursor.Count()

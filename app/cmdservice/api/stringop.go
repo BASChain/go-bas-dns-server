@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"github.com/BASChain/go-bas-dns-server/app/cmdcommon"
 	"github.com/BASChain/go-bas-dns-server/app/cmdpb"
+	"github.com/BASChain/go-bas-dns-server/dns/dohserver/api"
 	"github.com/BASChain/go-bas/Bas_Ethereum"
 	"github.com/BASChain/go-bas/DataSync"
+	"github.com/BASChain/go-bas/Market"
+	"github.com/BASChain/go-bas/utils"
 	"github.com/ethereum/go-ethereum/common"
 	"net"
 	"strconv"
-	"github.com/BASChain/go-bas/Market"
-	"github.com/BASChain/go-bas-dns-server/dns/dohserver/api"
-	"github.com/BASChain/go-bas/utils"
 )
 
 type CmdStringOPSrv struct {
@@ -108,57 +108,57 @@ func getDomain(domain *DataSync.DomainRecord) string {
 	ip := domain.GetIPv4Addr()
 	msg += fmt.Sprintf("%-16s ", net.IPv4(ip[0], ip[1], ip[2], ip[3]).String())
 	msg += fmt.Sprintf("%-12s ", strconv.FormatInt(domain.GetExpire(), 10))
-	rare:="0"
+	rare := "0"
 	if domain.GetIsRare() {
 		rare = "1"
 	}
-	msg += fmt.Sprintf("%-2s",rare)
-	open:="0"
-	if domain.GetOpenStatus(){
+	msg += fmt.Sprintf("%-2s", rare)
+	open := "0"
+	if domain.GetOpenStatus() {
 		open = "1"
 	}
-	msg += fmt.Sprintf("%-2s",open)
+	msg += fmt.Sprintf("%-2s", open)
 
 	return msg
 }
 
 func getDealString(deal *Market.Deal) string {
-	msg:=""
+	msg := ""
 
-	d:=api.GetRecord(deal.GetHash())
-	msg += fmt.Sprintf("%-20s",string(d.Name))
+	d := api.GetRecord(deal.GetHash())
+	msg += fmt.Sprintf("%-20s", string(d.Name))
 	old := deal.GetFromOwner()
 	oldlen := len(old)
 	oldOwner := old[:4] + old[oldlen-4:]
 
-	own:=deal.GetOwner()
+	own := deal.GetOwner()
 	ownlen := len(own)
 
 	owner := own[:4] + own[ownlen-4:]
 
-	msg += fmt.Sprintf("%-9s",oldOwner)
-	msg += fmt.Sprintf("%-9s",owner)
+	msg += fmt.Sprintf("%-9s", oldOwner)
+	msg += fmt.Sprintf("%-9s", owner)
 
-	msg += fmt.Sprintf("%-26s",deal.GetAGreedPrice().String())
+	msg += fmt.Sprintf("%-26s", deal.GetAGreedPrice().String())
 	//t,_:=DataSync.GetTimestamp(deal.BlockNumber)
-	msg += fmt.Sprintf("%-12s",strconv.FormatInt(utils.BlockNumnber2TimeStamp(deal.BlockNumber),10))
+	msg += fmt.Sprintf("%-12s", strconv.FormatInt(utils.BlockNumnber2TimeStamp(deal.BlockNumber), 10))
 
 	return msg
 
 }
 
-func GetDeal(domain string) string  {
+func GetDeal(domain string) string {
 	msg := ""
 
-	domainhash:=Bas_Ethereum.Hash{}
-	if domain != ""{
+	domainhash := Bas_Ethereum.Hash{}
+	if domain != "" {
 		domainhash = Bas_Ethereum.GetHash(domain)
 	}
 
-	for i:=0;i<len(Market.Sold);i++{
-		d:=&Market.Sold[i]
-		if domain == "" || (domain != "" && d.GetHash() == domainhash){
-			if msg != ""{
+	for i := 0; i < len(Market.Sold); i++ {
+		d := &Market.Sold[i]
+		if domain == "" || (domain != "" && d.GetHash() == domainhash) {
+			if msg != "" {
 				msg += "\r\n"
 			}
 			msg += getDealString(d)
@@ -168,24 +168,24 @@ func GetDeal(domain string) string  {
 	return msg
 }
 
-func GetOrder(wallet string) string  {
+func GetOrder(wallet string) string {
 
 	msg := ""
 
-	if wallet != ""{
-		addr:=common.HexToAddress(wallet)
-		if m,ok:=Market.SellOrders[addr];!ok{
+	if wallet != "" {
+		addr := common.HexToAddress(wallet)
+		if m, ok := Market.SellOrders[addr]; !ok {
 			return "Not found"
-		}else{
+		} else {
 			msg = getOrderString(m)
 		}
-	}else{
-		for k,m:=range Market.SellOrders{
-			if msg != ""{
+	} else {
+		for k, m := range Market.SellOrders {
+			if msg != "" {
 				msg += "\r\n"
 			}
 			msg += k.String() + " "
-			if msg != ""{
+			if msg != "" {
 				msg += "\r\n"
 			}
 			msg += getOrderString(m)
@@ -196,21 +196,21 @@ func GetOrder(wallet string) string  {
 }
 
 func getOrderString(m map[Bas_Ethereum.Hash]*Market.SellOrder) string {
-	msg:=""
+	msg := ""
 
-	for k,v:=range m{
-		if msg != ""{
+	for k, v := range m {
+		if msg != "" {
 			msg += "\r\n"
 		}
-		msg += k.String()+" "
-		d:=api.GetRecord(k)
-		if d == nil{
+		msg += k.String() + " "
+		d := api.GetRecord(k)
+		if d == nil {
 			continue
 		}
 
-		msg += fmt.Sprintf("%-20s",string(d.Name))
-		msg += fmt.Sprintf("%-12s",strconv.FormatInt(utils.BlockNumnber2TimeStamp(v.BlockNumber),10))
-		msg += fmt.Sprintf("%-16s",v.GetPriceStr())
+		msg += fmt.Sprintf("%-20s", string(d.Name))
+		msg += fmt.Sprintf("%-12s", strconv.FormatInt(utils.BlockNumnber2TimeStamp(v.BlockNumber), 10))
+		msg += fmt.Sprintf("%-16s", v.GetPriceStr())
 	}
 
 	return msg

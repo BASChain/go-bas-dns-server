@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"github.com/BASChain/go-bas-dns-server/config"
 	"github.com/BASChain/go-bas-dns-server/dns/mem"
-	"github.com/BASChain/go-bas/Transactions"
 	"github.com/ethereum/go-ethereum/common"
 	"io/ioutil"
 	"math/big"
 	"net/http"
 
 	"github.com/BASChain/go-bas-dns-server/dns/exlib"
-
 )
 
 type FreeBas struct {
@@ -65,7 +63,7 @@ func (fb *FreeBas) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var flag bool
 
 	var b bool
-	b, err = Transactions.CheckIfApplied(addr)
+	b, err = exlib.CheckIfApplied(addr)
 	if b {
 		resp.State = 0
 		resp.ErrMsg = "You have Applied"

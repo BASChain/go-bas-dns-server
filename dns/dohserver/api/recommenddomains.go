@@ -1,25 +1,24 @@
 package api
 
 import (
-	"net/http"
-	"fmt"
-	"io/ioutil"
+	"encoding/hex"
 	"encoding/json"
-	"strings"
+	"fmt"
+	"github.com/BASChain/go-bas/Bas_Ethereum"
 	"github.com/BASChain/go-bas/DataSync"
 	"github.com/kprc/nbsnetwork/tools"
-	"github.com/BASChain/go-bas/Bas_Ethereum"
-	"encoding/hex"
+	"io/ioutil"
+	"net/http"
+	"strings"
 )
 
 type RecommendDomains struct {
-
 }
 
 type RecommendDomainsReq struct {
-	SearchDomains string    `json:"searchdomains"`
-	PageNumber int			`json:"pagenumber"`
-	PageSize int			`json:"pagesize"`
+	SearchDomains string `json:"searchdomains"`
+	PageNumber    int    `json:"pagenumber"`
+	PageSize      int    `json:"pagesize"`
 }
 
 type DomainDetail struct {
@@ -28,17 +27,17 @@ type DomainDetail struct {
 }
 
 type RecommandDomain struct {
-	RecommendName string `json:"recommendname"`
-	RootDomain *DomainDetail	`json:"rootdomain"`
+	RecommendName string        `json:"recommendname"`
+	RootDomain    *DomainDetail `json:"rootdomain"`
 }
 
 type RecommendDomainsResp struct {
-	State int `json:"state"`
-	TotalCnt int `json:"totalcnt"`
-	PageNumber int `json:"pagenumber"`
-	PageSize int `json:"pagesize"`
-	Registered []*DomainDetail		`json:"registered"`
-	Recommend []*RecommandDomain	`json:"recommend"`
+	State      int                `json:"state"`
+	TotalCnt   int                `json:"totalcnt"`
+	PageNumber int                `json:"pagenumber"`
+	PageSize   int                `json:"pagesize"`
+	Registered []*DomainDetail    `json:"registered"`
+	Recommend  []*RecommandDomain `json:"recommend"`
 }
 
 func NewRecommendDomains() *RecommendDomains {
@@ -46,11 +45,11 @@ func NewRecommendDomains() *RecommendDomains {
 }
 
 func FindAllTopLevelDomain() []*DataSync.DomainRecord {
-	curTime := tools.GetNowMsTime()/1000
+	curTime := tools.GetNowMsTime() / 1000
 	var ds []*DataSync.DomainRecord
-	for _,r:=range DataSync.Records{
-		if r.GetIsRoot() && r.GetIsRare() && r.GetExpire() > curTime && r.GetOpenStatus(){
-			ds = append(ds,r)
+	for _, r := range DataSync.Records {
+		if r.GetIsRoot() && r.GetIsRare() && r.GetExpire() > curTime && r.GetOpenStatus() {
+			ds = append(ds, r)
 		}
 	}
 
@@ -58,9 +57,9 @@ func FindAllTopLevelDomain() []*DataSync.DomainRecord {
 }
 
 func Record2DomainDetail(d *DataSync.DomainRecord) *DomainDetail {
-	dd:=&DomainDetail{}
+	dd := &DomainDetail{}
 
-	if d == nil{
+	if d == nil {
 		return nil
 	}
 
@@ -115,41 +114,40 @@ func Record2DomainDetail(d *DataSync.DomainRecord) *DomainDetail {
 
 }
 
-func GetRootDomainRecord(domain string) *DataSync.DomainRecord  {
-	if domain == ""{
+func GetRootDomainRecord(domain string) *DataSync.DomainRecord {
+	if domain == "" {
 		return nil
 	}
 
 	dhash := Bas_Ethereum.GetHash(domain)
 
-	d,ok:=DataSync.Records[dhash]
-	if !ok{
+	d, ok := DataSync.Records[dhash]
+	if !ok {
 		return nil
 	}
 
 	return d
 }
 
-
 func GetSubDomainRecord(domain string) *DataSync.DomainRecord {
 
-	if domain == ""{
+	if domain == "" {
 		return nil
 	}
-	dsegs := strings.Split(domain,".")
-	if len(dsegs) == 1{
+	dsegs := strings.Split(domain, ".")
+	if len(dsegs) == 1 {
 		return nil
 	}
-	for _,s:=range dsegs{
-		if s == ""{
+	for _, s := range dsegs {
+		if s == "" {
 			return nil
 		}
 	}
 
 	dhash := Bas_Ethereum.GetHash(domain)
 
-	d,ok:=DataSync.Records[dhash]
-	if !ok{
+	d, ok := DataSync.Records[dhash]
+	if !ok {
 		return nil
 	}
 
@@ -157,7 +155,7 @@ func GetSubDomainRecord(domain string) *DataSync.DomainRecord {
 
 }
 
-func (rd *RecommendDomains)  ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (rd *RecommendDomains) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
@@ -188,22 +186,21 @@ func (rd *RecommendDomains)  ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	domainSegs := strings.Split(searchDomain,".")
+	domainSegs := strings.Split(searchDomain, ".")
 	if len(domainSegs) < 2 {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return
 	}
 
-	if req.PageNumber < 1{
+	if req.PageNumber < 1 {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return
 	}
 
-
-	for _,d:=range domainSegs{
-		if d == ""{
+	for _, d := range domainSegs {
+		if d == "" {
 			w.WriteHeader(500)
 			fmt.Fprintf(w, "{}")
 			return
@@ -213,84 +210,84 @@ func (rd *RecommendDomains)  ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	rootDomain := domainSegs[len(domainSegs)-1]
 
 	prefixDomain := ""
-	for i:=0;i<len(domainSegs)-1;i++{
-		if prefixDomain != ""{
-			prefixDomain += "."+domainSegs[i]
-		}else{
+	for i := 0; i < len(domainSegs)-1; i++ {
+		if prefixDomain != "" {
+			prefixDomain += "." + domainSegs[i]
+		} else {
 			prefixDomain += domainSegs[i]
 		}
 	}
 
 	cnt := 0
-	cb:=(req.PageNumber-1)*req.PageSize
-	ce:=req.PageNumber*req.PageSize
+	cb := (req.PageNumber - 1) * req.PageSize
+	ce := req.PageNumber * req.PageSize
 
 	var Registered []*DomainDetail
 	var Recommend []*RecommandDomain
 
-	d:=GetSubDomainRecord(searchDomain)
-	if d!=nil{
-		if cnt >=cb && cnt <ce{
-			dd:=Record2DomainDetail(d)
-			Registered = append(Registered,dd)
+	d := GetSubDomainRecord(searchDomain)
+	if d != nil {
+		if cnt >= cb && cnt < ce {
+			dd := Record2DomainDetail(d)
+			Registered = append(Registered, dd)
 		}
-		cnt ++
-	}else{
-		r:=GetRootDomainRecord(rootDomain)
-		if r!=nil{
-			if cnt >=cb && cnt <ce{
-				dr:=Record2DomainDetail(r)
-				rec:=&RecommandDomain{}
+		cnt++
+	} else {
+		r := GetRootDomainRecord(rootDomain)
+		if r != nil {
+			if cnt >= cb && cnt < ce {
+				dr := Record2DomainDetail(r)
+				rec := &RecommandDomain{}
 				rec.RecommendName = searchDomain
 				rec.RootDomain = dr
-				Recommend = append(Recommend,rec)
+				Recommend = append(Recommend, rec)
 			}
-			cnt ++
+			cnt++
 		}
 	}
 
-	roots:=FindAllTopLevelDomain()
-	curTime:=tools.GetNowMsTime()/1000
-	for i:=0;i<len(roots);i++{
-		r:=roots[i]
-		rname:=r.GetName()
-		if rname == rootDomain{
+	roots := FindAllTopLevelDomain()
+	curTime := tools.GetNowMsTime() / 1000
+	for i := 0; i < len(roots); i++ {
+		r := roots[i]
+		rname := r.GetName()
+		if rname == rootDomain {
 			continue
 		}
-		name:=prefixDomain+"."+rname
-		d:=GetSubDomainRecord(name)
-		if d == nil{
-			if cnt >=cb && cnt <ce{
-				dr:=Record2DomainDetail(roots[i])
-				rec:=&RecommandDomain{}
+		name := prefixDomain + "." + rname
+		d := GetSubDomainRecord(name)
+		if d == nil {
+			if cnt >= cb && cnt < ce {
+				dr := Record2DomainDetail(roots[i])
+				rec := &RecommandDomain{}
 				rec.RecommendName = name
 				rec.RootDomain = dr
-				Recommend = append(Recommend,rec)
+				Recommend = append(Recommend, rec)
 			}
-			cnt ++
-		}else{
-			if curTime > d.GetExpire(){
+			cnt++
+		} else {
+			if curTime > d.GetExpire() {
 				continue
 			}
 
-			if cnt >=cb && cnt <ce{
-				dd:=Record2DomainDetail(d)
-				Registered = append(Registered,dd)
+			if cnt >= cb && cnt < ce {
+				dd := Record2DomainDetail(d)
+				Registered = append(Registered, dd)
 			}
 
-			cnt ++
+			cnt++
 		}
 	}
 
-	resp:=&RecommendDomainsResp{}
+	resp := &RecommendDomainsResp{}
 
-	if len(Registered)==0 && len(Recommend)==0{
+	if len(Registered) == 0 && len(Recommend) == 0 {
 		resp.State = 0
-	}else{
+	} else {
 		resp.State = 1
 	}
 	resp.TotalCnt = cnt
-	resp.PageNumber =req.PageNumber
+	resp.PageNumber = req.PageNumber
 	resp.PageSize = req.PageSize
 	resp.Recommend = Recommend
 	resp.Registered = Registered
@@ -306,12 +303,4 @@ func (rd *RecommendDomains)  ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	w.Write(bresp)
 
-
 }
-
-
-
-
-
-
-

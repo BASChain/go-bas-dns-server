@@ -60,25 +60,25 @@ func GetDohDaemonServer() *DohServer {
 }
 
 const (
-	TotalPath     string = "getDomainTotal"
-	DomainList    string = "getDomainList"
-	DomainInfo    string = "domainInfo"
-	DomainSell    string = "domainSell"
-	AutoComplete  string = "autocomplete"
-	FreeEth       string = "freeEth"
-	FreeBas       string = "freeBas"
-	FreeCoinState string = "freeCoinState"
-	RegDomain     string = "registerDomain"
-	TopLevelDomain string = "tldList"
-	RecommendDomains string = "RecommendDomains"
-	LatestRegisters string = "LatestRegisters"
-	ExpensiveDomains string = "ExpensiveDomains"
-	LatestDealDomains string = "latestDealDomains"
-	BasBasicSettings string = "basBasicSettings"
-	SubDomainList string = "subDomainList"
-	SellingDomainList string = "SellingDomainList"
+	TotalPath          string = "getDomainTotal"
+	DomainList         string = "getDomainList"
+	DomainInfo         string = "domainInfo"
+	DomainSell         string = "domainSell"
+	AutoComplete       string = "autocomplete"
+	FreeEth            string = "freeEth"
+	FreeBas            string = "freeBas"
+	FreeCoinState      string = "freeCoinState"
+	RegDomain          string = "registerDomain"
+	TopLevelDomain     string = "tldList"
+	RecommendDomains   string = "RecommendDomains"
+	LatestRegisters    string = "LatestRegisters"
+	ExpensiveDomains   string = "ExpensiveDomains"
+	LatestDealDomains  string = "latestDealDomains"
+	BasBasicSettings   string = "basBasicSettings"
+	SubDomainList      string = "subDomainList"
+	SellingDomainList  string = "SellingDomainList"
 	FavoriteDomainList string = "favoriteDomainList"
-	MarketSearch  string = "marketSearch"
+	MarketSearch       string = "marketSearch"
 )
 
 func NewDohServers() *DohServer {
@@ -108,19 +108,19 @@ func NewDohServers() *DohServer {
 	mux.Handle(path.Join(cfg.ContactApi, FreeEth), api.NewFreeEth())
 	mux.Handle(path.Join(cfg.ContactApi, FreeBas), api.NewFreeBas())
 	mux.Handle(path.Join(cfg.ContactApi, FreeCoinState), api.NewFreeCoinState())
-	mux.Handle(path.Join(cfg.ContactApi, BasBasicSettings),api.NewBasSettings())
+	mux.Handle(path.Join(cfg.ContactApi, BasBasicSettings), api.NewBasSettings())
 	mux.Handle(path.Join(cfg.DnsBasApi, RegDomain), api.NewRegDomain())
 	mux.Handle(path.Join(cfg.DnsBasApi, DomainInfo), api.NewDomainInfo())
 	mux.Handle(path.Join(cfg.DnsBasApi, DomainSell), api.NewSellAutoComplete())
-	mux.Handle(path.Join(cfg.DnsBasApi, TopLevelDomain),api.NewTopLevelDomains())
-	mux.Handle(path.Join(cfg.DnsBasApi, RecommendDomains),api.NewRecommendDomains())
-	mux.Handle(path.Join(cfg.DnsBasApi, LatestRegisters),api.NewLatestRegisters())
-	mux.Handle(path.Join(cfg.DnsBasApi, ExpensiveDomains),api.NewExpensiveDomains())
-	mux.Handle(path.Join(cfg.DnsBasApi, LatestDealDomains),api.NewLatestDealDomain())
-	mux.Handle(path.Join(cfg.MyWalletApi, SubDomainList),api.NewSubDomainList())
-	mux.Handle(path.Join(cfg.MarketApi, SellingDomainList),api.NewSellingDomain())
-	mux.Handle(path.Join(cfg.MarketApi, MarketSearch),api.NewMarketSearch())
-	mux.Handle(path.Join(cfg.DnsBasApi,FavoriteDomainList),api.NewFavoriteDomain())
+	mux.Handle(path.Join(cfg.DnsBasApi, TopLevelDomain), api.NewTopLevelDomains())
+	mux.Handle(path.Join(cfg.DnsBasApi, RecommendDomains), api.NewRecommendDomains())
+	mux.Handle(path.Join(cfg.DnsBasApi, LatestRegisters), api.NewLatestRegisters())
+	mux.Handle(path.Join(cfg.DnsBasApi, ExpensiveDomains), api.NewExpensiveDomains())
+	mux.Handle(path.Join(cfg.DnsBasApi, LatestDealDomains), api.NewLatestDealDomain())
+	mux.Handle(path.Join(cfg.MyWalletApi, SubDomainList), api.NewSubDomainList())
+	mux.Handle(path.Join(cfg.MarketApi, SellingDomainList), api.NewSellingDomain())
+	mux.Handle(path.Join(cfg.MarketApi, MarketSearch), api.NewMarketSearch())
+	mux.Handle(path.Join(cfg.DnsBasApi, FavoriteDomainList), api.NewFavoriteDomain())
 
 	smux := http.NewServeMux()
 	smux.Handle(cfg.DnsPath, &DohServer{})
@@ -130,19 +130,18 @@ func NewDohServers() *DohServer {
 	smux.Handle(path.Join(cfg.ContactApi, FreeEth), api.NewFreeEth())
 	smux.Handle(path.Join(cfg.ContactApi, FreeBas), api.NewFreeBas())
 	smux.Handle(path.Join(cfg.ContactApi, FreeCoinState), api.NewFreeCoinState())
-	smux.Handle(path.Join(cfg.ContactApi, BasBasicSettings),api.NewBasSettings())
+	smux.Handle(path.Join(cfg.ContactApi, BasBasicSettings), api.NewBasSettings())
 	smux.Handle(path.Join(cfg.DnsBasApi, RegDomain), api.NewRegDomain())
 	smux.Handle(path.Join(cfg.DnsBasApi, DomainInfo), api.NewDomainInfo())
 	smux.Handle(path.Join(cfg.DnsBasApi, DomainSell), api.NewSellAutoComplete())
-	smux.Handle(path.Join(cfg.DnsBasApi, TopLevelDomain),api.NewTopLevelDomains())
-	smux.Handle(path.Join(cfg.DnsBasApi, RecommendDomains),api.NewRecommendDomains())
-	smux.Handle(path.Join(cfg.DnsBasApi, LatestRegisters),api.NewLatestRegisters())
-	smux.Handle(path.Join(cfg.DnsBasApi, ExpensiveDomains),api.NewExpensiveDomains())
-	smux.Handle(path.Join(cfg.MyWalletApi, SubDomainList),api.NewSubDomainList())
-	smux.Handle(path.Join(cfg.MarketApi, SellingDomainList),api.NewSellingDomain())
-	smux.Handle(path.Join(cfg.MarketApi, MarketSearch),api.NewMarketSearch())
-	smux.Handle(path.Join(cfg.DnsBasApi,FavoriteDomainList),api.NewFavoriteDomain())
-
+	smux.Handle(path.Join(cfg.DnsBasApi, TopLevelDomain), api.NewTopLevelDomains())
+	smux.Handle(path.Join(cfg.DnsBasApi, RecommendDomains), api.NewRecommendDomains())
+	smux.Handle(path.Join(cfg.DnsBasApi, LatestRegisters), api.NewLatestRegisters())
+	smux.Handle(path.Join(cfg.DnsBasApi, ExpensiveDomains), api.NewExpensiveDomains())
+	smux.Handle(path.Join(cfg.MyWalletApi, SubDomainList), api.NewSubDomainList())
+	smux.Handle(path.Join(cfg.MarketApi, SellingDomainList), api.NewSellingDomain())
+	smux.Handle(path.Join(cfg.MarketApi, MarketSearch), api.NewMarketSearch())
+	smux.Handle(path.Join(cfg.DnsBasApi, FavoriteDomainList), api.NewFavoriteDomain())
 
 	server.dohServer.Handler = http.Handler(mux)
 
@@ -347,7 +346,7 @@ func (doh *DohServer) doDNSQuery(ctx context.Context, req *DNSRequest) (resp *DN
 		if err != nil {
 			req.response, err = server.BCReplyTraditionTypeA(msg)
 			if req.response != nil && req.request != nil && len(req.request.Question) > 0 {
-				req.response.Answer = append(req.response.Answer, server.BuildNullAnswer(req.request.Question[0],""))
+				req.response.Answer = append(req.response.Answer, server.BuildNullAnswer(req.request.Question[0], ""))
 			}
 		}
 	case server.TypeBCAddr:
@@ -356,7 +355,7 @@ func (doh *DohServer) doDNSQuery(ctx context.Context, req *DNSRequest) (resp *DN
 	default:
 		req.response, err = server.BCReplyTraditionTypeA(msg)
 		if req.response != nil && req.request != nil && len(req.request.Question) > 0 {
-			req.response.Answer = append(req.response.Answer, server.BuildNullAnswer(req.request.Question[0],""))
+			req.response.Answer = append(req.response.Answer, server.BuildNullAnswer(req.request.Question[0], ""))
 		}
 	}
 

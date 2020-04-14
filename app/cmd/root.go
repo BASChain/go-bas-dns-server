@@ -24,10 +24,10 @@ import (
 	"github.com/BASChain/go-bas-dns-server/dns/dohserver"
 	"github.com/BASChain/go-bas-dns-server/dns/mem"
 	"github.com/BASChain/go-bas-dns-server/dns/server"
+	"github.com/BASChain/go-bas/service"
 	"github.com/Ungigdu/BAS_contract_go/BAS_Ethereum"
 	"github.com/spf13/cobra"
 	"log"
-	"github.com/BASChain/go-bas/service"
 )
 
 //var cfgFile string

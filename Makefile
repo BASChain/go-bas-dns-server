@@ -18,7 +18,7 @@ LDFLAGS=-x -ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -X=main.B
 #LDFLAGS=-race -x -ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -X=main.BuildTime=$(BUILDTIME)"
 
 # go source files, ignore vendor directory
-SRC = $(shell find . -type f -name '*.go' -not -path "./test/*")
+SRC = $(shell find . -type f -name '*.go' -not -path "./test/*" -not -path "./dns/exlib/*" -not -path "./dns/dohserver/api/freecoinstate.go")
 
 .PHONY: all build clean install uninstall fmt simplify check run Test preinst
 
@@ -47,7 +47,7 @@ staticfile2bin:
 
 #$(TARGET): staticfile2bin proto $(SRC)
 #	@go build $(LDFLAGS) -o $(TARGET)
-$(TARGET): staticfile2bin proto $(SRC)
+$(TARGET): proto $(SRC)
 	@go build $(LDFLAGS) -o $(TARGET)
 
 build: $(TARGET)

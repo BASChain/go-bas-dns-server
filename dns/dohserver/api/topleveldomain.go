@@ -1,62 +1,57 @@
 package api
 
 import (
-	"net/http"
-	"fmt"
-	"io/ioutil"
 	"encoding/json"
+	"fmt"
 	"github.com/BASChain/go-bas/DataSync"
-	"github.com/kprc/nbsnetwork/tools"
-	"strings"
 	"github.com/kprc/nbsnetwork/common/list"
+	"github.com/kprc/nbsnetwork/tools"
+	"io/ioutil"
+	"net/http"
+	"strings"
 )
 
 type TopLevelDomains struct {
-
 }
 
-
-type TopLevelDomainsReq struct{
-    Text string 		`json:"text"`
-	PageNumber int		`json:"pagenumber"`
-	PageSize int		`json:"pagesize"`
+type TopLevelDomainsReq struct {
+	Text       string `json:"text"`
+	PageNumber int    `json:"pagenumber"`
+	PageSize   int    `json:"pagesize"`
 }
-
-
 
 type TopLevelDomainsResp struct {
-	State int			`json:"state"`
-	TotalCnt int		`json:"totalcnt"`
-	PageNumber int		`json:"pagenumber"`
-	PageSize int		`json:"pagesize"`
-	Domains []string	`json:"domains"`
+	State      int      `json:"state"`
+	TotalCnt   int      `json:"totalcnt"`
+	PageNumber int      `json:"pagenumber"`
+	PageSize   int      `json:"pagesize"`
+	Domains    []string `json:"domains"`
 }
 
 func NewTopLevelDomains() *TopLevelDomains {
 	return &TopLevelDomains{}
 }
 
-func tldCmp(v1,v2 interface{}) int  {
-	d1,d2:=v1.(string),v2.(string)
+func tldCmp(v1, v2 interface{}) int {
+	d1, d2 := v1.(string), v2.(string)
 
-	if d1 == d2{
+	if d1 == d2 {
 		return 0
 	}
 
 	return 1
 }
 
-func tldSort(v1,v2 interface{}) int  {
-	d1,d2:=v1.(string),v2.(string)
-	if strings.Compare(d1,d2) >= 0{
+func tldSort(v1, v2 interface{}) int {
+	d1, d2 := v1.(string), v2.(string)
+	if strings.Compare(d1, d2) >= 0 {
 		return 1
 	}
 
 	return -1
 }
 
-
-func (tld *TopLevelDomains)ServeHTTP(w http.ResponseWriter,r *http.Request) {
+func (tld *TopLevelDomains) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
@@ -71,15 +66,15 @@ func (tld *TopLevelDomains)ServeHTTP(w http.ResponseWriter,r *http.Request) {
 		return
 	}
 
-	req:=&TopLevelDomainsReq{}
-	err = json.Unmarshal(body,req)
-	if err!=nil {
+	req := &TopLevelDomainsReq{}
+	err = json.Unmarshal(body, req)
+	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return
 	}
 
-	if req.PageNumber < 1{
+	if req.PageNumber < 1 {
 		w.WriteHeader(500)
 		fmt.Fprintf(w, "{}")
 		return
@@ -88,36 +83,35 @@ func (tld *TopLevelDomains)ServeHTTP(w http.ResponseWriter,r *http.Request) {
 	tldList := list.NewList(tldCmp)
 	tldList.SetSortFunc(tldSort)
 
+	curTime := tools.GetNowMsTime() / 1000
 
-	curTime:=tools.GetNowMsTime()/1000
+	for _, r := range DataSync.Records {
 
-	for _,r:=range DataSync.Records{
-
-		if r.GetIsRoot() && r.GetIsRare() && r.GetExpire() > curTime && r.GetOpenStatus(){
-			if req.Text == "" || (req.Text != "" && strings.Contains(r.GetName(),req.Text)){
+		if r.GetIsRoot() && r.GetIsRare() && r.GetExpire() > curTime && r.GetOpenStatus() {
+			if req.Text == "" || (req.Text != "" && strings.Contains(r.GetName(), req.Text)) {
 				tldList.AddValueOrder(r.GetName())
 			}
 		}
 	}
-	resp:=&TopLevelDomainsResp{}
+	resp := &TopLevelDomainsResp{}
 	cnt := 0
-	rb := (req.PageNumber-1) * req.PageSize
+	rb := (req.PageNumber - 1) * req.PageSize
 	re := (req.PageNumber) * req.PageSize
 
-	cursor:=tldList.ListIterator(0)
-	if cursor.Count() <= rb{
+	cursor := tldList.ListIterator(0)
+	if cursor.Count() <= rb {
 		resp.State = 0
-	}else{
+	} else {
 		resp.State = 1
-		for{
-			nxt:=cursor.Next()
-			if nxt == nil{
+		for {
+			nxt := cursor.Next()
+			if nxt == nil {
 				break
 			}
-			if cnt >=rb && cnt <re{
-				resp.Domains = append(resp.Domains,nxt.(string))
+			if cnt >= rb && cnt < re {
+				resp.Domains = append(resp.Domains, nxt.(string))
 			}
-			cnt ++
+			cnt++
 		}
 	}
 	resp.PageSize = req.PageSize
@@ -135,8 +129,4 @@ func (tld *TopLevelDomains)ServeHTTP(w http.ResponseWriter,r *http.Request) {
 	w.WriteHeader(200)
 	w.Write(bresp)
 
-
 }
-
-
-
