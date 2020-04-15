@@ -146,7 +146,10 @@ func (dl *DomainList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						dtli.RegSubDomainPrice = droot.RCustomPrice.String()
 					}
 				}
-				dtli.RegSubDomainPrice = DataSync.SUBGAS.String()
+				if dtli.RegSubDomainPrice == ""{
+					dtli.RegSubDomainPrice = DataSync.SUBGAS.String()
+				}
+
 			}
 
 			dlist.AddValueOrder(dtli)
