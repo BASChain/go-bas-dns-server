@@ -232,9 +232,6 @@ func GetBASDHomeDir() string {
 	return path.Join(curHome, BASD_HomeDir)
 }
 
-func GetKeyFile() string {
-	return path.Join(GetBASDHomeDir(), "UTC--2020-03-11T06-56-52.423772000Z--33324a5ee0b35f17536ceda27274e88e76640f24")
-}
 
 func GetBASDCFGFile() string {
 	return path.Join(GetBASDHomeDir(), BASD_CFG_FileName)

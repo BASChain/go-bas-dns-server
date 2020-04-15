@@ -127,9 +127,11 @@ func NewDohServers() *DohServer {
 	smux.Handle(path.Join(cfg.DnsBasApi, TotalPath), api.NewDomainTotal())
 	smux.Handle(path.Join(cfg.DnsBasApi, DomainList), api.NewDomainList())
 	smux.Handle(path.Join(cfg.BasApi, AutoComplete), api.NewAutoComplete())
-	smux.Handle(path.Join(cfg.ContactApi, FreeEth), api.NewFreeEth())
-	smux.Handle(path.Join(cfg.ContactApi, FreeBas), api.NewFreeBas())
-	smux.Handle(path.Join(cfg.ContactApi, FreeCoinState), api.NewFreeCoinState())
+	if config.EthNet == "test"{
+		smux.Handle(path.Join(cfg.ContactApi, FreeEth), api.NewFreeEth())
+		smux.Handle(path.Join(cfg.ContactApi, FreeBas), api.NewFreeBas())
+		smux.Handle(path.Join(cfg.ContactApi, FreeCoinState), api.NewFreeCoinState())
+	}
 	smux.Handle(path.Join(cfg.ContactApi, BasBasicSettings), api.NewBasSettings())
 	smux.Handle(path.Join(cfg.DnsBasApi, RegDomain), api.NewRegDomain())
 	smux.Handle(path.Join(cfg.DnsBasApi, DomainInfo), api.NewDomainInfo())
