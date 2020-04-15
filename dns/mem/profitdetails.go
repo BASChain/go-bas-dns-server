@@ -196,17 +196,46 @@ func GetDomainRecord(receipt Bas_Ethereum.Hash) (domain *DataSync.DomainRecord, 
 func GetOwner(blockNum uint64, txidx uint, domainName string) *common.Address {
 	dhash := Bas_Ethereum.GetHash(domainName)
 
+	DataSync.TLock()
 	trs, ok := DataSync.TransferRecords[dhash]
 	if !ok {
+		DataSync.TUnLock()
 		return nil
 	}
+	DataSync.TUnLock()
 
-	for i := 0; i < len(trs); i++ {
-		tr := &trs[i]
+	var nearest *DataSync.TransferRecord
+
+	trs.Lock()
+	defer trs.UnLock()
+
+	cursor:=trs.GetList().ListIterator(0)
+	for{
+		n:=cursor.Next()
+		if n == nil{
+			break
+		}
+		tr:=n.(*DataSync.TransferRecord)
+		if tr.BlockNumber > blockNum{
+			continue
+		}else if tr.BlockNumber == blockNum{
+			if tr.TxIndex > txidx{
+				continue
+			}
+		}
+		if nearest == nil{
+			nearest = tr
+			break
+		}
 
 	}
 
-	return nil
+	if nearest == nil{
+		return nil
+	}else{
+		return &nearest.To
+	}
+
 }
 
 func (mps *MinerProfitStore) InsertReceipt(receipt *Miner.SimplifiedReceipt) error {
