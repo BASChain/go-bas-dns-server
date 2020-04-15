@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"math/big"
 )
 
 type DomainList struct {
@@ -25,11 +26,12 @@ type DomainListReq struct {
 }
 
 type DomainListItem struct {
-	IsOrder     bool   `json:"isorder"`
-	Name        string `json:"name"`
-	Expire      int64  `json:"expire"`
-	OpenApplied bool   `json:"openApplied"`
-	Hash        string `json:"hash"`
+	IsOrder     		bool   `json:"isorder"`
+	Name        		string `json:"name"`
+	Expire      		int64  `json:"expire"`
+	OpenApplied 		bool   `json:"openApplied"`
+	Hash        		string `json:"hash"`
+	RegSubDomainPrice  	string `json:"regsubdomainprice"`
 }
 
 type DomainListResp struct {
@@ -137,6 +139,15 @@ func (dl *DomainList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			dtli.Expire = dm.GetExpire()
 			dtli.OpenApplied = dm.GetOpenStatus()
 			dtli.Hash = "0x" + hex.EncodeToString(hasharr[i][:])
+			if !dm.IsRoot{
+				roothash := dm.GetParentHash()
+				if droot,ok1:=DataSync.Records[roothash];ok1{
+					if droot.RCustomPrice.Cmp(big.NewInt(0)) != 0{
+						dtli.RegSubDomainPrice = droot.RCustomPrice.String()
+					}
+				}
+				dtli.RegSubDomainPrice = DataSync.SUBGAS.String()
+			}
 
 			dlist.AddValueOrder(dtli)
 
