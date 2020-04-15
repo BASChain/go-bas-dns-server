@@ -83,7 +83,7 @@ func GoBasKeyUtc20200311t065652423772000z33324a5ee0b35f17536ceda27274e88e76640f2
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "../go-bas/key/UTC--2020-03-11T06-56-52.423772000Z--33324a5ee0b35f17536ceda27274e88e76640f24", size: 491, mode: os.FileMode(420), modTime: time.Unix(1583928551, 0)}
+	info := bindataFileInfo{name: "../go-bas/key/UTC--2020-03-11T06-56-52.423772000Z--33324a5ee0b35f17536ceda27274e88e76640f24", size: 491, mode: os.FileMode(420), modTime: time.Unix(1586937259, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -182,7 +182,6 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
-
 var _bintree = &bintree{nil, map[string]*bintree{
 	"..": &bintree{nil, map[string]*bintree{
 		"go-bas": &bintree{nil, map[string]*bintree{
@@ -239,3 +238,4 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
+

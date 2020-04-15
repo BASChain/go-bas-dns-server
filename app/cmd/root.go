@@ -64,6 +64,8 @@ var rootCmd = &cobra.Command{
 		config.GetBasDCfg().Save()
 
 		//BAS_Ethereum.RecoverContract()
+		config.GetBasDCfg().SettingNet()
+
 		go service.StartService()
 		go mem.MemStateStart()
 		go server.DNSServerDaemon()

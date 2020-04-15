@@ -9,13 +9,14 @@ TARGET := basd
 VERSION := 1.1.1
 BUILD := `git rev-parse HEAD`
 BUILDTIME := `date "+%Y-%m-%d/%H:%M:%S/%Z"`
+BUILDNET := main
 
 #include .Makefile
 
 # Use linker flags to provide version/build settings to the target
 #LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -X=main.BuildTime=$(BUILDTIME) -linkmode=external -v"
-LDFLAGS=-x -ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -X=main.BuildTime=$(BUILDTIME) -w"
-#LDFLAGS=-race -x -ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -X=main.BuildTime=$(BUILDTIME)"
+LDFLAGS=-x -ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -X=main.BuildTime=$(BUILDTIME) -X=main.Net=$(BUILDNET) -w"
+#LDFLAGS=-race -x -ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -X=main.BuildTime=$(BUILDTIME) -X=main.Net=$(BUILDNET)"
 
 # go source files, ignore vendor directory
 SRC = $(shell find . -type f -name '*.go' -not -path "./test/*" -not -path "./dns/exlib/*" -not -path "./dns/dohserver/api/freecoinstate.go")

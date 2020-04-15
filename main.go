@@ -14,17 +14,22 @@
 
 package main
 
-import "github.com/BASChain/go-bas-dns-server/app/cmd"
+import (
+	"github.com/BASChain/go-bas-dns-server/app/cmd"
+	"github.com/BASChain/go-bas-dns-server/config"
+)
 
 var (
 	Version   string
 	Build     string
 	BuildTime string
+	Net       string
 )
 
 func main() {
 	cmd.CmdVersion = Version
 	cmd.CmdBuild = Build
 	cmd.CmdBuildTime = BuildTime
+	config.EthNet = Net
 	cmd.Execute()
 }
