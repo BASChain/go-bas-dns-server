@@ -19,7 +19,7 @@ LDFLAGS=-x -ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -X=main.B
 #LDFLAGS=-race -x -ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -X=main.BuildTime=$(BUILDTIME) -X=main.Net=$(BUILDNET)"
 
 # go source files, ignore vendor directory
-SRC = $(shell find . -type f -name '*.go' -not -path "./test/*" -not -path "./dns/exlib/*" -not -path "./dns/dohserver/api/freecoinstate.go")
+SRC = $(shell find . -type f -name '*.go' -not -path "./test/*")
 
 .PHONY: all build clean install uninstall fmt simplify check run Test preinst
 
@@ -35,7 +35,7 @@ rpcservice := app/cmdpb
 #dhtrpc := dht/pb
 #assetdir := ui/asset
 #wifiapdir := wifiap/control
-keydir := ../go-bas/key
+keydir := ./
 resdir := config
 
 proto:
@@ -43,12 +43,12 @@ proto:
 #	protoc -I=$(dhtrpc)  --go_out=plugins=grpc:${dhtrpc}   ${dhtrpc}/*.proto
 
 staticfile2bin:
-	go-bindata -o $(resdir)/keyres.go -pkg=config $(keydir)/...
+	go-bindata -o $(resdir)/keyres.go -pkg=config $(keydir)/LICENSE
 #	go-bindata -o $(wifiapdir)/res.go -pkg=control wifiap/staticfile/...
 
 #$(TARGET): staticfile2bin proto $(SRC)
 #	@go build $(LDFLAGS) -o $(TARGET)
-$(TARGET): proto $(SRC)
+$(TARGET): staticfile2bin proto $(SRC)
 	@go build $(LDFLAGS) -o $(TARGET)
 
 build: $(TARGET)
@@ -56,7 +56,7 @@ build: $(TARGET)
 
 clean:
 	@rm -f $(TARGET)
-	@rm -f $(rpcservice)/*.pb.go $(assetdir)/res.go
+	@rm -f $(rpcservice)/*.pb.go $(resdir)/keyres.go
 #install: preinst
 #	#@go install $(LDFLAGS)
 #	@mv $$(which ${BASENAME})  $(subst ${BASENAME},$(TARGET),$$(which ${BASENAME}))

@@ -17,6 +17,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/BASChain/go-bas-dns-server/config"
 )
 
 var (
@@ -34,6 +35,7 @@ var versionCmd = &cobra.Command{
 		fmt.Println("Version      :", CmdVersion)
 		fmt.Println("Build commit :", CmdBuild)
 		fmt.Println("Build Time   :", CmdBuildTime)
+		fmt.Println("Environment  :", config.EthNet)
 	},
 }
 

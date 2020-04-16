@@ -6,7 +6,7 @@ TARGET := linux-amd64-basd
 .DEFAULT_GOAL: $(TARGET)
 
 # These will be provided to the target
-VERSION := 1.1.0
+VERSION := 1.1.1
 BUILD := `git rev-parse HEAD`
 BUILDTIME := `date "+%Y-%m-%d/%H:%M:%S/%Z"`
 BUILDNET := test
@@ -56,7 +56,7 @@ build: $(TARGET)
 
 clean:
 	@rm -f $(TARGET)
-	@rm -f $(rpcservice)/*.pb.go $(assetdir)/res.go
+	@rm -f $(rpcservice)/*.pb.go $(resdir)/keyres.go
 #install: preinst
 #	#@go install $(LDFLAGS)
 #	@mv $$(which ${BASENAME})  $(subst ${BASENAME},$(TARGET),$$(which ${BASENAME}))
