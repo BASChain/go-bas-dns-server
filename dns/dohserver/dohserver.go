@@ -79,6 +79,9 @@ const (
 	SellingDomainList  string = "SellingDomainList"
 	FavoriteDomainList string = "favoriteDomainList"
 	MarketSearch       string = "marketSearch"
+	DrawSummary        string = "drawSummary"
+	DrawHistory        string = "drawHistory"
+	MiningDetails      string = "miningDetails"
 )
 
 func NewDohServers() *DohServer {
@@ -127,7 +130,7 @@ func NewDohServers() *DohServer {
 	smux.Handle(path.Join(cfg.DnsBasApi, TotalPath), api.NewDomainTotal())
 	smux.Handle(path.Join(cfg.DnsBasApi, DomainList), api.NewDomainList())
 	smux.Handle(path.Join(cfg.BasApi, AutoComplete), api.NewAutoComplete())
-	if config.EthNet == "test"{
+	if config.EthNet == "test" {
 		smux.Handle(path.Join(cfg.ContactApi, FreeEth), api.NewFreeEth())
 		smux.Handle(path.Join(cfg.ContactApi, FreeBas), api.NewFreeBas())
 		smux.Handle(path.Join(cfg.ContactApi, FreeCoinState), api.NewFreeCoinState())

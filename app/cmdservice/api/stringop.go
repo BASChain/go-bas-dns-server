@@ -121,11 +121,9 @@ func getDomain(domain *DataSync.DomainRecord) string {
 
 	price := domain.RCustomPrice.String()
 
-	if len(price) > 10{
-		msg += fmt.Sprintf("%-20s",price[0:len(price)-10])
+	if len(price) > 10 {
+		msg += fmt.Sprintf("%-20s", price[0:len(price)-10])
 	}
-
-
 
 	return msg
 }

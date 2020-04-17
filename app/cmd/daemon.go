@@ -66,6 +66,7 @@ var daemonCmd = &cobra.Command{
 		defer cntxt.Release()
 
 		config.GetBasDCfg().SettingNet()
+		mem.StartProfitService()
 
 		//BAS_Ethereum.RecoverContract()
 		go service.StartService()

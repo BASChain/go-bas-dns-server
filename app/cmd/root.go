@@ -65,6 +65,7 @@ var rootCmd = &cobra.Command{
 
 		//BAS_Ethereum.RecoverContract()
 		config.GetBasDCfg().SettingNet()
+		mem.StartProfitService()
 
 		go service.StartService()
 		go mem.MemStateStart()

@@ -16,8 +16,8 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"github.com/BASChain/go-bas-dns-server/config"
+	"github.com/spf13/cobra"
 )
 
 var (

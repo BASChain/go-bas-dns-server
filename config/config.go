@@ -2,12 +2,12 @@ package config
 
 import (
 	"encoding/json"
+	"github.com/BASChain/go-bas/service"
 	"github.com/kprc/nbsnetwork/tools"
 	"log"
 	"os"
 	"path"
 	"sync"
-	"github.com/BASChain/go-bas/service"
 )
 
 const (
@@ -18,40 +18,41 @@ const (
 var EthNet string
 
 type BasContactConfig struct {
-	TokenAddr string `json:"tokenaddr"`
-	OwnershipAddr string `json:"ownershipaddr"`
-	AssetAddr string `json:"assetaddr"`
-	DNSAddr string `json:"dnsaddr"`
-	OANNAddr string `json:"oannaddr"`
-	MinerAddr string `json:"mineraddr"`
-	MarketAddr string `json:"marketaddr"`
+	TokenAddr     string   `json:"tokenaddr"`
+	OwnershipAddr string   `json:"ownershipaddr"`
+	AssetAddr     string   `json:"assetaddr"`
+	DNSAddr       string   `json:"dnsaddr"`
+	OANNAddr      string   `json:"oannaddr"`
+	MinerAddr     string   `json:"mineraddr"`
+	MarketAddr    string   `json:"marketaddr"`
 	RemoteServers []string `json:"remoteservers"`
 }
 
 type BASDConfig struct {
-	UpdPort        int      `json:"updport"`
-	TcpPort        int      `json:"tcpport"`
-	RopstenNAP     string   `json:"ropstennap"`
-	TokenAddr      string   `json:"tokenaddr"`
-	MgrAddr        string   `json:"mgraddr"`
-	CmdListenPort  string   `json:"cmdlistenport"`
-	ResolvDns      []string `json:"resolvdns"`
-	DohServerPort  int      `json:"dohserverport"`
-	DohsServerPort int      `json:"dohsserverport"`
-	CertFile       string   `json:"certfile"`
-	KeyFile        string   `json:"keyfile"`
-	DnsPath        string   `json:"dnspath"`
-	TimeOut        int      `json:"timeout"`
-	TryTimes       int      `json:"trytimes"`
-	BasApi         string   `json:"basapi"`
-	DnsBasApi      string   `json:"dnsbasapi"`
-	ContactApi     string   `json:"contactapi"`
-	MyWalletApi    string   `json:"mywalletapi"`
-	MarketApi      string   `json:"marketapi"`
-	FreeEthAmount  string   `json:"freetokenamount"`
-	FreeBasAmount  string   `json:"freebasamount"`
-	TestContactCfg BasContactConfig   `json:"testcontactcfg"`
-	MainContactCfg BasContactConfig   `json:"maincontactcfg"`
+	UpdPort        int              `json:"updport"`
+	TcpPort        int              `json:"tcpport"`
+	RopstenNAP     string           `json:"ropstennap"`
+	TokenAddr      string           `json:"tokenaddr"`
+	MgrAddr        string           `json:"mgraddr"`
+	CmdListenPort  string           `json:"cmdlistenport"`
+	ResolvDns      []string         `json:"resolvdns"`
+	DohServerPort  int              `json:"dohserverport"`
+	DohsServerPort int              `json:"dohsserverport"`
+	CertFile       string           `json:"certfile"`
+	KeyFile        string           `json:"keyfile"`
+	DnsPath        string           `json:"dnspath"`
+	TimeOut        int              `json:"timeout"`
+	TryTimes       int              `json:"trytimes"`
+	BasApi         string           `json:"basapi"`
+	DnsBasApi      string           `json:"dnsbasapi"`
+	ContactApi     string           `json:"contactapi"`
+	MyWalletApi    string           `json:"mywalletapi"`
+	MarketApi      string           `json:"marketapi"`
+	MinerApi       string           `json:"minerapi"`
+	FreeEthAmount  string           `json:"freetokenamount"`
+	FreeBasAmount  string           `json:"freebasamount"`
+	TestContactCfg BasContactConfig `json:"testcontactcfg"`
+	MainContactCfg BasContactConfig `json:"maincontactcfg"`
 }
 
 var (
@@ -74,31 +75,32 @@ func (bc *BASDConfig) InitCfg() *BASDConfig {
 	bc.ContactApi = "/api/contact"
 	bc.MarketApi = "/api/market"
 	bc.MyWalletApi = "/api/mywallet"
+	bc.MinerApi = "/api/miner"
 	bc.FreeEthAmount = "10000000000000000"      //0.01eth
 	bc.FreeBasAmount = "4000000000000000000000" //100bas
 	bc.MainContactCfg = BasContactConfig{
-			TokenAddr:"0x105B1413461394148023FEB5bE3b4307448872d5",
-		OwnershipAddr:"0x35D5FE9dfbED34e0d404A8073D8Ee9618E8dbC16",
-		AssetAddr:"0x36631a815bbecfb8947e814196DbF1768397d75b",
-		DNSAddr:"0xEc784426d352fF80E6c4192a10B009dc45e92DBD",
-		OANNAddr:"0x6a76585B037988281Aa2c80E6E42d689bA940Cef",
-		MinerAddr:"0xb685C02bF992c61c68393aF7fcD8F46833Fb6937",
-		MarketAddr:"0xa26fDE795d1f15768B588Fb6A9342129AC38C648",
-		RemoteServers:[]string{
+		TokenAddr:     "0x105B1413461394148023FEB5bE3b4307448872d5",
+		OwnershipAddr: "0x35D5FE9dfbED34e0d404A8073D8Ee9618E8dbC16",
+		AssetAddr:     "0x36631a815bbecfb8947e814196DbF1768397d75b",
+		DNSAddr:       "0xEc784426d352fF80E6c4192a10B009dc45e92DBD",
+		OANNAddr:      "0x6a76585B037988281Aa2c80E6E42d689bA940Cef",
+		MinerAddr:     "0xb685C02bF992c61c68393aF7fcD8F46833Fb6937",
+		MarketAddr:    "0xa26fDE795d1f15768B588Fb6A9342129AC38C648",
+		RemoteServers: []string{
 			"wss://mainnet.infura.io/ws/v3/831ab04fa4964991b5fba5c52106d7b0",
 			"wss://mainnet.infura.io/ws/v3/8b8db3cca50a4fcf97173b7619b1c4c3",
 			//"ws://75.135.96.248:3334",
 		},
-		}
+	}
 	bc.TestContactCfg = BasContactConfig{
-		TokenAddr:"0x9d0314f9Bacd569DCB22276867AAEeE1C8A87614",
-		OwnershipAddr:"0x4b91b82bed39B1d946C9E3BC12ba09C2F22fd3ee",
-		AssetAddr:"0x2B1110a13183A7045C7BCE3ba0092Ff0de4FD241",
-		DNSAddr:"0x8951f6B80b880E8A47d0d18000A4c90F288F61a3",
-		OANNAddr:"0x540d08bB1B16e09E1AefD56147c9435f83BBd437",
-		MinerAddr:"0xCAB59645aE535A7b5a4f81d8D17E2fe0d2Cf4687",
-		MarketAddr:"0xA32ccce4B7aB28d3Ce40BBa03A2748bCbe4544dB",
-		RemoteServers:[]string{
+		TokenAddr:     "0x9d0314f9Bacd569DCB22276867AAEeE1C8A87614",
+		OwnershipAddr: "0x4b91b82bed39B1d946C9E3BC12ba09C2F22fd3ee",
+		AssetAddr:     "0x2B1110a13183A7045C7BCE3ba0092Ff0de4FD241",
+		DNSAddr:       "0x8951f6B80b880E8A47d0d18000A4c90F288F61a3",
+		OANNAddr:      "0x540d08bB1B16e09E1AefD56147c9435f83BBd437",
+		MinerAddr:     "0xCAB59645aE535A7b5a4f81d8D17E2fe0d2Cf4687",
+		MarketAddr:    "0xA32ccce4B7aB28d3Ce40BBa03A2748bCbe4544dB",
+		RemoteServers: []string{
 			"wss://ropsten.infura.io/ws/v3/831ab04fa4964991b5fba5c52106d7b0",
 			"wss://ropsten.infura.io/ws/v3/8b8db3cca50a4fcf97173b7619b1c4c3",
 			"ws://75.135.96.248:3334",
@@ -107,26 +109,26 @@ func (bc *BASDConfig) InitCfg() *BASDConfig {
 	return bc
 }
 
-func (bc *BASDConfig)SettingNet()  {
+func (bc *BASDConfig) SettingNet() {
 	var c *BasContactConfig
 
-	if EthNet == "main"{
-		c=&bc.MainContactCfg
+	if EthNet == "main" {
+		c = &bc.MainContactCfg
 	}
 
-	if EthNet == "test"{
-		c=&bc.TestContactCfg
+	if EthNet == "test" {
+		c = &bc.TestContactCfg
 	}
 
-	log.Println("Current Eth Net is",EthNet)
+	log.Println("Current Eth Net is", EthNet)
 
-	if c != nil{
+	if c != nil {
 
 		service.ChangeAccessPoint(c.RemoteServers)
 
-		service.ChangeContractAddresses(c.TokenAddr,c.OwnershipAddr,c.AssetAddr,c.DNSAddr,c.OANNAddr,c.MinerAddr,c.MarketAddr)
+		service.ChangeContractAddresses(c.TokenAddr, c.OwnershipAddr, c.AssetAddr, c.DNSAddr, c.OANNAddr, c.MinerAddr, c.MarketAddr)
 
-	}else{
+	} else {
 		panic("Setting eth net failed")
 	}
 }
@@ -231,7 +233,6 @@ func GetBASDHomeDir() string {
 
 	return path.Join(curHome, BASD_HomeDir)
 }
-
 
 func GetBASDCFGFile() string {
 	return path.Join(GetBASDHomeDir(), BASD_CFG_FileName)
