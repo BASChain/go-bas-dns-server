@@ -30,6 +30,10 @@ type DrawSummaryResp struct {
 	TotalReceipts       int     `json:"totalreceipts"`
 }
 
+func NewDrawSummary() *DrawSummary {
+	return &DrawSummary{}
+}
+
 func subbigint(x,y big.Int) *big.Int  {
 	z:=&big.Int{}
 
@@ -70,7 +74,6 @@ func (dl *DrawSummary) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	resp.Wallet = req.Wallet
 
 	store.Lock()
-
 
 	m:=store.GetProfitMiner(&addr)
 
