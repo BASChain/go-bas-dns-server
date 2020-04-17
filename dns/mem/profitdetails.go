@@ -19,6 +19,7 @@ type ProfitItem struct {
 	from        *common.Address
 	Amount      *big.Int
 	Allocation  *[4]big.Int
+	AllocTyp    uint8
 	BlockNumber uint64
 	TxIndex     uint
 	IsDraw      int //0 is not recongnize, 1 draw,2 wait for draw
@@ -32,17 +33,17 @@ type WithdrawDetail struct {
 }
 
 type ProfitBase struct {
-	lock              sync.Mutex
-	addr              *common.Address
-	lWithdrawDetails  list.List
-	lProfitItem       list.List
-	lProfitItem4Miner list.List
-	totalWithdraw     big.Int
-	total4Withdraw        big.Int
-	totalWithDrawTimes    int
-	totalReceipts         int
-	totalFromMiner    big.Int
-	totalFromOwner    big.Int
+	lock                   sync.Mutex
+	addr                   *common.Address
+	lWithdrawDetails       list.List
+	lProfitItem            list.List
+	lProfitItem4Miner      list.List
+	totalWithdraw          big.Int
+	total4Withdraw         big.Int
+	totalWithDrawTimes     int
+	totalReceipts          int
+	totalFromMiner         big.Int
+	totalFromOwner         big.Int
 	totalWithdrawFromMiner big.Int
 	totalWithdrawFromOwner big.Int
 }
@@ -71,6 +72,108 @@ var (
 type StoreInterface interface {
 	InsertReceipt(receipt *Miner.SimplifiedReceipt) error
 	InsertWithdraw(withdraw *Miner.SimplifiedWithdraw) error
+	Lock()
+	UnLock()
+	GetProfitMiner(addr *common.Address) *ProfitMiner
+}
+
+func (mps *MinerProfitStore)Lock()  {
+	mps.lock.Lock()
+}
+func (mps *MinerProfitStore)UnLock()  {
+	mps.lock.Unlock()
+}
+//need lock
+func (mps *MinerProfitStore)GetProfitMiner(addr *common.Address) *ProfitMiner  {
+	if m,ok:=mps.store[*addr];!ok{
+		return nil
+	}else{
+		return m
+	}
+}
+
+func (pi *ProfitItem)GetReceiptHash() *Bas_Ethereum.Hash  {
+	return pi.receiptHash
+}
+func (pi *ProfitItem)GetDomainHash() *Bas_Ethereum.Hash  {
+	return pi.domainHash
+}
+func (pi *ProfitItem)GetDomainOwner() *common.Address  {
+	return pi.domainOwner
+}
+func (pi *ProfitItem)GetFromAddress() *common.Address  {
+	return pi.from
+}
+
+func (pi *ProfitItem)GetAmount() *big.Int {
+	return pi.Amount
+}
+func (pi *ProfitItem)GetAllocation() *[4]big.Int  {
+	return pi.Allocation
+}
+func (pi *ProfitItem)GetAllocTyp() uint8 {
+	return pi.AllocTyp
+}
+func (pi *ProfitItem)GetTractId() (uint64,uint)  {
+	return pi.BlockNumber,pi.TxIndex
+}
+func (pi *ProfitItem)GetSrcTyp() string  {
+	return pi.srcType
+}
+
+func (pi *ProfitItem)GetIsDraw() int{
+	return pi.IsDraw
+}
+
+func (pb *ProfitBase)Lock()  {
+	pb.lock.Lock()
+}
+
+func (pb *ProfitBase)UnLock()  {
+	pb.lock.Unlock()
+}
+
+func (pb *ProfitBase)Address() *common.Address {
+	return pb.addr
+}
+
+func (pb *ProfitBase)GetWithDrawDetailsList() list.List  {
+	return pb.lWithdrawDetails
+}
+
+func (pb *ProfitBase)GetProfitItemList() list.List   {
+	return pb.lProfitItem
+}
+
+func (pb *ProfitBase)GetProfitItem4MinerList()  list.List {
+	return pb.lProfitItem4Miner
+}
+
+func (pb *ProfitBase)GetTotalWithdraw() big.Int  {
+	return pb.totalWithdraw
+}
+
+func (pb *ProfitBase)GetTotal4Withdraw() big.Int  {
+	return pb.total4Withdraw
+}
+
+func (pb *ProfitBase)GetTotalWithdrawTimes() int  {
+	return pb.totalWithDrawTimes
+}
+func (pb *ProfitBase)GetTotalReceipts() int  {
+	return pb.totalReceipts
+}
+func (pb *ProfitBase)GetTotalFromMiner() big.Int  {
+	return pb.totalFromMiner
+}
+func (pb *ProfitBase)GetTotalFromOwner() big.Int {
+	return pb.totalFromOwner
+}
+func (pb *ProfitBase)GetTotalWithdrawFromMiner() big.Int  {
+	return pb.totalWithdrawFromMiner
+}
+func (pb *ProfitBase)GetTotalWithdrawFromOwner() big.Int  {
+	return pb.totalWithdrawFromOwner
 }
 
 func profitItemCmp(v1, v2 interface{}) int {
@@ -150,6 +253,8 @@ func GetMinerProfitStore() StoreInterface {
 
 	return minerProfitStore
 }
+
+
 
 func StartProfitService() {
 	Miner.RegMinerReceipt(GetMinerProfitStore().InsertReceipt)
@@ -262,10 +367,33 @@ func ownerIsMiner(own *common.Address, sett *Miner.Setting) bool {
 	return false
 }
 
-func priceCalc(amount *big.Int,promo uint8)  {
-	
+func priceCalc4Owner(amount *big.Int, promo *big.Int) *big.Int {
+
+	r := *amount
+	rx := r.Mul(amount, promo)
+	rd := rx.Div(rx, big.NewInt(100))
+
+	return rd
 }
 
+func priceCalc4Miner(minerCnt int, amount *big.Int, promo *big.Int) *big.Int {
+	r := *amount
+	rx := r.Mul(amount, promo)
+	rd := rx.Div(rx, big.NewInt(int64(100*minerCnt)))
+
+	return rd
+}
+
+func getSetting(blockNum uint64, txIdx uint, typ uint8) (alc *[4]big.Int, sett Miner.Setting) {
+
+	err, sett1 := Miner.SettingRecords.GetClosest(blockNum, txIdx)
+	if err == nil {
+		sett := sett1.(Miner.Setting).Allocation[typ]
+		alc = &sett
+	}
+
+	return
+}
 
 func (mps *MinerProfitStore) InsertReceipt(receipt *Miner.SimplifiedReceipt) error {
 	if receipt == nil {
@@ -296,13 +424,7 @@ func (mps *MinerProfitStore) InsertReceipt(receipt *Miner.SimplifiedReceipt) err
 
 	mps.lock.Unlock()
 
-	var alc *[4]big.Int
-
-	err, sett := Miner.SettingRecords.GetClosest(receipt.BlockNumber, receipt.TxIndex)
-	if err == nil {
-		rcd := sett.(Miner.Setting).Allocation[receipt.Allocation]
-		alc = &rcd
-	}
+	alc, sett := getSetting(receipt.BlockNumber, receipt.TxIndex, receipt.Allocation)
 
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -320,19 +442,94 @@ func (mps *MinerProfitStore) InsertReceipt(receipt *Miner.SimplifiedReceipt) err
 		IsDraw:      0,
 		srcType:     pay.Option,
 		from:        &pay.Payer,
+		AllocTyp:    receipt.Allocation,
 	}
-	m.totalReceipts ++
+
+	if alc != nil {
+		prown := priceCalc4Owner(&receipt.Amount, &alc[Miner.ToRoot])
+		m.total4Withdraw.Add(&m.total4Withdraw, prown)
+		m.totalFromOwner.Add(&m.totalFromOwner, prown)
+	}
+
+	m.totalReceipts++
 
 	m.lProfitItem.AddValueOrder(pi)
 
 	if alc != nil {
-		s := sett.(Miner.Setting)
-		if ownerIsMiner(m.addr, &s) {
+
+		if ownerIsMiner(m.addr, &sett) {
+			prminer := priceCalc4Miner(len(sett.Miners), &receipt.Amount, &alc[Miner.ToMiner])
+			m.total4Withdraw.Add(&m.total4Withdraw, prminer)
+			m.totalFromMiner.Add(&m.totalFromMiner, prminer)
 			m.lProfitItem4Miner.AddValueOrder(pi)
 		}
 	}
 
 	return nil
+}
+
+//without lock
+func calcWD(m *ProfitMiner, blockNum uint64, txIdx uint) {
+	if m.lProfitItem4Miner.Count() > 0 {
+		zerobigint := big.NewInt(0)
+		m.totalFromMiner = *zerobigint
+		m.lProfitItem4Miner.Traverse(m, func(arg interface{}, v interface{}) (ret interface{}, err error) {
+			item := v.(*ProfitItem)
+			if blockNum < item.BlockNumber {
+				return nil, nil
+			}
+			if blockNum == item.BlockNumber && txIdx < item.TxIndex {
+				return nil, nil
+			}
+			var alc *[4]big.Int
+			var sett Miner.Setting
+			if item.Allocation == nil {
+				alc, sett = getSetting(item.BlockNumber, item.TxIndex, item.AllocTyp)
+				if alc == nil {
+					return nil, nil
+				}
+				item.Allocation = alc
+			}
+			if item.Allocation == nil{
+				return nil, nil
+			}
+			item.IsDraw = 1
+			mm := arg.(*ProfitMiner)
+			prminer := priceCalc4Miner(len(sett.Miners), item.Amount, &alc[Miner.ToMiner])
+			mm.totalWithdrawFromMiner.Add(&mm.totalWithdrawFromMiner, prminer)
+			return nil, nil
+		})
+
+	}
+
+	if m.lProfitItem.Count() > 0{
+		m.lProfitItem.Traverse(m, func(arg interface{}, v interface{}) (ret interface{}, err error) {
+			item := v.(*ProfitItem)
+			if blockNum < item.BlockNumber {
+				return nil, nil
+			}
+			if blockNum == item.BlockNumber && txIdx < item.TxIndex {
+				return nil, nil
+			}
+			var alc *[4]big.Int
+			//var sett Miner.Setting
+			if item.Allocation == nil {
+				alc, _ = getSetting(item.BlockNumber, item.TxIndex, item.AllocTyp)
+				if alc == nil {
+					return nil, nil
+				}
+				item.Allocation = alc
+			}
+			if item.Allocation == nil{
+				return nil, nil
+			}
+			item.IsDraw = 1
+			mm := arg.(*ProfitMiner)
+			prown := priceCalc4Owner(item.Amount, &alc[Miner.ToRoot])
+			mm.totalWithdrawFromOwner.Add(&mm.totalWithdrawFromOwner, prown)
+			return nil, nil
+		})
+	}
 }
 
 func (mps *MinerProfitStore) InsertWithdraw(withdraw *Miner.SimplifiedWithdraw) error {
@@ -359,8 +556,9 @@ func (mps *MinerProfitStore) InsertWithdraw(withdraw *Miner.SimplifiedWithdraw) 
 	m.lWithdrawDetails.AddValueOrder(wd)
 
 	m.totalWithdraw.Add(&m.totalWithdraw, wd.Amount)
-	m.totalWithDrawTimes ++
+	m.totalWithDrawTimes++
 
+	calcWD(m, wd.BlockNumber, wd.TxIndex)
 
 	return nil
 }
