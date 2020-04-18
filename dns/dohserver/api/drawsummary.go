@@ -85,9 +85,12 @@ func (dl *DrawSummary) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		resp.TotalReceipts = m.GetTotalReceipts()
 
 		resp.TotalWait2WDraw = subbigint(m.GetTotal4Withdraw(), m.GetTotalWithdraw()).String()
-		resp.TotalWDrawed = m.GetTotalWithdraw().String()
-		resp.TotalMinerEarned = m.GetTotalWithdrawFromMiner().String()
-		resp.TotalOwnerEarned = m.GetTotalWithdrawFromOwner().String()
+		twd:=m.GetTotalWithdraw()
+		resp.TotalWDrawed = (&twd).String()
+		tme:=m.GetTotalWithdrawFromMiner()
+		resp.TotalMinerEarned = (&tme).String()
+		twfo:=m.GetTotalWithdrawFromOwner()
+		resp.TotalOwnerEarned = (&twfo).String()
 		resp.Wait2WDrawFromMiner = subbigint(m.GetTotalFromMiner(), m.GetTotalWithdrawFromMiner()).String()
 		resp.Wait2WDrawFromOwner = subbigint(m.GetTotalFromOwner(), m.GetTotalWithdrawFromOwner()).String()
 	}

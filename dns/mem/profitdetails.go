@@ -19,6 +19,7 @@ type ProfitItem struct {
 	from        *common.Address
 	Amount      *big.Int
 	Allocation  *[4]big.Int
+	MinerCnt    int
 	AllocTyp    uint8
 	BlockNumber uint64
 	TxIndex     uint
@@ -367,7 +368,7 @@ func ownerIsMiner(own *common.Address, sett *Miner.Setting) bool {
 	return false
 }
 
-func priceCalc4Owner(amount *big.Int, promo *big.Int) *big.Int {
+func PriceCalc4Owner(amount *big.Int, promo *big.Int) *big.Int {
 
 	r := *amount
 	rx := r.Mul(amount, promo)
@@ -376,15 +377,21 @@ func priceCalc4Owner(amount *big.Int, promo *big.Int) *big.Int {
 	return rd
 }
 
-func priceCalc4Miner(minerCnt int, amount *big.Int, promo *big.Int) *big.Int {
+func PriceCalc4Miner(minerCnt int, amount *big.Int, promo *big.Int) *big.Int {
 	r := *amount
 	rx := r.Mul(amount, promo)
+
+	if minerCnt == 0{
+		bigzero:=big.NewInt(0)
+		return bigzero
+	}
+
 	rd := rx.Div(rx, big.NewInt(int64(100*minerCnt)))
 
 	return rd
 }
 
-func getSetting(blockNum uint64, txIdx uint, typ uint8) (alc *[4]big.Int, sett Miner.Setting) {
+func GetSetting(blockNum uint64, txIdx uint, typ uint8) (alc *[4]big.Int, sett Miner.Setting) {
 
 	err, sett1 := Miner.SettingRecords.GetClosest(blockNum, txIdx)
 	if err == nil {
@@ -424,7 +431,7 @@ func (mps *MinerProfitStore) InsertReceipt(receipt *Miner.SimplifiedReceipt) err
 
 	mps.lock.Unlock()
 
-	alc, sett := getSetting(receipt.BlockNumber, receipt.TxIndex, receipt.Allocation)
+	alc, sett := GetSetting(receipt.BlockNumber, receipt.TxIndex, receipt.Allocation)
 
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -446,7 +453,7 @@ func (mps *MinerProfitStore) InsertReceipt(receipt *Miner.SimplifiedReceipt) err
 	}
 
 	if alc != nil {
-		prown := priceCalc4Owner(&receipt.Amount, &alc[Miner.ToRoot])
+		prown := PriceCalc4Owner(&receipt.Amount, &alc[Miner.ToRoot])
 		m.total4Withdraw.Add(&m.total4Withdraw, prown)
 		m.totalFromOwner.Add(&m.totalFromOwner, prown)
 	}
@@ -458,9 +465,10 @@ func (mps *MinerProfitStore) InsertReceipt(receipt *Miner.SimplifiedReceipt) err
 	if alc != nil {
 
 		if ownerIsMiner(m.addr, &sett) {
-			prminer := priceCalc4Miner(len(sett.Miners), &receipt.Amount, &alc[Miner.ToMiner])
+			prminer := PriceCalc4Miner(len(sett.Miners), &receipt.Amount, &alc[Miner.ToMiner])
 			m.total4Withdraw.Add(&m.total4Withdraw, prminer)
 			m.totalFromMiner.Add(&m.totalFromMiner, prminer)
+			pi.MinerCnt = len(sett.Miners)
 			m.lProfitItem4Miner.AddValueOrder(pi)
 		}
 	}
@@ -484,7 +492,7 @@ func calcWD(m *ProfitMiner, blockNum uint64, txIdx uint) {
 			var alc *[4]big.Int
 			var sett Miner.Setting
 			if item.Allocation == nil {
-				alc, sett = getSetting(item.BlockNumber, item.TxIndex, item.AllocTyp)
+				alc, sett = GetSetting(item.BlockNumber, item.TxIndex, item.AllocTyp)
 				if alc == nil {
 					return nil, nil
 				}
@@ -494,8 +502,9 @@ func calcWD(m *ProfitMiner, blockNum uint64, txIdx uint) {
 				return nil, nil
 			}
 			item.IsDraw = 1
+			item.MinerCnt = len(sett.Miners)
 			mm := arg.(*ProfitMiner)
-			prminer := priceCalc4Miner(len(sett.Miners), item.Amount, &alc[Miner.ToMiner])
+			prminer := PriceCalc4Miner(len(sett.Miners), item.Amount, &alc[Miner.ToMiner])
 			mm.totalWithdrawFromMiner.Add(&mm.totalWithdrawFromMiner, prminer)
 			return nil, nil
 		})
@@ -514,7 +523,7 @@ func calcWD(m *ProfitMiner, blockNum uint64, txIdx uint) {
 			var alc *[4]big.Int
 			//var sett Miner.Setting
 			if item.Allocation == nil {
-				alc, _ = getSetting(item.BlockNumber, item.TxIndex, item.AllocTyp)
+				alc, _ = GetSetting(item.BlockNumber, item.TxIndex, item.AllocTyp)
 				if alc == nil {
 					return nil, nil
 				}
@@ -525,7 +534,7 @@ func calcWD(m *ProfitMiner, blockNum uint64, txIdx uint) {
 			}
 			item.IsDraw = 1
 			mm := arg.(*ProfitMiner)
-			prown := priceCalc4Owner(item.Amount, &alc[Miner.ToRoot])
+			prown := PriceCalc4Owner(item.Amount, &alc[Miner.ToRoot])
 			mm.totalWithdrawFromOwner.Add(&mm.totalWithdrawFromOwner, prown)
 			return nil, nil
 		})
