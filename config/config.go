@@ -97,7 +97,7 @@ func (bc *BASDConfig) InitCfg() *BASDConfig {
 		OwnershipAddr: "0x4b91b82bed39B1d946C9E3BC12ba09C2F22fd3ee",
 		AssetAddr:     "0x2B1110a13183A7045C7BCE3ba0092Ff0de4FD241",
 		DNSAddr:       "0x8951f6B80b880E8A47d0d18000A4c90F288F61a3",
-		OANNAddr:      "0x540d08bB1B16e09E1AefD56147c9435f83BBd437",
+		OANNAddr:      "0x5e6B639843da8A9883aF8055C71D21d7dd4c30C3",
 		MinerAddr:     "0xCAB59645aE535A7b5a4f81d8D17E2fe0d2Cf4687",
 		MarketAddr:    "0xA32ccce4B7aB28d3Ce40BBa03A2748bCbe4544dB",
 		RemoteServers: []string{

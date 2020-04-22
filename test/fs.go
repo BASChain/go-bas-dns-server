@@ -7,6 +7,7 @@ import (
 	//"github.com/BASChain/go-bas-dns-server/fastsearch2"
 	"fmt"
 	"github.com/kprc/nbsnetwork/common/list"
+	"github.com/zserge/webview"
 )
 
 func main()  {
@@ -20,10 +21,19 @@ func main()  {
 	////testfs2()
 	//testmyTimeAfter()
 	//testTimeAfter()
-	testlist()
+	//testlist()
 
 	//time.After(time.Second)
 	//time.AfterFunc()
+
+		//debug := true
+		w := webview.New(false)
+		defer w.Destroy()
+		w.SetTitle("Minimal webview example")
+		w.SetSize(1024, 768, webview.HintNone)
+		w.Navigate("https://www.baidu.com")
+		w.Run()
+
 
 }
 
