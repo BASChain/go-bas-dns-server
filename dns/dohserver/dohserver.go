@@ -4,14 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/BASChain/go-bas-dns-server/config"
-	"github.com/BASChain/go-bas-dns-server/dns/dohserver/api"
 	"github.com/BASChain/go-bas-dns-server/dns/server"
 	"github.com/BASChain/go-bas-dns-server/lib/dns"
 	"github.com/BASChain/go-bas-dns-server/lib/json-dns"
 	"log"
 	"net"
 	"net/http"
-	"path"
 	"strconv"
 	"strings"
 	"sync"
@@ -105,52 +103,52 @@ func NewDohServers() *DohServer {
 	mux := http.NewServeMux()
 	mux.Handle(cfg.DnsPath, &DohServer{})
 
-	mux.Handle(path.Join(cfg.DnsBasApi, TotalPath), api.NewDomainTotal())
-	mux.Handle(path.Join(cfg.DnsBasApi, DomainList), api.NewDomainList())
-	mux.Handle(path.Join(cfg.BasApi, AutoComplete), api.NewAutoComplete())
-	mux.Handle(path.Join(cfg.ContactApi, FreeEth), api.NewFreeEth())
-	mux.Handle(path.Join(cfg.ContactApi, FreeBas), api.NewFreeBas())
-	mux.Handle(path.Join(cfg.ContactApi, FreeCoinState), api.NewFreeCoinState())
-	mux.Handle(path.Join(cfg.ContactApi, BasBasicSettings), api.NewBasSettings())
-	mux.Handle(path.Join(cfg.DnsBasApi, RegDomain), api.NewRegDomain())
-	mux.Handle(path.Join(cfg.DnsBasApi, DomainInfo), api.NewDomainInfo())
-	mux.Handle(path.Join(cfg.DnsBasApi, DomainSell), api.NewSellAutoComplete())
-	mux.Handle(path.Join(cfg.DnsBasApi, TopLevelDomain), api.NewTopLevelDomains())
-	mux.Handle(path.Join(cfg.DnsBasApi, RecommendDomains), api.NewRecommendDomains())
-	mux.Handle(path.Join(cfg.DnsBasApi, LatestRegisters), api.NewLatestRegisters())
-	mux.Handle(path.Join(cfg.DnsBasApi, ExpensiveDomains), api.NewExpensiveDomains())
-	mux.Handle(path.Join(cfg.DnsBasApi, LatestDealDomains), api.NewLatestDealDomain())
-	mux.Handle(path.Join(cfg.MyWalletApi, SubDomainList), api.NewSubDomainList())
-	mux.Handle(path.Join(cfg.MarketApi, SellingDomainList), api.NewSellingDomain())
-	mux.Handle(path.Join(cfg.MarketApi, MarketSearch), api.NewMarketSearch())
-	mux.Handle(path.Join(cfg.DnsBasApi, FavoriteDomainList), api.NewFavoriteDomain())
-	mux.Handle(path.Join(cfg.MinerApi, DrawSummary), api.NewDrawSummary())
-	mux.Handle(path.Join(cfg.MinerApi, MiningDetails), api.NewMiningDetail())
+	//mux.Handle(path.Join(cfg.DnsBasApi, TotalPath), api.NewDomainTotal())
+	//mux.Handle(path.Join(cfg.DnsBasApi, DomainList), api.NewDomainList())
+	//mux.Handle(path.Join(cfg.BasApi, AutoComplete), api.NewAutoComplete())
+	//mux.Handle(path.Join(cfg.ContactApi, FreeEth), api.NewFreeEth())
+	//mux.Handle(path.Join(cfg.ContactApi, FreeBas), api.NewFreeBas())
+	//mux.Handle(path.Join(cfg.ContactApi, FreeCoinState), api.NewFreeCoinState())
+	//mux.Handle(path.Join(cfg.ContactApi, BasBasicSettings), api.NewBasSettings())
+	//mux.Handle(path.Join(cfg.DnsBasApi, RegDomain), api.NewRegDomain())
+	//mux.Handle(path.Join(cfg.DnsBasApi, DomainInfo), api.NewDomainInfo())
+	//mux.Handle(path.Join(cfg.DnsBasApi, DomainSell), api.NewSellAutoComplete())
+	//mux.Handle(path.Join(cfg.DnsBasApi, TopLevelDomain), api.NewTopLevelDomains())
+	//mux.Handle(path.Join(cfg.DnsBasApi, RecommendDomains), api.NewRecommendDomains())
+	//mux.Handle(path.Join(cfg.DnsBasApi, LatestRegisters), api.NewLatestRegisters())
+	//mux.Handle(path.Join(cfg.DnsBasApi, ExpensiveDomains), api.NewExpensiveDomains())
+	//mux.Handle(path.Join(cfg.DnsBasApi, LatestDealDomains), api.NewLatestDealDomain())
+	//mux.Handle(path.Join(cfg.MyWalletApi, SubDomainList), api.NewSubDomainList())
+	//mux.Handle(path.Join(cfg.MarketApi, SellingDomainList), api.NewSellingDomain())
+	//mux.Handle(path.Join(cfg.MarketApi, MarketSearch), api.NewMarketSearch())
+	//mux.Handle(path.Join(cfg.DnsBasApi, FavoriteDomainList), api.NewFavoriteDomain())
+	//mux.Handle(path.Join(cfg.MinerApi, DrawSummary), api.NewDrawSummary())
+	//mux.Handle(path.Join(cfg.MinerApi, MiningDetails), api.NewMiningDetail())
 
 	smux := http.NewServeMux()
 	smux.Handle(cfg.DnsPath, &DohServer{})
-	smux.Handle(path.Join(cfg.DnsBasApi, TotalPath), api.NewDomainTotal())
-	smux.Handle(path.Join(cfg.DnsBasApi, DomainList), api.NewDomainList())
-	smux.Handle(path.Join(cfg.BasApi, AutoComplete), api.NewAutoComplete())
-	if config.EthNet == "test" {
-		smux.Handle(path.Join(cfg.ContactApi, FreeEth), api.NewFreeEth())
-		smux.Handle(path.Join(cfg.ContactApi, FreeBas), api.NewFreeBas())
-		smux.Handle(path.Join(cfg.ContactApi, FreeCoinState), api.NewFreeCoinState())
-	}
-	smux.Handle(path.Join(cfg.ContactApi, BasBasicSettings), api.NewBasSettings())
-	smux.Handle(path.Join(cfg.DnsBasApi, RegDomain), api.NewRegDomain())
-	smux.Handle(path.Join(cfg.DnsBasApi, DomainInfo), api.NewDomainInfo())
-	smux.Handle(path.Join(cfg.DnsBasApi, DomainSell), api.NewSellAutoComplete())
-	smux.Handle(path.Join(cfg.DnsBasApi, TopLevelDomain), api.NewTopLevelDomains())
-	smux.Handle(path.Join(cfg.DnsBasApi, RecommendDomains), api.NewRecommendDomains())
-	smux.Handle(path.Join(cfg.DnsBasApi, LatestRegisters), api.NewLatestRegisters())
-	smux.Handle(path.Join(cfg.DnsBasApi, ExpensiveDomains), api.NewExpensiveDomains())
-	smux.Handle(path.Join(cfg.MyWalletApi, SubDomainList), api.NewSubDomainList())
-	smux.Handle(path.Join(cfg.MarketApi, SellingDomainList), api.NewSellingDomain())
-	smux.Handle(path.Join(cfg.MarketApi, MarketSearch), api.NewMarketSearch())
-	smux.Handle(path.Join(cfg.DnsBasApi, FavoriteDomainList), api.NewFavoriteDomain())
-	smux.Handle(path.Join(cfg.MinerApi, DrawSummary), api.NewDrawSummary())
-	smux.Handle(path.Join(cfg.MinerApi, MiningDetails), api.NewMiningDetail())
+	//smux.Handle(path.Join(cfg.DnsBasApi, TotalPath), api.NewDomainTotal())
+	//smux.Handle(path.Join(cfg.DnsBasApi, DomainList), api.NewDomainList())
+	//smux.Handle(path.Join(cfg.BasApi, AutoComplete), api.NewAutoComplete())
+	//if config.EthNet == "test" {
+	//	smux.Handle(path.Join(cfg.ContactApi, FreeEth), api.NewFreeEth())
+	//	smux.Handle(path.Join(cfg.ContactApi, FreeBas), api.NewFreeBas())
+	//	smux.Handle(path.Join(cfg.ContactApi, FreeCoinState), api.NewFreeCoinState())
+	//}
+	//smux.Handle(path.Join(cfg.ContactApi, BasBasicSettings), api.NewBasSettings())
+	//smux.Handle(path.Join(cfg.DnsBasApi, RegDomain), api.NewRegDomain())
+	//smux.Handle(path.Join(cfg.DnsBasApi, DomainInfo), api.NewDomainInfo())
+	//smux.Handle(path.Join(cfg.DnsBasApi, DomainSell), api.NewSellAutoComplete())
+	//smux.Handle(path.Join(cfg.DnsBasApi, TopLevelDomain), api.NewTopLevelDomains())
+	//smux.Handle(path.Join(cfg.DnsBasApi, RecommendDomains), api.NewRecommendDomains())
+	//smux.Handle(path.Join(cfg.DnsBasApi, LatestRegisters), api.NewLatestRegisters())
+	//smux.Handle(path.Join(cfg.DnsBasApi, ExpensiveDomains), api.NewExpensiveDomains())
+	//smux.Handle(path.Join(cfg.MyWalletApi, SubDomainList), api.NewSubDomainList())
+	//smux.Handle(path.Join(cfg.MarketApi, SellingDomainList), api.NewSellingDomain())
+	//smux.Handle(path.Join(cfg.MarketApi, MarketSearch), api.NewMarketSearch())
+	//smux.Handle(path.Join(cfg.DnsBasApi, FavoriteDomainList), api.NewFavoriteDomain())
+	//smux.Handle(path.Join(cfg.MinerApi, DrawSummary), api.NewDrawSummary())
+	//smux.Handle(path.Join(cfg.MinerApi, MiningDetails), api.NewMiningDetail())
 
 	server.dohServer.Handler = http.Handler(mux)
 

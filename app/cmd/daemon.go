@@ -25,7 +25,7 @@ import (
 	"github.com/BASChain/go-bas-dns-server/config"
 	"github.com/BASChain/go-bas-dns-server/dns/dohserver"
 	"github.com/BASChain/go-bas-dns-server/dns/mem"
-	"github.com/BASChain/go-bas/service"
+	//"github.com/BASChain/go-bas/service"
 	"path"
 )
 
@@ -66,10 +66,10 @@ var daemonCmd = &cobra.Command{
 		defer cntxt.Release()
 
 		config.GetBasDCfg().SettingNet()
-		mem.StartProfitService()
+		//mem.StartProfitService()
 
 		//BAS_Ethereum.RecoverContract()
-		go service.StartService()
+		//go service.StartService()
 		go mem.MemStateStart()
 		go server.DNSServerDaemon()
 		go dohserver.GetDohDaemonServer().StartDaemon()

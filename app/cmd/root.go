@@ -24,8 +24,8 @@ import (
 	"github.com/BASChain/go-bas-dns-server/dns/dohserver"
 	"github.com/BASChain/go-bas-dns-server/dns/mem"
 	"github.com/BASChain/go-bas-dns-server/dns/server"
-	"github.com/BASChain/go-bas/service"
-	"github.com/Ungigdu/BAS_contract_go/BAS_Ethereum"
+	//"github.com/BASChain/go-bas/service"
+	//"github.com/Ungigdu/BAS_contract_go/BAS_Ethereum"
 	"github.com/spf13/cobra"
 	"log"
 )
@@ -65,9 +65,9 @@ var rootCmd = &cobra.Command{
 
 		//BAS_Ethereum.RecoverContract()
 		config.GetBasDCfg().SettingNet()
-		mem.StartProfitService()
+		//mem.StartProfitService()
 
-		go service.StartService()
+		//go service.StartService()
 		go mem.MemStateStart()
 		go server.DNSServerDaemon()
 
@@ -104,15 +104,15 @@ func Set2SmartContract() {
 	//fmt.Println(*cfg)
 
 	if cfg.RopstenNAP != "" {
-		BAS_Ethereum.RopstenNetworkAccessPoint = cfg.RopstenNAP
+		//BAS_Ethereum.RopstenNetworkAccessPoint = cfg.RopstenNAP
 	}
 
 	if cfg.TokenAddr != "" {
-		BAS_Ethereum.BASTokenAddress = cfg.TokenAddr
+		//BAS_Ethereum.BASTokenAddress = cfg.TokenAddr
 	}
 
 	if cfg.MgrAddr != "" {
-		BAS_Ethereum.BASManagerSimpleAddress = cfg.MgrAddr
+		//BAS_Ethereum.BASManagerSimpleAddress = cfg.MgrAddr
 	}
 
 }

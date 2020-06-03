@@ -2,7 +2,7 @@ package config
 
 import (
 	"encoding/json"
-	"github.com/BASChain/go-bas/service"
+	//"github.com/BASChain/go-bas/service"
 	"github.com/kprc/nbsnetwork/tools"
 	"log"
 	"os"
@@ -63,7 +63,7 @@ var (
 func (bc *BASDConfig) InitCfg() *BASDConfig {
 	bc.UpdPort = 53
 	bc.TcpPort = 53
-	bc.CmdListenPort = "127.0.0.1:59538"
+	bc.CmdListenPort = "127.0.0.1:59537"
 	bc.ResolvDns = []string{"202.106.0.20", "8.8.8.8", "202.106.46.151", "8.8.4.4"}
 	bc.DohServerPort = 8053
 	bc.DohsServerPort = 8043
@@ -124,9 +124,9 @@ func (bc *BASDConfig) SettingNet() {
 
 	if c != nil {
 
-		service.ChangeAccessPoint(c.RemoteServers)
+		//service.ChangeAccessPoint(c.RemoteServers)
 
-		service.ChangeContractAddresses(c.TokenAddr, c.OwnershipAddr, c.AssetAddr, c.DNSAddr, c.OANNAddr, c.MinerAddr, c.MarketAddr)
+		//service.ChangeContractAddresses(c.TokenAddr, c.OwnershipAddr, c.AssetAddr, c.DNSAddr, c.OANNAddr, c.MinerAddr, c.MarketAddr)
 
 	} else {
 		panic("Setting eth net failed")

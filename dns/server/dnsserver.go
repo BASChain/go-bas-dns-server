@@ -6,7 +6,6 @@ import (
 	"github.com/BASChain/go-bas-dns-server/lib/dns"
 	"github.com/btcsuite/btcutil/base58"
 
-	"github.com/BASChain/go-bas-dns-server/dns/dohserver/api"
 	"log"
 	"net"
 	"strconv"
@@ -150,43 +149,44 @@ func BCReplayTypeA2(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 
 }
 
-func BCReplayTypeA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
-	qn := q.Name
-	if qn[len(qn)-1] == '.' {
-		qn = qn[:len(qn)-1]
-	}
-	//log.Println("query :",qn)
-
-	dr := api.QueryBasByDomainName(qn)
-	if dr == nil {
-		//log.Println("query ",qn,"failed")
-		return nil, errors.New("Not Found")
-	}
-
-	if dr.GetIPv4() == 0 {
-
-		if dr.GetAliasName() != "" {
-			m := msg.Copy()
-			//m.Question[0].Name=dr.GetAliasName()
-			m.Compress = true
-			m.Response = true
-			m.Answer = append(m.Answer, BuildCnameAnswer(dr.GetAliasName(), q))
-			m.Answer = append(m.Answer, BuildNullAnswer(q, "AliasName"))
-			//m.Answer = append(m.Answer,BuildAAnswer(dr.GetIPv4Addr(), q))
-			//log.Println("response to client, type alias",qn)
-			return m, nil
-		}
-	} else {
-		m := msg.Copy()
-		m.Compress = true
-		m.Response = true
-		m.Answer = buildAnswer(dr.GetIPv4Addr(), q)
-		//log.Println("response to client, type a",qn)
-		return m, nil
-	}
-	return nil, errors.New("No settings")
-
-}
+//
+//func BCReplayTypeA(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
+//	qn := q.Name
+//	if qn[len(qn)-1] == '.' {
+//		qn = qn[:len(qn)-1]
+//	}
+//	//log.Println("query :",qn)
+//
+//	dr := api.QueryBasByDomainName(qn)
+//	if dr == nil {
+//		//log.Println("query ",qn,"failed")
+//		return nil, errors.New("Not Found")
+//	}
+//
+//	if dr.GetIPv4() == 0 {
+//
+//		if dr.GetAliasName() != "" {
+//			m := msg.Copy()
+//			//m.Question[0].Name=dr.GetAliasName()
+//			m.Compress = true
+//			m.Response = true
+//			m.Answer = append(m.Answer, BuildCnameAnswer(dr.GetAliasName(), q))
+//			m.Answer = append(m.Answer, BuildNullAnswer(q, "AliasName"))
+//			//m.Answer = append(m.Answer,BuildAAnswer(dr.GetIPv4Addr(), q))
+//			//log.Println("response to client, type alias",qn)
+//			return m, nil
+//		}
+//	} else {
+//		m := msg.Copy()
+//		m.Compress = true
+//		m.Response = true
+//		m.Answer = buildAnswer(dr.GetIPv4Addr(), q)
+//		//log.Println("response to client, type a",qn)
+//		return m, nil
+//	}
+//	return nil, errors.New("No settings")
+//
+//}
 
 func replyTraditionTypA(w dns.ResponseWriter, msg *dns.Msg) {
 	m, _ := BCReplyTraditionTypeA(msg)
