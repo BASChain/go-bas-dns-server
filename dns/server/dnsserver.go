@@ -108,7 +108,11 @@ func replyTypA(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) error {
 	if m, err := BCReplayTypeA2(msg, q); err != nil {
 		return err
 	} else {
-		w.WriteMsg(m)
+		err := w.WriteMsg(m)
+		if err != nil {
+			log.Println("Write Msg:", q.Name, err)
+		}
+
 		return nil
 	}
 
@@ -122,16 +126,21 @@ func BCReplayTypeA2(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 	//log.Println("query :",qn)
 
 	ip, cn, err := mem.GetDomainA(qn)
+	if err != nil {
+		log.Println("query:", qn, err)
+	}
+
 	if binary.BigEndian.Uint32(ip.To4()) == 0 {
 		if cn != "" {
 			m := msg.Copy()
 			//m.Question[0].Name=dr.GetAliasName()
 			m.Compress = true
 			m.Response = true
-			m.Answer = append(m.Answer, BuildCnameAnswer(cn, q))
-			m.Answer = append(m.Answer, BuildNullAnswer(q, "AliasName"))
+			m.Answer = append(m.Answer, BuildCnameAnswer(cn+".", q))
+			m.Answer = append(m.Answer, BuildNullAnswer(q, "AliasName."))
 			//m.Answer = append(m.Answer,BuildAAnswer(dr.GetIPv4Addr(), q))
 			//log.Println("response to client, type alias",qn)
+
 			return m, nil
 		}
 	} else {
@@ -139,7 +148,7 @@ func BCReplayTypeA2(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 		m.Compress = true
 		m.Response = true
 		var ipparam [4]byte
-		copy(ipparam[:], ip)
+		copy(ipparam[:], ip.To4())
 		m.Answer = buildAnswer(ipparam, q)
 		//log.Println("response to client, type a",qn)
 		return m, nil

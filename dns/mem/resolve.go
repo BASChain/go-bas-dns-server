@@ -4,6 +4,7 @@ import (
 	"github.com/BASChain/go-bmail-resolver"
 	"github.com/kprc/nbsnetwork/tools"
 	"github.com/pkg/errors"
+	"log"
 	"net"
 	"sync"
 )
@@ -26,7 +27,7 @@ func GetDomainA(domain string) (net.IP, string, error) {
 	da, err := getDomainA(domain)
 	if err != nil {
 		reqDomainA(domain)
-		return nil, "", err
+		return net.IPv4zero, "", err
 	}
 
 	if tools.GetNowMsTime()-da.whence >= 300000 {
@@ -49,9 +50,15 @@ func GetDomainA(domain string) (net.IP, string, error) {
 
 }
 
+func init() {
+	reqMem = make(map[string]struct{})
+	daMem = make(map[string]*DomainA)
+}
+
 func getDomainA(domain string) (*DomainA, error) {
 	daMemLock.Lock()
 	defer daMemLock.Unlock()
+
 	if da, ok := daMem[domain]; !ok {
 		return nil, errors.New("not found")
 	} else {
@@ -94,7 +101,14 @@ func updateDomainA(domain string) {
 
 	ips, cns, err := nr.DomainA3(domain)
 	if err != nil {
+		log.Println("eth resolver", domain, err)
 		return
+	}
+	if len(ips) > 0 {
+		log.Println("eth resolver", domain, ips[0].String())
+	}
+	if len(cns) > 0 {
+		log.Println("eth resolver", domain, cns[0])
 	}
 
 	var (
