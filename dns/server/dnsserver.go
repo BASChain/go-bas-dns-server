@@ -11,7 +11,9 @@ import (
 	"net"
 	"strconv"
 
+	"encoding/binary"
 	"errors"
+	"github.com/BASChain/go-bas-dns-server/dns/mem"
 )
 
 const (
@@ -104,12 +106,47 @@ func BuildCnameAnswer(cname string, q dns.Question) dns.RR {
 }
 
 func replyTypA(w dns.ResponseWriter, msg *dns.Msg, q dns.Question) error {
-	if m, err := BCReplayTypeA(msg, q); err != nil {
+	if m, err := BCReplayTypeA2(msg, q); err != nil {
 		return err
 	} else {
 		w.WriteMsg(m)
 		return nil
 	}
+
+}
+
+func BCReplayTypeA2(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
+	qn := q.Name
+	if qn[len(qn)-1] == '.' {
+		qn = qn[:len(qn)-1]
+	}
+	//log.Println("query :",qn)
+
+	ip, cn, err := mem.GetDomainA(qn)
+	if binary.BigEndian.Uint32(ip.To4()) == 0 {
+		if cn != "" {
+			m := msg.Copy()
+			//m.Question[0].Name=dr.GetAliasName()
+			m.Compress = true
+			m.Response = true
+			m.Answer = append(m.Answer, BuildCnameAnswer(cn, q))
+			m.Answer = append(m.Answer, BuildNullAnswer(q, "AliasName"))
+			//m.Answer = append(m.Answer,BuildAAnswer(dr.GetIPv4Addr(), q))
+			//log.Println("response to client, type alias",qn)
+			return m, nil
+		}
+	} else {
+		m := msg.Copy()
+		m.Compress = true
+		m.Response = true
+		var ipparam [4]byte
+		copy(ipparam[:], ip)
+		m.Answer = buildAnswer(ipparam, q)
+		//log.Println("response to client, type a",qn)
+		return m, nil
+	}
+
+	return nil, errors.New("No settings")
 
 }
 

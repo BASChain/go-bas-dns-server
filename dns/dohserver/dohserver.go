@@ -124,8 +124,8 @@ func NewDohServers() *DohServer {
 	mux.Handle(path.Join(cfg.MarketApi, SellingDomainList), api.NewSellingDomain())
 	mux.Handle(path.Join(cfg.MarketApi, MarketSearch), api.NewMarketSearch())
 	mux.Handle(path.Join(cfg.DnsBasApi, FavoriteDomainList), api.NewFavoriteDomain())
-	mux.Handle(path.Join(cfg.MinerApi,DrawSummary),api.NewDrawSummary())
-	mux.Handle(path.Join(cfg.MinerApi,MiningDetails),api.NewMiningDetail())
+	mux.Handle(path.Join(cfg.MinerApi, DrawSummary), api.NewDrawSummary())
+	mux.Handle(path.Join(cfg.MinerApi, MiningDetails), api.NewMiningDetail())
 
 	smux := http.NewServeMux()
 	smux.Handle(cfg.DnsPath, &DohServer{})
@@ -149,8 +149,8 @@ func NewDohServers() *DohServer {
 	smux.Handle(path.Join(cfg.MarketApi, SellingDomainList), api.NewSellingDomain())
 	smux.Handle(path.Join(cfg.MarketApi, MarketSearch), api.NewMarketSearch())
 	smux.Handle(path.Join(cfg.DnsBasApi, FavoriteDomainList), api.NewFavoriteDomain())
-	smux.Handle(path.Join(cfg.MinerApi,DrawSummary),api.NewDrawSummary())
-	smux.Handle(path.Join(cfg.MinerApi,MiningDetails),api.NewMiningDetail())
+	smux.Handle(path.Join(cfg.MinerApi, DrawSummary), api.NewDrawSummary())
+	smux.Handle(path.Join(cfg.MinerApi, MiningDetails), api.NewMiningDetail())
 
 	server.dohServer.Handler = http.Handler(mux)
 
@@ -350,7 +350,7 @@ func (doh *DohServer) doDNSQuery(ctx context.Context, req *DNSRequest) (resp *DN
 
 	switch q.Qtype {
 	case dns.TypeA:
-		req.response, err = server.BCReplayTypeA(req.request, q)
+		req.response, err = server.BCReplayTypeA2(req.request, q)
 
 		if err != nil {
 			req.response, err = server.BCReplyTraditionTypeA(msg)

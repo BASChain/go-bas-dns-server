@@ -10,7 +10,7 @@ import (
 	"github.com/zserge/webview"
 )
 
-func main()  {
+func main() {
 
 	//testfs()
 
@@ -26,28 +26,27 @@ func main()  {
 	//time.After(time.Second)
 	//time.AfterFunc()
 
-		//debug := true
-		w := webview.New(false)
-		defer w.Destroy()
-		w.SetTitle("Minimal webview example")
-		w.SetSize(1024, 768, webview.HintNone)
-		w.Navigate("https://www.baidu.com")
-		w.Run()
-
+	//debug := true
+	w := webview.New(false)
+	defer w.Destroy()
+	w.SetTitle("Minimal webview example")
+	w.SetSize(1024, 768, webview.HintNone)
+	w.Navigate("https://www.baidu.com")
+	w.Run()
 
 }
 
 func getNextTime(d int) <-chan time.Time {
-	fmt.Println("start getNextTime",d)
+	fmt.Println("start getNextTime", d)
 	c := make(chan time.Time)
 
-	time.Sleep(time.Second*time.Duration(d))
+	time.Sleep(time.Second * time.Duration(d))
 
-	c<-time.Now()
+	c <- time.Now()
 
-	time.Sleep(time.Second*time.Duration(1))
+	time.Sleep(time.Second * time.Duration(1))
 
-	fmt.Println("end getNextTime",d)
+	fmt.Println("end getNextTime", d)
 	return c
 }
 
@@ -62,8 +61,8 @@ func getNextTime(d int) <-chan time.Time {
 //
 //}
 
-func testmyTimeAfter()  {
-	for{
+func testmyTimeAfter() {
+	for {
 		select {
 		case <-getNextTime(2):
 			fmt.Println("AAAAAA")
@@ -73,12 +72,12 @@ func testmyTimeAfter()  {
 	}
 }
 
-func testTimeAfter()  {
-	for{
+func testTimeAfter() {
+	for {
 		select {
-		case <-time.After(time.Second*2):
+		case <-time.After(time.Second * 2):
 			fmt.Println("AAAAAA")
-		case <-time.After(time.Second*2):
+		case <-time.After(time.Second * 2):
 			fmt.Println("BBBBBB")
 		}
 	}
@@ -88,21 +87,20 @@ type a struct {
 	x int
 }
 
-func testacmp(v1,v2 interface{}) int  {
-	a1,a2 := v1.(*a),v2.(*a)
+func testacmp(v1, v2 interface{}) int {
+	a1, a2 := v1.(*a), v2.(*a)
 
-
-	if a1.x == a2.x{
-		return  0
+	if a1.x == a2.x {
+		return 0
 	}
 
 	return 1
 }
 
-func testasort(v1,v2 interface{}) int {
-	a1,a2 := v1.(*a),v2.(*a)
+func testasort(v1, v2 interface{}) int {
+	a1, a2 := v1.(*a), v2.(*a)
 
-	if a1.x > a2.x{
+	if a1.x > a2.x {
 		return 1
 	}
 
@@ -110,33 +108,31 @@ func testasort(v1,v2 interface{}) int {
 
 }
 
-func testlist()  {
+func testlist() {
 	l := list.NewList(testacmp)
 	l.SetSortFunc(testasort)
 
-	a1:=&a{3}
-	a2:=&a{2}
-	a3:=&a{4}
+	a1 := &a{3}
+	a2 := &a{2}
+	a3 := &a{4}
 
 	l.AddValueOrder(a1)
 	l.AddValueOrder(a2)
 	l.AddValueOrder(a3)
 
-	cusor:=l.ListIterator(0)
+	cusor := l.ListIterator(0)
 
-	for{
-		n:=cusor.Next()
-		if n == nil{
+	for {
+		n := cusor.Next()
+		if n == nil {
 			break
 		}
 		fmt.Println(n.(*a).x)
 	}
 
-
 }
 
-
-func testfs()  {
+func testfs() {
 	//for i:=0;i<100000;i++{
 	//
 	//	bts := make([]byte,5)
@@ -169,7 +165,7 @@ func testfs()  {
 	//fmt.Println(fastsearch.Find("googl"))
 }
 
-func testfs2()  {
+func testfs2() {
 
 	//fastsearch2.Insert("abcd")
 	//fastsearch2.Insert("sina")
@@ -203,7 +199,5 @@ func testfs2()  {
 	//fmt.Println(fastsearch2.Find("google"))
 	//fmt.Println(fastsearch2.Find("aaaaaa"))
 	//fmt.Println(fastsearch2.Find("______"))
-
-
 
 }

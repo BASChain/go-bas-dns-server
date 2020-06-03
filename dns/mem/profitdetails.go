@@ -78,102 +78,103 @@ type StoreInterface interface {
 	GetProfitMiner(addr *common.Address) *ProfitMiner
 }
 
-func (mps *MinerProfitStore)Lock()  {
+func (mps *MinerProfitStore) Lock() {
 	mps.lock.Lock()
 }
-func (mps *MinerProfitStore)UnLock()  {
+func (mps *MinerProfitStore) UnLock() {
 	mps.lock.Unlock()
 }
+
 //need lock
-func (mps *MinerProfitStore)GetProfitMiner(addr *common.Address) *ProfitMiner  {
-	if m,ok:=mps.store[*addr];!ok{
+func (mps *MinerProfitStore) GetProfitMiner(addr *common.Address) *ProfitMiner {
+	if m, ok := mps.store[*addr]; !ok {
 		return nil
-	}else{
+	} else {
 		return m
 	}
 }
 
-func (pi *ProfitItem)GetReceiptHash() *Bas_Ethereum.Hash  {
+func (pi *ProfitItem) GetReceiptHash() *Bas_Ethereum.Hash {
 	return pi.receiptHash
 }
-func (pi *ProfitItem)GetDomainHash() *Bas_Ethereum.Hash  {
+func (pi *ProfitItem) GetDomainHash() *Bas_Ethereum.Hash {
 	return pi.domainHash
 }
-func (pi *ProfitItem)GetDomainOwner() *common.Address  {
+func (pi *ProfitItem) GetDomainOwner() *common.Address {
 	return pi.domainOwner
 }
-func (pi *ProfitItem)GetFromAddress() *common.Address  {
+func (pi *ProfitItem) GetFromAddress() *common.Address {
 	return pi.from
 }
 
-func (pi *ProfitItem)GetAmount() *big.Int {
+func (pi *ProfitItem) GetAmount() *big.Int {
 	return pi.Amount
 }
-func (pi *ProfitItem)GetAllocation() *[4]big.Int  {
+func (pi *ProfitItem) GetAllocation() *[4]big.Int {
 	return pi.Allocation
 }
-func (pi *ProfitItem)GetAllocTyp() uint8 {
+func (pi *ProfitItem) GetAllocTyp() uint8 {
 	return pi.AllocTyp
 }
-func (pi *ProfitItem)GetTractId() (uint64,uint)  {
-	return pi.BlockNumber,pi.TxIndex
+func (pi *ProfitItem) GetTractId() (uint64, uint) {
+	return pi.BlockNumber, pi.TxIndex
 }
-func (pi *ProfitItem)GetSrcTyp() string  {
+func (pi *ProfitItem) GetSrcTyp() string {
 	return pi.srcType
 }
 
-func (pi *ProfitItem)GetIsDraw() int{
+func (pi *ProfitItem) GetIsDraw() int {
 	return pi.IsDraw
 }
 
-func (pb *ProfitBase)Lock()  {
+func (pb *ProfitBase) Lock() {
 	pb.lock.Lock()
 }
 
-func (pb *ProfitBase)UnLock()  {
+func (pb *ProfitBase) UnLock() {
 	pb.lock.Unlock()
 }
 
-func (pb *ProfitBase)Address() *common.Address {
+func (pb *ProfitBase) Address() *common.Address {
 	return pb.addr
 }
 
-func (pb *ProfitBase)GetWithDrawDetailsList() list.List  {
+func (pb *ProfitBase) GetWithDrawDetailsList() list.List {
 	return pb.lWithdrawDetails
 }
 
-func (pb *ProfitBase)GetProfitItemList() list.List   {
+func (pb *ProfitBase) GetProfitItemList() list.List {
 	return pb.lProfitItem
 }
 
-func (pb *ProfitBase)GetProfitItem4MinerList()  list.List {
+func (pb *ProfitBase) GetProfitItem4MinerList() list.List {
 	return pb.lProfitItem4Miner
 }
 
-func (pb *ProfitBase)GetTotalWithdraw() big.Int  {
+func (pb *ProfitBase) GetTotalWithdraw() big.Int {
 	return pb.totalWithdraw
 }
 
-func (pb *ProfitBase)GetTotal4Withdraw() big.Int  {
+func (pb *ProfitBase) GetTotal4Withdraw() big.Int {
 	return pb.total4Withdraw
 }
 
-func (pb *ProfitBase)GetTotalWithdrawTimes() int  {
+func (pb *ProfitBase) GetTotalWithdrawTimes() int {
 	return pb.totalWithDrawTimes
 }
-func (pb *ProfitBase)GetTotalReceipts() int  {
+func (pb *ProfitBase) GetTotalReceipts() int {
 	return pb.totalReceipts
 }
-func (pb *ProfitBase)GetTotalFromMiner() big.Int  {
+func (pb *ProfitBase) GetTotalFromMiner() big.Int {
 	return pb.totalFromMiner
 }
-func (pb *ProfitBase)GetTotalFromOwner() big.Int {
+func (pb *ProfitBase) GetTotalFromOwner() big.Int {
 	return pb.totalFromOwner
 }
-func (pb *ProfitBase)GetTotalWithdrawFromMiner() big.Int  {
+func (pb *ProfitBase) GetTotalWithdrawFromMiner() big.Int {
 	return pb.totalWithdrawFromMiner
 }
-func (pb *ProfitBase)GetTotalWithdrawFromOwner() big.Int  {
+func (pb *ProfitBase) GetTotalWithdrawFromOwner() big.Int {
 	return pb.totalWithdrawFromOwner
 }
 
@@ -254,8 +255,6 @@ func GetMinerProfitStore() StoreInterface {
 
 	return minerProfitStore
 }
-
-
 
 func StartProfitService() {
 	Miner.RegMinerReceipt(GetMinerProfitStore().InsertReceipt)
@@ -381,8 +380,8 @@ func PriceCalc4Miner(minerCnt int, amount *big.Int, promo *big.Int) *big.Int {
 	r := *amount
 	rx := r.Mul(amount, promo)
 
-	if minerCnt == 0{
-		bigzero:=big.NewInt(0)
+	if minerCnt == 0 {
+		bigzero := big.NewInt(0)
 		return bigzero
 	}
 
@@ -498,7 +497,7 @@ func calcWD(m *ProfitMiner, blockNum uint64, txIdx uint) {
 				}
 				item.Allocation = alc
 			}
-			if item.Allocation == nil{
+			if item.Allocation == nil {
 				return nil, nil
 			}
 			item.IsDraw = 1
@@ -511,7 +510,7 @@ func calcWD(m *ProfitMiner, blockNum uint64, txIdx uint) {
 
 	}
 
-	if m.lProfitItem.Count() > 0{
+	if m.lProfitItem.Count() > 0 {
 		m.lProfitItem.Traverse(m, func(arg interface{}, v interface{}) (ret interface{}, err error) {
 			item := v.(*ProfitItem)
 			if blockNum < item.BlockNumber {
@@ -529,7 +528,7 @@ func calcWD(m *ProfitMiner, blockNum uint64, txIdx uint) {
 				}
 				item.Allocation = alc
 			}
-			if item.Allocation == nil{
+			if item.Allocation == nil {
 				return nil, nil
 			}
 			item.IsDraw = 1

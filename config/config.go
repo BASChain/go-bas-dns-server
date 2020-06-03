@@ -63,7 +63,7 @@ var (
 func (bc *BASDConfig) InitCfg() *BASDConfig {
 	bc.UpdPort = 53
 	bc.TcpPort = 53
-	bc.CmdListenPort = "127.0.0.1:59527"
+	bc.CmdListenPort = "127.0.0.1:59538"
 	bc.ResolvDns = []string{"202.106.0.20", "8.8.8.8", "202.106.46.151", "8.8.4.4"}
 	bc.DohServerPort = 8053
 	bc.DohsServerPort = 8043
