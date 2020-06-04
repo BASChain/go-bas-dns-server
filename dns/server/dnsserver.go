@@ -79,11 +79,12 @@ func BuildNullAnswer(q dns.Question, data string) dns.RR {
 	NULL.Hdr.Rrtype = dns.TypeNULL
 	NULL.Hdr.Class = dns.ClassINET
 	NULL.Hdr.Ttl = 10
-	NULL.Hdr.Rdlength = uint16(len("TraditionSystemName"))
 
 	if data == "" {
-		NULL.Data = "TraditionSystemName"
+		NULL.Hdr.Rdlength = uint16(len("TraditionSystemName."))
+		NULL.Data = "TraditionSystemName."
 	} else {
+		NULL.Hdr.Rdlength = uint16(len(data))
 		NULL.Data = data
 	}
 
