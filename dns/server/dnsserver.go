@@ -81,8 +81,8 @@ func BuildNullAnswer(q dns.Question, data string) dns.RR {
 	NULL.Hdr.Ttl = 10
 
 	if data == "" {
-		NULL.Hdr.Rdlength = uint16(len("TraditionSystemName."))
-		NULL.Data = "TraditionSystemName."
+		NULL.Hdr.Rdlength = uint16(len("TraditionSystemName"))
+		NULL.Data = "TraditionSystemName"
 	} else {
 		NULL.Hdr.Rdlength = uint16(len(data))
 		NULL.Data = data
@@ -137,8 +137,8 @@ func BCReplayTypeA2(msg *dns.Msg, q dns.Question) (resp *dns.Msg, err error) {
 			//m.Question[0].Name=dr.GetAliasName()
 			m.Compress = true
 			m.Response = true
-			m.Answer = append(m.Answer, BuildCnameAnswer(cn+".", q))
-			m.Answer = append(m.Answer, BuildNullAnswer(q, "AliasName."))
+			m.Answer = append(m.Answer, BuildCnameAnswer(cn, q))
+			m.Answer = append(m.Answer, BuildNullAnswer(q, "AliasName"))
 			//m.Answer = append(m.Answer,BuildAAnswer(dr.GetIPv4Addr(), q))
 			//log.Println("response to client, type alias",qn)
 
